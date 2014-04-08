@@ -1,4 +1,4 @@
 package org.drools.model;
 
-public interface Type {
+public interface Type<T> {
 }

@@ -1,47 +1,54 @@
 package org.drools.model.builder.impl;
 
-import org.drools.model.DataSource;
-import org.drools.model.IndexModel;
-import org.drools.model.Type;
+import org.drools.model.*;
 import org.drools.model.builder.FromBuilder;
 import org.drools.model.builder.Indexable;
+import org.drools.model.impl.*;
 
-public class FromBuilderImpl implements FromBuilder {
+import java.util.*;
 
-    private final Type type;
+public class FromBuilderImpl<T> implements FromBuilder {
 
-    private FromBuilderImpl(Type type) {
+    private final Type<T> type;
+
+    private FromBuilderImpl(Type<T> type) {
         this.type = type;
     }
 
-    public WithSource source(DataSource dataSource) {
-        return new WithSourceImpl(type, dataSource);
+    public WithSource<T> source(DataSource dataSource) {
+        return new WithSourceImpl<T>(type, dataSource);
     }
 
     //IndexBuilder<FromBuilderImpl> index();
     //FromBuilderImpl filter(Expression e);
 
-    public static FromBuilderImpl from(Type type) {
+    public static <T> FromBuilderImpl<T> from(Type<T> type) {
         return new FromBuilderImpl(type);
     }
 
-    public static class WithSourceImpl implements FromBuilder.WithSource, Indexable {
-        private final Type type;
+    public static class WithSourceImpl<T> implements FromBuilder.WithSource<T>, Indexable {
+        private final Type<T> type;
         private final DataSource dataSource;
+        private final List<IndexModel> indexes = new ArrayList<IndexModel>();
 
-        public WithSourceImpl(Type type, DataSource dataSource) {
+        public WithSourceImpl(Type<T> type, DataSource dataSource) {
             this.type = type;
             this.dataSource = dataSource;
         }
 
-        public IndexBuilder<WithSourceImpl> index() {
-            return new IndexBuilder<WithSourceImpl>(this);
+        @Override
+        public FromModel build() {
+            return new FromModelImpl(type, dataSource, indexes);
+        }
+
+        @Override
+        public IndexBuilder<T, WithSourceImpl<T>> index() {
+            return new IndexBuilder<T, WithSourceImpl<T>>(this);
         }
 
         @Override
         public void addIndex(IndexModel index) {
-            throw new UnsupportedOperationException("org.drools.model.builder.impl.FromBuilderImpl.WithSourceImpl.addIndex -> TODO");
-
+            indexes.add(index);
         }
     }
 }

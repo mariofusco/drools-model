@@ -34,10 +34,4 @@ public class FromModelImpl<T> implements FromModel<T> {
     public List<Processor> getProcessors() {
         return null;
     }
-
-    @Override
-    public T reference() {
-        // TODO ???
-        return null;
-    }
 }

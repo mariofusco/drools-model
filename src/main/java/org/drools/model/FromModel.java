@@ -9,8 +9,6 @@ public interface FromModel<T> {
 
     List<Processor> getProcessors();
 
-    T reference();
-
     //Expression getIndex();
     //Expression getExpression();
 }

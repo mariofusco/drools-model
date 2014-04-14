@@ -1,8 +1,8 @@
 package org.drools.model.builder.impl;
 
 import org.drools.model.builder.Indexable;
-import org.drools.model.expression.Expression0;
-import org.drools.model.expression.Expression1;
+import org.drools.model.functions.Expression0;
+import org.drools.model.functions.Expression1;
 import org.drools.model.index.*;
 
 public class IndexBuilder<T, I extends Indexable> {

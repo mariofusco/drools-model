@@ -1,7 +1,7 @@
 package org.drools.model.index;
 
 import org.drools.model.*;
-import org.drools.model.expression.*;
+import org.drools.model.functions.*;
 
 public class GreaterThanIndexModel0 implements IndexModel {
     private final Expression0<?> rhs;

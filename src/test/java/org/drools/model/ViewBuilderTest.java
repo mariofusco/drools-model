@@ -2,10 +2,9 @@ package org.drools.model;
 
 import org.junit.Test;
 
-import static org.drools.model.builder.impl.FromBuilderImpl.from;
+import static org.drools.model.DSL.*;
 import static org.drools.model.impl.CollectionObjectSource.sourceOf;
 import static org.drools.model.impl.DataSourceImpl.dataSource;
-import static org.drools.model.impl.JavaClassType.typeOf;
 
 public class ViewBuilderTest {
 
@@ -16,14 +15,13 @@ public class ViewBuilderTest {
                                                  new Person("Edson", 35),
                                                  new Person("Mario", 40)));
 
-        // Person(name == "Mark", age > 18) from entry-point "persons"
+        // Person(name == "Mark" or (age > 18 and age < 65)) from entry-point "persons"
 
-        FromModel<Person> from1 =
-                from(typeOf(Person.class))
-                        .source(persons)
-                        .index().equalTo(Person::getName, () -> "Mark")
-                        .index().greaterThan(Person::getAge, () -> 18)
-                        .build();
+        Pattern pattern =
+                filter(typeOf(Person.class))
+                        .with(person -> person.getName().equals("Mark"))
+                        .or(person -> person.getAge() > 18 && person.getAge() < 65)
+                        .from(persons);
     }
 
     @Test
@@ -34,18 +32,18 @@ public class ViewBuilderTest {
                                                  new Person("Mario", 40)));
 
         // $mark: Person(name == "Mark") from entry-point "persons"
-        // Person(age > $mark.age) from entry-point "persons"
+        // $older: Person(name != "Mark" && age > $mark.age) from entry-point "persons"
 
-        FromModel<Person> from1 =
-                from(typeOf(Person.class))
-                        .source(persons)
-                        .index().equalTo(Person::getName, () -> "Mark")
-                        .build();
-
-        FromModel<Person> from2 =
-                from(typeOf(Person.class))
-                        .source(persons)
-                        .index().greaterThan(Person::getAge, () -> from1.reference().getAge()) // join
-                        .build();
+        Variable<Person> mark = bind(typeOf(Person.class));
+        Variable<Person> older = bind(typeOf(Person.class));
+        Pattern pattern = patterns(
+                filter(mark)
+                        .with(person -> person.getName().equals("Mark"))
+                        .from(persons),
+                using(mark).filter(older)
+                        .with(person -> !person.getName().equals("Mark"))
+                        .and(older, mark, (p1, p2) -> p1.getAge() > p2.getAge())
+                        .from(persons)
+        );
     }
 }

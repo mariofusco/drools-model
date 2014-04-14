@@ -1,4 +1,4 @@
-package org.drools.model.expression;
+package org.drools.model.functions;
 
 import org.drools.model.Expression;
 

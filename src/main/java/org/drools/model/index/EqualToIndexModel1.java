@@ -1,8 +1,8 @@
 package org.drools.model.index;
 
 import org.drools.model.IndexModel;
-import org.drools.model.expression.Expression0;
-import org.drools.model.expression.Expression1;
+import org.drools.model.functions.Expression0;
+import org.drools.model.functions.Expression1;
 
 public class EqualToIndexModel1 implements IndexModel {
     private final Expression1<?,?> lhs;

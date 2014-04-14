@@ -1,8 +1,7 @@
 package org.drools.model.builder.impl;
 
 import org.drools.model.*;
-import org.drools.model.builder.FromBuilder;
-import org.drools.model.builder.Indexable;
+import org.drools.model.builder.*;
 import org.drools.model.impl.*;
 
 import java.util.*;
@@ -26,9 +25,10 @@ public class FromBuilderImpl<T> implements FromBuilder {
         return new FromBuilderImpl(type);
     }
 
-    public static class WithSourceImpl<T> implements FromBuilder.WithSource<T>, Indexable {
+    public static class WithSourceImpl<T> implements FromBuilder.WithSource<T>, Indexable, Filterable {
         private final Type<T> type;
         private final DataSource dataSource;
+        private final List<Expression> filters = new ArrayList<Expression>();
         private final List<IndexModel> indexes = new ArrayList<IndexModel>();
 
         public WithSourceImpl(Type<T> type, DataSource dataSource) {
@@ -47,8 +47,18 @@ public class FromBuilderImpl<T> implements FromBuilder {
         }
 
         @Override
+        public FilterBuilder<T, WithSourceImpl<T>> filter() {
+            return new FilterBuilder<T, WithSourceImpl<T>>(this);
+        }
+
+        @Override
         public void addIndex(IndexModel index) {
             indexes.add(index);
+        }
+
+        @Override
+        public void addFilter(Expression expression) {
+            filters.add(expression);
         }
     }
 }

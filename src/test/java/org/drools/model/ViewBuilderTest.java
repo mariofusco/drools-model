@@ -3,6 +3,7 @@ package org.drools.model;
 import org.junit.Test;
 
 import static org.drools.model.DSL.*;
+import static org.drools.model.DSL.lhs;
 import static org.drools.model.impl.CollectionObjectSource.sourceOf;
 import static org.drools.model.impl.DataSourceImpl.dataSource;
 
@@ -22,6 +23,8 @@ public class ViewBuilderTest {
                         .with(person -> person.getName().equals("Mark"))
                         .or(person -> person.getAge() > 18 && person.getAge() < 65)
                         .from(persons);
+
+        System.out.println(pattern);
     }
 
     @Test
@@ -36,7 +39,7 @@ public class ViewBuilderTest {
 
         Variable<Person> mark = bind(typeOf(Person.class));
         Variable<Person> older = bind(typeOf(Person.class));
-        Pattern pattern = patterns(
+        LHS patterns = lhs(
                 filter(mark)
                         .with(person -> person.getName().equals("Mark"))
                         .from(persons),
@@ -44,6 +47,8 @@ public class ViewBuilderTest {
                         .with(person -> !person.getName().equals("Mark"))
                         .and(older, mark, (p1, p2) -> p1.getAge() > p2.getAge())
                         .from(persons)
-        );
+                          );
+
+        System.out.println(patterns);
     }
 }

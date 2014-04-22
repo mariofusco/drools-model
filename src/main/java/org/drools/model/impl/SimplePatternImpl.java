@@ -1,13 +1,13 @@
 package org.drools.model.impl;
 
-import org.drools.model.SimplePattern;
+import org.drools.model.Constraint;
 import org.drools.model.DataSource;
 import org.drools.model.Variable;
-import org.drools.model.constraints.Constraint;
+import org.drools.model.constraints.AbstractConstraint;
 import org.drools.model.constraints.SingleConstraint1;
 import org.drools.model.functions.Predicate1;
 
-public class SimplePatternImpl<T> implements SimplePattern<T> {
+public class SimplePatternImpl<T> implements SimplePatternBuilder<T> {
     private final Variable<T> variable;
     private DataSource dataSource;
 
@@ -15,51 +15,99 @@ public class SimplePatternImpl<T> implements SimplePattern<T> {
         this.variable = variable;
     }
 
+    @Override
     public SimplePatternImpl<T> from(DataSource dataSource) {
         this.dataSource = dataSource;
         return this;
     }
 
-    public SimplePattern.Constrained<T> with(Predicate1<T> predicate) {
+    @Override
+    public SimplePatternBuilder.Constrained<T> with(Predicate1<T> predicate) {
         return with(new SingleConstraint1<T>(variable, predicate));
     }
 
-    public SimplePattern.Constrained<T> with(Constraint constraint) {
+    @Override
+    public SimplePatternBuilder.Constrained<T> with(AbstractConstraint constraint) {
         return new ConstrainedImpl(variable, constraint);
     }
 
-    public class ConstrainedImpl<T> implements SimplePattern.Constrained<T> {
+    @Override
+    public DataSource getDataSource() {
+        return dataSource;
+    }
+
+    @Override
+    public Variable getVariable() {
+        return variable;
+    }
+
+    @Override
+    public Constraint getConstraint() {
+        return null;
+    }
+
+    @Override
+    public Type getType() {
+        return Type.SIMPLE;
+    }
+
+    public static class ConstrainedImpl<T> implements SimplePatternBuilder.Constrained<T> {
 
         private final Variable<T> variable;
-        private Constraint constraint;
+        private AbstractConstraint constraint;
         private DataSource dataSource;
 
-        public ConstrainedImpl(Variable<T> variable, Constraint constraint) {
+        public ConstrainedImpl(Variable<T> variable, AbstractConstraint constraint) {
             this.variable = variable;
             this.constraint = constraint;
         }
 
+        @Override
         public ConstrainedImpl<T> from(DataSource dataSource) {
             this.dataSource = dataSource;
             return this;
         }
 
+        @Override
         public ConstrainedImpl<T> and(Predicate1<T> predicate) {
             return and(new SingleConstraint1<T>(variable, predicate));
         }
 
-        public ConstrainedImpl<T> and(Constraint constraint) {
-            constraint = constraint.and(constraint);
+        @Override
+        public ConstrainedImpl<T> and(AbstractConstraint constraint) {
+            this.constraint = this.constraint.and(constraint);
             return this;
         }
 
+        @Override
         public ConstrainedImpl<T> or(Predicate1<T> predicate) {
             return or(new SingleConstraint1<T>(variable, predicate));
         }
 
-        public ConstrainedImpl<T> or(Constraint constraint) {
-            constraint = constraint.or(constraint);
+        @Override
+        public ConstrainedImpl<T> or(AbstractConstraint constraint) {
+            this.constraint = this.constraint.or(constraint);
             return this;
+        }
+
+        @Override
+        public DataSource getDataSource() {
+            return dataSource;
+        }
+
+        @Override
+        public Variable getVariable() {
+            return variable;
+        }
+
+        @Override
+        public Constraint getConstraint() {
+            return constraint;
+        }
+
+        @Override
+        public Type getType() {
+            return Type.SIMPLE;
         }
     }
 }

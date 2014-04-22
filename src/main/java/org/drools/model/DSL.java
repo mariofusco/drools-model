@@ -1,11 +1,12 @@
 package org.drools.model;
 
-import org.drools.model.constraints.Constraint;
+import org.drools.model.constraints.AbstractConstraint;
 import org.drools.model.constraints.SingleConstraint1;
 import org.drools.model.functions.Predicate1;
 import org.drools.model.impl.JavaClassType;
 import org.drools.model.impl.JoinFactory;
 import org.drools.model.impl.PatternArray;
+import org.drools.model.impl.SimplePatternBuilder;
 import org.drools.model.impl.SimplePatternImpl;
 import org.drools.model.impl.VariableImpl;
 
@@ -19,11 +20,11 @@ public class DSL {
         return new JavaClassType<T>(type);
     }
 
-    public static <T> SimplePattern<T> filter(Variable<T> var) {
+    public static <T> SimplePatternBuilder<T> filter(Variable<T> var) {
         return new SimplePatternImpl<T>(var);
     }
 
-    public static <T> SimplePattern<T> filter(Type<T> type) {
+    public static <T> SimplePatternBuilder<T> filter(Type<T> type) {
         return filter(bind(type));
     }
 
@@ -31,19 +32,19 @@ public class DSL {
         return new JoinFactory(vars);
     }
 
-    public static <A> Constraint constraint(Variable<A> variable, Predicate1<A> predicate) {
+    public static <A> AbstractConstraint constraint(Variable<A> variable, Predicate1<A> predicate) {
         return new SingleConstraint1<A>(variable, predicate);
     }
 
-    public static Constraint and(Constraint... constraints) {
-        return Constraint.and(constraints);
+    public static AbstractConstraint and(AbstractConstraint... constraints) {
+        return AbstractConstraint.and(constraints);
     }
 
-    public static Constraint or(Constraint... constraints) {
-        return Constraint.or(constraints);
+    public static AbstractConstraint or(AbstractConstraint... constraints) {
+        return AbstractConstraint.or(constraints);
     }
 
-    public static Pattern patterns(Pattern... patterns) {
+    public static LHS lhs(Pattern... patterns) {
         return new PatternArray(patterns);
     }
 }

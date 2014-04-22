@@ -14,4 +14,8 @@ public class CollectionObjectSource implements ObjectSource {
     public static ObjectSource sourceOf(Object... items) {
         return new CollectionObjectSource(Arrays.asList(items));
     }
+
+    public Collection getObjects() {
+        return source;
+    }
 }

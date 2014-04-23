@@ -5,7 +5,7 @@ import org.drools.model.*;
 import java.util.*;
 
 public class CollectionObjectSource implements ObjectSource {
-    private final Collection source;
+    private final Collection<? extends Object> source;
 
     public CollectionObjectSource(Collection source) {
         this.source = source;
@@ -15,7 +15,7 @@ public class CollectionObjectSource implements ObjectSource {
         return new CollectionObjectSource(Arrays.asList(items));
     }
 
-    public Collection getObjects() {
+    public Collection<? extends Object> getObjects() {
         return source;
     }
 }

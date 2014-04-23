@@ -1,6 +1,5 @@
 package org.drools.model.constraints;
 
-import org.drools.model.Constraint;
 import org.drools.model.Variable;
 import org.drools.model.functions.Predicate1;
 
@@ -15,13 +14,8 @@ public class SingleConstraint1<A> extends AbstractSingleConstraint {
     }
 
     @Override
-    public Iterable<? extends Constraint> getChildren() {
-        return null;
-    }
-
-    @Override
     public Type getType() {
-        return Type.SIMPLE;
+        return Type.SINGLE;
     }
 
     @Override

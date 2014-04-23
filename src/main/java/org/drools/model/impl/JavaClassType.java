@@ -9,4 +9,8 @@ public class JavaClassType<T> implements Type<T> {
     public JavaClassType(Class<T> type) {
         this.type = type;
     }
+
+    public boolean isInstance(Object obj) {
+        return type.isInstance(obj);
+    }
 }

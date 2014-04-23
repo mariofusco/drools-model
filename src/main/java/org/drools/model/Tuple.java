@@ -1,8 +1,9 @@
 package org.drools.model;
 
 public interface Tuple {
+
     Tuple getParent();
-    Object get(int index);
+    <T> T get(Variable<T> variable);
     int size();
 
 }

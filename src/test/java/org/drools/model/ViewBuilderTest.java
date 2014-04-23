@@ -1,11 +1,18 @@
 package org.drools.model;
 
+import org.drools.model.engine.BruteForceEngine;
 import org.junit.Test;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static org.drools.model.DSL.*;
 import static org.drools.model.DSL.lhs;
 import static org.drools.model.impl.CollectionObjectSource.sourceOf;
 import static org.drools.model.impl.DataSourceImpl.dataSource;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ViewBuilderTest {
 
@@ -14,7 +21,8 @@ public class ViewBuilderTest {
 
         DataSource persons = dataSource(sourceOf(new Person("Mark", 37),
                                                  new Person("Edson", 35),
-                                                 new Person("Mario", 40)));
+                                                 new Person("Mario", 40),
+                                                 new Person("Sofia", 3)));
 
         // Person(name == "Mark" or (age > 18 and age < 65)) from entry-point "persons"
 
@@ -24,7 +32,13 @@ public class ViewBuilderTest {
                         .or(person -> person.getAge() > 18 && person.getAge() < 65)
                         .from(persons);
 
-        System.out.println(pattern);
+        List<TupleHandle> result = BruteForceEngine.get().evaluate(pattern);
+        assertEquals(3, result.size());
+        List<String> names = result.stream()
+                                .map(TupleHandle::getObject)
+                                .map(o -> ((Person) o).getName())
+                                .collect(toList());
+        assertTrue(names.containsAll(asList("Mark", "Edson", "Mario")));
     }
 
     @Test

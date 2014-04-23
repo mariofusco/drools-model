@@ -1,9 +1,11 @@
 package org.drools.model;
 
-public interface Constraint {
-    enum Type { SIMPLE, OR, AND }
+import java.util.Collection;
 
-    Iterable<? extends Constraint> getChildren();
+public interface Constraint {
+    enum Type { SINGLE, OR, AND }
+
+    Collection<? extends Constraint> getChildren();
 
     Type getType();
 }

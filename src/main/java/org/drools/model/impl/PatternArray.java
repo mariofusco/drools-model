@@ -4,7 +4,6 @@ import org.drools.model.LHS;
 import org.drools.model.Pattern;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 public class PatternArray implements LHS {
@@ -14,8 +13,7 @@ public class PatternArray implements LHS {
         this.patterns = Arrays.asList(patterns);
     }
 
-    @Override
-    public Iterator<Pattern> iterator() {
-        return patterns.iterator();
+    public List<Pattern> getPatterns() {
+        return patterns;
     }
 }

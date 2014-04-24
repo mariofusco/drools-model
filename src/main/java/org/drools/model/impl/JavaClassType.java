@@ -13,4 +13,9 @@ public class JavaClassType<T> implements Type<T> {
     public boolean isInstance(Object obj) {
         return type.isInstance(obj);
     }
+
+    @Override
+    public String toString() {
+        return type.getSimpleName();
+    }
 }

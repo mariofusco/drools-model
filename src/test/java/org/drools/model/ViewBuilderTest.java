@@ -33,6 +33,7 @@ public class ViewBuilderTest {
                         .from(persons);
 
         List<TupleHandle> result = BruteForceEngine.get().evaluate(pattern);
+
         assertEquals(3, result.size());
         List<String> names = result.stream()
                                 .map(TupleHandle::getObject)
@@ -53,7 +54,7 @@ public class ViewBuilderTest {
 
         Variable<Person> mark = bind(typeOf(Person.class));
         Variable<Person> older = bind(typeOf(Person.class));
-        LHS patterns = lhs(
+        LHS lhs = lhs(
                 filter(mark)
                         .with(person -> person.getName().equals("Mark"))
                         .from(persons),
@@ -61,8 +62,12 @@ public class ViewBuilderTest {
                         .with(person -> !person.getName().equals("Mark"))
                         .and(older, mark, (p1, p2) -> p1.getAge() > p2.getAge())
                         .from(persons)
-                          );
+        );
 
-        System.out.println(patterns);
+        List<TupleHandle> result = BruteForceEngine.get().evaluate(lhs);
+        assertEquals(1, result.size());
+        TupleHandle tuple = result.get(0);
+        assertEquals("Mark", tuple.get(mark).getName());
+        assertEquals("Mario", tuple.get(older).getName());
     }
 }

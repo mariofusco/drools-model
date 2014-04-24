@@ -14,4 +14,9 @@ public class VariableImpl<T> implements Variable<T> {
     public Type<T> getType() {
         return type;
     }
+
+    @Override
+    public String toString() {
+        return "Variable of type " + type;
+    }
 }

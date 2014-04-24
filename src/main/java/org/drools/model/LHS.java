@@ -1,4 +1,7 @@
 package org.drools.model;
 
-public interface LHS extends Iterable<Pattern> {
+import java.util.List;
+
+public interface LHS {
+    List<Pattern> getPatterns();
 }

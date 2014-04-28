@@ -8,22 +8,22 @@ import java.util.List;
 
 public class AndConstraints extends AbstractConstraint {
 
-    private final List<AbstractConstraint> constraints = new ArrayList<AbstractConstraint>();
+    private final List<Constraint> constraints = new ArrayList<Constraint>();
 
-    AndConstraints(AbstractConstraint... constraints) {
-        for (AbstractConstraint constraint : constraints) {
+    AndConstraints(Constraint... constraints) {
+        for (Constraint constraint : constraints) {
             and(constraint);
         }
     }
 
     @Override
-    public AndConstraints and(AbstractConstraint constraint) {
+    public AndConstraints and(Constraint constraint) {
         constraints.add(constraint);
         return this;
     }
 
     @Override
-    public Collection<? extends Constraint> getChildren() {
+    public Collection<Constraint> getChildren() {
         return constraints;
     }
 

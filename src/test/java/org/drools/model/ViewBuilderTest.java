@@ -8,7 +8,7 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.drools.model.DSL.*;
-import static org.drools.model.DSL.lhs;
+import static org.drools.model.DSL.filter;
 import static org.drools.model.impl.CollectionObjectSource.sourceOf;
 import static org.drools.model.impl.DataSourceImpl.dataSource;
 import static org.junit.Assert.assertEquals;
@@ -54,7 +54,7 @@ public class ViewBuilderTest {
 
         Variable<Person> mark = bind(typeOf(Person.class));
         Variable<Person> older = bind(typeOf(Person.class));
-        LHS lhs = lhs(
+        View view = view(
                 filter(mark)
                         .with(person -> person.getName().equals("Mark"))
                         .from(persons),
@@ -64,10 +64,58 @@ public class ViewBuilderTest {
                         .from(persons)
         );
 
-        List<TupleHandle> result = BruteForceEngine.get().evaluate(lhs);
+        List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
         assertEquals(1, result.size());
         TupleHandle tuple = result.get(0);
         assertEquals("Mark", tuple.get(mark).getName());
         assertEquals("Mario", tuple.get(older).getName());
+    }
+
+    @Test
+    public void testNot() {
+        DataSource persons = dataSource(sourceOf(new Person("Mark", 37),
+                                                 new Person("Edson", 35),
+                                                 new Person("Mario", 40)));
+
+        // $oldest: Person()
+        // not( Person(age > $oldest.age) )
+
+        Variable<Person> oldest = bind(typeOf(Person.class));
+
+        View view = view(
+                filter(oldest).from(persons),
+                not( using(oldest).filter(typeOf(Person.class))
+                             .with(oldest, (p1, p2) -> p1.getAge() > p2.getAge())
+                             .from(persons) )
+        );
+
+        List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
+        assertEquals(1, result.size());
+        TupleHandle tuple = result.get(0);
+        assertEquals("Mario", tuple.get(oldest).getName());
+    }
+
+    @Test
+    public void testExists() {
+        DataSource persons = dataSource(sourceOf(new Person("Mark", 37),
+                                                 new Person("Edson", 35),
+                                                 new Person("Mario", 40)));
+
+        // $person: Person()
+        // exists( Person(name.length > $person.name.length) )
+
+        Variable<Person> person = bind(typeOf(Person.class));
+
+        View view = view(
+                filter(person).from(persons),
+                exists( using(person).filter(typeOf(Person.class))
+                             .with(person, (p1, p2) -> p1.getName().length() > p2.getName().length())
+                             .from(persons) )
+        );
+
+        List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
+        assertEquals(1, result.size());
+        TupleHandle tuple = result.get(0);
+        assertEquals("Mark", tuple.get(person).getName());
     }
 }

@@ -13,7 +13,7 @@ public class JoinPatternImpl<T> implements JoinPatternBuilder<T> {
 
     private final Variable[] lhs;
     private final Variable<T> rhs;
-    private AbstractConstraint constraints;
+    private Constraint constraints;
     private DataSource dataSource;
 
     public JoinPatternImpl(Variable[] lhs, Variable<T> rhs) {
@@ -37,7 +37,12 @@ public class JoinPatternImpl<T> implements JoinPatternBuilder<T> {
     }
 
     @Override
-    public ConstrainedImpl<T> with(AbstractConstraint constraint) {
+    public <A> ConstrainedImpl<T> with(Variable<A> var2, Predicate2<T, A> predicate) {
+        return with(new SingleConstraint2<T, A>(rhs, var2, predicate));
+    }
+
+    @Override
+    public ConstrainedImpl<T> with(Constraint constraint) {
         this.constraints = constraints;
         return new ConstrainedImpl(lhs, rhs, constraint);
     }
@@ -54,7 +59,7 @@ public class JoinPatternImpl<T> implements JoinPatternBuilder<T> {
 
     @Override
     public Constraint getConstraint() {
-        return null;
+        return Constraint.True;
     }
 
     @Override
@@ -71,10 +76,10 @@ public class JoinPatternImpl<T> implements JoinPatternBuilder<T> {
 
         private final Variable[] lhs;
         private final Variable<T> rhs;
-        private AbstractConstraint constraint;
+        private Constraint constraint;
         private DataSource dataSource;
 
-        public ConstrainedImpl(Variable[] lhs, Variable<T> rhs, AbstractConstraint constraint) {
+        public ConstrainedImpl(Variable[] lhs, Variable<T> rhs, Constraint constraint) {
             this.lhs = lhs;
             this.rhs = rhs;
             this.constraint = constraint;
@@ -97,8 +102,13 @@ public class JoinPatternImpl<T> implements JoinPatternBuilder<T> {
         }
 
         @Override
+        public <A> ConstrainedImpl<T> and(Variable<A> var1, Predicate2<T, A> predicate) {
+            return and(new SingleConstraint2<T, A>(rhs, var1, predicate));
+        }
+
+        @Override
         public ConstrainedImpl<T> and(AbstractConstraint constraint) {
-            this.constraint = this.constraint.and(constraint);
+            this.constraint = ((AbstractConstraint)this.constraint).and(constraint);
             return this;
         }
 
@@ -113,8 +123,14 @@ public class JoinPatternImpl<T> implements JoinPatternBuilder<T> {
         }
 
         @Override
+        public <A> ConstrainedImpl<T> or(Variable<A> var1, Predicate2<T, A> predicate) {
+            return or(new SingleConstraint2<T, A>(rhs, var1, predicate));
+        }
+
+
+        @Override
         public ConstrainedImpl<T> or(AbstractConstraint constraint) {
-            this.constraint = this.constraint.or(constraint);
+            this.constraint = ((AbstractConstraint)this.constraint).or(constraint);
             return this;
         }
 

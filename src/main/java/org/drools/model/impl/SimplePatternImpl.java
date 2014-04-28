@@ -43,7 +43,7 @@ public class SimplePatternImpl<T> implements SimplePatternBuilder<T> {
 
     @Override
     public Constraint getConstraint() {
-        return null;
+        return Constraint.True;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class SimplePatternImpl<T> implements SimplePatternBuilder<T> {
     public static class ConstrainedImpl<T> implements SimplePatternBuilder.Constrained<T> {
 
         private final Variable<T> variable;
-        private AbstractConstraint constraint;
+        private Constraint constraint;
         private DataSource dataSource;
 
         public ConstrainedImpl(Variable<T> variable, AbstractConstraint constraint) {
@@ -74,8 +74,8 @@ public class SimplePatternImpl<T> implements SimplePatternBuilder<T> {
         }
 
         @Override
-        public ConstrainedImpl<T> and(AbstractConstraint constraint) {
-            this.constraint = this.constraint.and(constraint);
+        public ConstrainedImpl<T> and(Constraint constraint) {
+            this.constraint = ((AbstractConstraint)this.constraint).and(constraint);
             return this;
         }
 
@@ -85,8 +85,8 @@ public class SimplePatternImpl<T> implements SimplePatternBuilder<T> {
         }
 
         @Override
-        public ConstrainedImpl<T> or(AbstractConstraint constraint) {
-            this.constraint = this.constraint.or(constraint);
+        public ConstrainedImpl<T> or(Constraint constraint) {
+            this.constraint = ((AbstractConstraint)this.constraint).or(constraint);
             return this;
         }
 

@@ -2,6 +2,6 @@ package org.drools.model;
 
 import java.util.List;
 
-public interface LHS {
+public interface View {
     List<Pattern> getPatterns();
 }

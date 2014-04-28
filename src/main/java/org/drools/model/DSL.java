@@ -3,6 +3,7 @@ package org.drools.model;
 import org.drools.model.constraints.AbstractConstraint;
 import org.drools.model.constraints.SingleConstraint1;
 import org.drools.model.functions.Predicate1;
+import org.drools.model.impl.ExistentialPatternImpl;
 import org.drools.model.impl.JavaClassType;
 import org.drools.model.impl.JoinFactory;
 import org.drools.model.impl.PatternArray;
@@ -44,7 +45,15 @@ public class DSL {
         return AbstractConstraint.or(constraints);
     }
 
-    public static LHS lhs(Pattern... patterns) {
+    public static View view(Pattern... patterns) {
         return new PatternArray(patterns);
+    }
+
+    public static ExistentialPattern not(Pattern pattern) {
+        return new ExistentialPatternImpl(ExistentialPattern.ExistentialType.NOT, pattern);
+    }
+
+    public static ExistentialPattern exists(Pattern pattern) {
+        return new ExistentialPatternImpl(ExistentialPattern.ExistentialType.EXISTS, pattern);
     }
 }

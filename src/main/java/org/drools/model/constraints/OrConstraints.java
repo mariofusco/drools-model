@@ -8,22 +8,22 @@ import java.util.List;
 
 public class OrConstraints extends AbstractConstraint {
 
-    private final List<AbstractConstraint> constraints = new ArrayList<AbstractConstraint>();
+    private final List<Constraint> constraints = new ArrayList<Constraint>();
 
-    OrConstraints(AbstractConstraint... constraints) {
-        for (AbstractConstraint constraint : constraints) {
+    OrConstraints(Constraint... constraints) {
+        for (Constraint constraint : constraints) {
             or(constraint);
         }
     }
 
     @Override
-    public OrConstraints or(AbstractConstraint constraint) {
+    public OrConstraints or(Constraint constraint) {
         constraints.add(constraint);
         return this;
     }
 
     @Override
-    public Collection<? extends Constraint> getChildren() {
+    public Collection<Constraint> getChildren() {
         return constraints;
     }
 

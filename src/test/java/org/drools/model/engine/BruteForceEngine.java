@@ -2,12 +2,13 @@ package org.drools.model.engine;
 
 import org.drools.model.Constraint;
 import org.drools.model.DataSource;
-import org.drools.model.LHS;
+import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
 import org.drools.model.SingleConstraint;
 import org.drools.model.TupleHandle;
 import org.drools.model.Type;
 import org.drools.model.Variable;
+import org.drools.model.View;
 import org.drools.model.constraints.AndConstraints;
 import org.drools.model.constraints.OrConstraints;
 import org.drools.model.constraints.SingleConstraint1;
@@ -16,6 +17,7 @@ import org.drools.model.impl.TupleHandleImpl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -28,7 +30,7 @@ public class BruteForceEngine {
         return INSTANCE;
     }
 
-    public List<TupleHandle> evaluate(LHS lhs) {
+    public List<TupleHandle> evaluate(View lhs) {
         return lhs.getPatterns().stream()
                 .reduce(new Bindings(),
                         (bindings, pattern) -> evaluatePattern(pattern, bindings),
@@ -41,10 +43,29 @@ public class BruteForceEngine {
     }
 
     private Bindings evaluatePattern(Pattern pattern, Bindings bindings) {
+        if (pattern instanceof ExistentialPattern) {
+            return evaluateExistential((ExistentialPattern) pattern, bindings);
+        }
         Stream<Object> objects = getObjectsOfType(pattern.getDataSource(), pattern.getVariable().getType());
         List<BoundTuple> tuples =
                 objects.flatMap(obj -> generateMatches(pattern, bindings, obj))
                        .collect(toList());
+        return new Bindings(tuples);
+    }
+
+    private Bindings evaluateExistential(ExistentialPattern pattern, Bindings bindings) {
+        List<Object> objects = getObjectsOfType(pattern.getDataSource(), pattern.getVariable().getType()).collect(toList());
+        Predicate<BoundTuple> existentialPredicate =
+                tuple -> objects.stream()
+                                 .map(obj -> tuple.bind(pattern.getVariable(), obj))
+                                 .anyMatch(t -> match(pattern.getConstraint(), t));
+        if (pattern.getExistentialType() == ExistentialPattern.ExistentialType.NOT) {
+            existentialPredicate = existentialPredicate.negate();
+        }
+        List<BoundTuple> tuples =
+            bindings.tuples.parallelStream()
+                    .filter(existentialPredicate)
+                    .collect(toList());
         return new Bindings(tuples);
     }
 
@@ -57,11 +78,17 @@ public class BruteForceEngine {
     private Stream<BoundTuple> generateMatches(Pattern pattern, Bindings bindings, Object obj) {
         return bindings.tuples.parallelStream()
                         .map(t -> t.bind(pattern.getVariable(), obj))
-                        .filter(t -> match(pattern.getConstraint(), t.getTupleHandle()));
+                        .filter(t -> match(pattern.getConstraint(), t));
     }
 
+    private boolean match(Constraint constraint, BoundTuple tuple) {
+        return match(constraint, tuple.getTupleHandle());
+    }
+    
     private boolean match(Constraint constraint, TupleHandle tuple) {
         switch (constraint.getType()) {
+            case TRUE:
+                return true;
             case SINGLE:
                 Variable[] vars = ((SingleConstraint)constraint).getVariables();
                 switch (vars.length) {

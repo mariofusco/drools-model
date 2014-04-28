@@ -1,5 +1,6 @@
 package org.drools.model.impl;
 
+import org.drools.model.Constraint;
 import org.drools.model.DataSource;
 import org.drools.model.Pattern;
 import org.drools.model.constraints.AbstractConstraint;
@@ -17,9 +18,9 @@ public interface SimplePatternBuilder<T> extends Pattern {
         Constrained<T> from(DataSource dataSource);
 
         Constrained<T> and(Predicate1<T> predicate);
-        Constrained<T> and(AbstractConstraint constraint);
+        Constrained<T> and(Constraint constraint);
 
         Constrained<T> or(Predicate1<T> predicate);
-        Constrained<T> or(AbstractConstraint constraint);
+        Constrained<T> or(Constraint constraint);
     }
 }

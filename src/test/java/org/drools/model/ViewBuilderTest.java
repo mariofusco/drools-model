@@ -129,7 +129,11 @@ public class ViewBuilderTest {
 
         // accumulate( $p : Person(name.startsWith("M"));
         //             $sum : sum( $p.age ),
-        //             $avg : avg( $p.age ))
+        //             $avg : avg( $p.age ),
+        //             $max : reduce( init( int max = 0; ), // attempt of a generic accumulate
+        //                            action( person.getAge() > max ? person.getAge() : max )
+        //                          )
+        //           )
 
         Variable<Integer> resultSum = bind(typeOf(Integer.class));
         Variable<Double> resultAvg = bind(typeOf(Double.class));
@@ -140,7 +144,8 @@ public class ViewBuilderTest {
                                     .with(person -> person.getName().startsWith("M"))
                                     .from(persons),
                             sum(Person::getAge).as(resultSum),
-                            avg(Person::getAge).as(resultAvg) )
+                            avg(Person::getAge).as(resultAvg),
+                            reduce(0, (Integer max, Person p) -> p.getAge() > max ? p.getAge() : max).as(resultMax) )
         );
 
         List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
@@ -148,5 +153,6 @@ public class ViewBuilderTest {
         TupleHandle tuple = result.get(0);
         assertEquals(77, (int)tuple.get(resultSum));
         assertEquals(38.5, (double)tuple.get(resultAvg), 0.01);
+        assertEquals(40, (int)tuple.get(resultMax), 0.01);
     }
 }

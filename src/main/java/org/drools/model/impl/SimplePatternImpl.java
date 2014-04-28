@@ -27,7 +27,7 @@ public class SimplePatternImpl<T> implements SimplePatternBuilder<T> {
     }
 
     @Override
-    public SimplePatternBuilder.Constrained<T> with(AbstractConstraint constraint) {
+    public SimplePatternBuilder.Constrained<T> with(Constraint constraint) {
         return new ConstrainedImpl(variable, constraint);
     }
 
@@ -37,7 +37,7 @@ public class SimplePatternImpl<T> implements SimplePatternBuilder<T> {
     }
 
     @Override
-    public Variable getVariable() {
+    public Variable<T> getVariable() {
         return variable;
     }
 
@@ -57,7 +57,7 @@ public class SimplePatternImpl<T> implements SimplePatternBuilder<T> {
         private Constraint constraint;
         private DataSource dataSource;
 
-        public ConstrainedImpl(Variable<T> variable, AbstractConstraint constraint) {
+        public ConstrainedImpl(Variable<T> variable, Constraint constraint) {
             this.variable = variable;
             this.constraint = constraint;
         }
@@ -96,7 +96,7 @@ public class SimplePatternImpl<T> implements SimplePatternBuilder<T> {
         }
 
         @Override
-        public Variable getVariable() {
+        public Variable<T> getVariable() {
             return variable;
         }
 

@@ -1,6 +1,6 @@
 package org.drools.model;
 
-public interface ExistentialPattern extends JoinPattern {
+public interface ExistentialPattern<T> extends JoinPattern<T> {
     enum ExistentialType { NOT, EXISTS }
 
     ExistentialType getExistentialType();

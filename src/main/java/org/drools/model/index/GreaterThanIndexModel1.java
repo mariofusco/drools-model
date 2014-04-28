@@ -4,10 +4,10 @@ import org.drools.model.*;
 import org.drools.model.functions.*;
 
 public class GreaterThanIndexModel1 implements IndexModel {
-    private final Expression1<?,?> lhs;
-    private final Expression0<?> rhs;
+    private final Function1<?,?> lhs;
+    private final Function0<?> rhs;
 
-    public GreaterThanIndexModel1(Expression1 lhs, Expression0<?> rhs) {
+    public GreaterThanIndexModel1(Function1 lhs, Function0<?> rhs) {
         this.lhs = lhs;
         this.rhs = rhs;
     }

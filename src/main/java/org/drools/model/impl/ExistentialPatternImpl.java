@@ -7,7 +7,7 @@ import org.drools.model.JoinPattern;
 import org.drools.model.Pattern;
 import org.drools.model.Variable;
 
-public class ExistentialPatternImpl implements ExistentialPattern {
+public class ExistentialPatternImpl<T> implements ExistentialPattern<T> {
 
     private final Pattern pattern;
     private final ExistentialType existentialType;
@@ -28,7 +28,7 @@ public class ExistentialPatternImpl implements ExistentialPattern {
     }
 
     @Override
-    public Variable getVariable() {
+    public Variable<T> getVariable() {
         return pattern.getVariable();
     }
 

@@ -1,14 +1,14 @@
 package org.drools.model.index;
 
 import org.drools.model.IndexModel;
-import org.drools.model.functions.Expression0;
-import org.drools.model.functions.Expression1;
+import org.drools.model.functions.Function0;
+import org.drools.model.functions.Function1;
 
 public class EqualToIndexModel1 implements IndexModel {
-    private final Expression1<?,?> lhs;
-    private final Expression0<?> rhs;
+    private final Function1<?,?> lhs;
+    private final Function0<?> rhs;
 
-    public EqualToIndexModel1(Expression1 lhs, Expression0<?> rhs) {
+    public EqualToIndexModel1(Function1 lhs, Function0<?> rhs) {
         this.lhs = lhs;
         this.rhs = rhs;
     }

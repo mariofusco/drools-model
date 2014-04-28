@@ -8,7 +8,7 @@ import org.drools.model.constraints.AbstractConstraint;
 import org.drools.model.functions.Predicate1;
 import org.drools.model.functions.Predicate2;
 
-public interface JoinPatternBuilder<T> extends JoinPattern {
+public interface JoinPatternBuilder<T> extends JoinPattern<T> {
 
     JoinPatternBuilder<T> from(DataSource dataSource);
 
@@ -17,7 +17,7 @@ public interface JoinPatternBuilder<T> extends JoinPattern {
     <A> Constrained<T> with(Variable<A> var2, Predicate2<T, A> predicate);
     Constrained<T> with(Constraint constraint);
 
-    public interface Constrained<T> extends JoinPattern {
+    public interface Constrained<T> extends JoinPattern<T> {
 
         Constrained<T> from(DataSource dataSource);
 

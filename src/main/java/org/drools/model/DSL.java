@@ -3,6 +3,7 @@ package org.drools.model;
 import org.drools.model.constraints.AbstractConstraint;
 import org.drools.model.constraints.SingleConstraint1;
 import org.drools.model.functions.Predicate1;
+import org.drools.model.impl.AccumulateImpl;
 import org.drools.model.impl.ExistentialPatternImpl;
 import org.drools.model.impl.JavaClassType;
 import org.drools.model.impl.JoinFactory;
@@ -37,11 +38,11 @@ public class DSL {
         return new SingleConstraint1<A>(variable, predicate);
     }
 
-    public static AbstractConstraint and(AbstractConstraint... constraints) {
+    public static AbstractConstraint and(Constraint... constraints) {
         return AbstractConstraint.and(constraints);
     }
 
-    public static AbstractConstraint or(AbstractConstraint... constraints) {
+    public static AbstractConstraint or(Constraint... constraints) {
         return AbstractConstraint.or(constraints);
     }
 
@@ -49,11 +50,15 @@ public class DSL {
         return new PatternArray(patterns);
     }
 
-    public static ExistentialPattern not(Pattern pattern) {
-        return new ExistentialPatternImpl(ExistentialPattern.ExistentialType.NOT, pattern);
+    public static <T> ExistentialPattern not(Pattern<T> pattern) {
+        return new ExistentialPatternImpl<T>(ExistentialPattern.ExistentialType.NOT, pattern);
     }
 
-    public static ExistentialPattern exists(Pattern pattern) {
-        return new ExistentialPatternImpl(ExistentialPattern.ExistentialType.EXISTS, pattern);
+    public static <T> ExistentialPattern<T> exists(Pattern<T> pattern) {
+        return new ExistentialPatternImpl<T>(ExistentialPattern.ExistentialType.EXISTS, pattern);
+    }
+
+    public static <T> AccumulatePattern<T> accumulate(Pattern<T> pattern, AccumulateFunction<T, ?, ?>... functions) {
+        return new AccumulateImpl<T>(pattern, functions);
     }
 }

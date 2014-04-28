@@ -1,12 +1,12 @@
 package org.drools.model;
 
-public interface Pattern {
+public interface Pattern<T> {
 
     enum Type { SIMPLE, JOIN }
 
     DataSource getDataSource();
 
-    Variable getVariable();
+    Variable<T> getVariable();
 
     Constraint getConstraint();
 

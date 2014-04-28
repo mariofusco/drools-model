@@ -8,7 +8,9 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.drools.model.DSL.*;
-import static org.drools.model.DSL.filter;
+import static org.drools.model.functions.Average.avg;
+import static org.drools.model.functions.Reduce.reduce;
+import static org.drools.model.functions.Sum.sum;
 import static org.drools.model.impl.CollectionObjectSource.sourceOf;
 import static org.drools.model.impl.DataSourceImpl.dataSource;
 import static org.junit.Assert.assertEquals;
@@ -117,5 +119,34 @@ public class ViewBuilderTest {
         assertEquals(1, result.size());
         TupleHandle tuple = result.get(0);
         assertEquals("Mark", tuple.get(person).getName());
+    }
+
+    @Test
+    public void testAccumulate() {
+        DataSource persons = dataSource(sourceOf(new Person("Mark", 37),
+                                                 new Person("Edson", 35),
+                                                 new Person("Mario", 40)));
+
+        // accumulate( $p : Person(name.startsWith("M"));
+        //             $sum : sum( $p.age ),
+        //             $avg : avg( $p.age ))
+
+        Variable<Integer> resultSum = bind(typeOf(Integer.class));
+        Variable<Double> resultAvg = bind(typeOf(Double.class));
+        Variable<Integer> resultMax = bind(typeOf(Integer.class));
+
+        View view = view(
+                accumulate( filter(typeOf(Person.class))
+                                    .with(person -> person.getName().startsWith("M"))
+                                    .from(persons),
+                            sum(Person::getAge).as(resultSum),
+                            avg(Person::getAge).as(resultAvg) )
+        );
+
+        List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
+        assertEquals(1, result.size());
+        TupleHandle tuple = result.get(0);
+        assertEquals(77, (int)tuple.get(resultSum));
+        assertEquals(38.5, (double)tuple.get(resultAvg), 0.01);
     }
 }

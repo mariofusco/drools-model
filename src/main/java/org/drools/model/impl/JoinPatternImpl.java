@@ -53,7 +53,7 @@ public class JoinPatternImpl<T> implements JoinPatternBuilder<T> {
     }
 
     @Override
-    public Variable getVariable() {
+    public Variable<T> getVariable() {
         return rhs;
     }
 
@@ -140,7 +140,7 @@ public class JoinPatternImpl<T> implements JoinPatternBuilder<T> {
         }
 
         @Override
-        public Variable getVariable() {
+        public Variable<T> getVariable() {
             return rhs;
         }
 

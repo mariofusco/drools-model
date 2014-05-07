@@ -1,4 +1,4 @@
-package org.drools.model.functions;
+package org.drools.model.functions.accumulate;
 
 import org.drools.model.AccumulateFunction;
 import org.drools.model.Variable;

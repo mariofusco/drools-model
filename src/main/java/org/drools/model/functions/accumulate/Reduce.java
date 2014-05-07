@@ -1,4 +1,6 @@
-package org.drools.model.functions;
+package org.drools.model.functions.accumulate;
+
+import org.drools.model.functions.Function2;
 
 public class Reduce<T, R> extends AbstractAccumulateFunction<T, R, R> {
 

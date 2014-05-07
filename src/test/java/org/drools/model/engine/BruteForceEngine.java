@@ -6,6 +6,7 @@ import org.drools.model.Constraint;
 import org.drools.model.DataSource;
 import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
+import org.drools.model.Rule;
 import org.drools.model.SingleConstraint;
 import org.drools.model.TupleHandle;
 import org.drools.model.Type;
@@ -18,11 +19,11 @@ import org.drools.model.constraints.SingleConstraint2;
 import org.drools.model.impl.TupleHandleImpl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 
 public class BruteForceEngine {
@@ -33,8 +34,16 @@ public class BruteForceEngine {
         return INSTANCE;
     }
 
-    public List<TupleHandle> evaluate(View lhs) {
-        return lhs.getPatterns().stream()
+    public void evaluate(Rule rule) {
+        List<TupleHandle> matches = evaluate(rule.getView());
+        matches.forEach(match -> {
+            rule.getConsequence().getBlock().execute(
+                    stream(rule.getConsequence().getVariables()).map(match::get).toArray());
+        });
+    }
+
+    public List<TupleHandle> evaluate(View view) {
+        return view.getPatterns().stream()
                 .reduce(new Bindings(),
                         (bindings, pattern) -> evaluatePattern(pattern, bindings),
                         (b1, b2) -> null)
@@ -93,7 +102,7 @@ public class BruteForceEngine {
 
         private AccumulateReducer(AccumulatePattern pattern) {
             this.functions = pattern.getFunctions();
-            this.accumulators = Arrays.stream(functions).map(AccumulateFunction::init).toArray();
+            this.accumulators = stream(functions).map(AccumulateFunction::init).toArray();
         }
 
         public AccumulateReducer accumulate(Object obj) {

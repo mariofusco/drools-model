@@ -2,12 +2,17 @@ package org.drools.model;
 
 import org.drools.model.constraints.AbstractConstraint;
 import org.drools.model.constraints.SingleConstraint1;
+import org.drools.model.functions.Block0;
+import org.drools.model.functions.Block1;
+import org.drools.model.functions.Block2;
 import org.drools.model.functions.Predicate1;
 import org.drools.model.impl.AccumulateImpl;
+import org.drools.model.impl.ConsequenceImpl;
 import org.drools.model.impl.ExistentialPatternImpl;
 import org.drools.model.impl.JavaClassType;
 import org.drools.model.impl.JoinFactory;
 import org.drools.model.impl.PatternArray;
+import org.drools.model.impl.RuleImpl;
 import org.drools.model.impl.SimplePatternBuilder;
 import org.drools.model.impl.SimplePatternImpl;
 import org.drools.model.impl.VariableImpl;
@@ -60,5 +65,40 @@ public class DSL {
 
     public static <T> AccumulatePattern<T> accumulate(Pattern<T> pattern, AccumulateFunction<T, ?, ?>... functions) {
         return new AccumulateImpl<T>(pattern, functions);
+    }
+
+    public static Consequence then(Block0 block) {
+        return new ConsequenceImpl(new Block() {
+            @Override
+            public void execute(Object... objs) {
+                block.execute();
+            }
+        });
+    }
+
+    public static <A> Consequence then(Variable<A> variable, Block1<A> block) {
+        return new ConsequenceImpl(new Block() {
+            @Override
+            public void execute(Object... objs) {
+                block.execute((A)objs[0]);
+            }
+        }, variable);
+    }
+
+    public static <A, B> Consequence then(Variable<A> var1, Variable<B> var2, Block2<A, B> block) {
+        return new ConsequenceImpl(new Block() {
+            @Override
+            public void execute(Object... objs) {
+                block.execute((A)objs[0], (B)objs[1]);
+            }
+        }, var1, var2);
+    }
+
+    public static Rule rule(View view, Consequence consequence) {
+        return new RuleImpl(view, consequence);
+    }
+
+    public static Rule rule(Pattern pattern, Consequence consequence) {
+        return rule(view(pattern), consequence);
     }
 }

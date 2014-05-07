@@ -8,9 +8,9 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.drools.model.DSL.*;
-import static org.drools.model.functions.Average.avg;
-import static org.drools.model.functions.Reduce.reduce;
-import static org.drools.model.functions.Sum.sum;
+import static org.drools.model.functions.accumulate.Average.avg;
+import static org.drools.model.functions.accumulate.Reduce.reduce;
+import static org.drools.model.functions.accumulate.Sum.sum;
 import static org.drools.model.impl.CollectionObjectSource.sourceOf;
 import static org.drools.model.impl.DataSourceImpl.dataSource;
 import static org.junit.Assert.assertEquals;
@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 public class ViewBuilderTest {
 
     @Test
-    public void testSimpleFrom() {
+    public void testSimpleView() {
 
         DataSource persons = dataSource(sourceOf(new Person("Mark", 37),
                                                  new Person("Edson", 35),

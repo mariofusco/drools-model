@@ -1,4 +1,4 @@
-package org.drools.model.index;
+package org.drools.model.patterns;
 
 import org.drools.model.*;
 import org.drools.model.functions.*;

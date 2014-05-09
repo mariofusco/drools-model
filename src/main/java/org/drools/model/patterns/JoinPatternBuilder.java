@@ -1,4 +1,4 @@
-package org.drools.model.impl;
+package org.drools.model.patterns;
 
 import org.drools.model.Constraint;
 import org.drools.model.DataSource;

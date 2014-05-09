@@ -1,14 +1,11 @@
 package org.drools.model;
 
-public interface Pattern<T> {
+import java.util.List;
 
-    enum Type { SIMPLE, JOIN }
+public interface Pattern {
+    enum Type { SINGLE, OR, AND }
 
-    DataSource getDataSource();
-
-    Variable<T> getVariable();
-
-    Constraint getConstraint();
+    List<Pattern> getPatterns();
 
     Type getType();
 }

@@ -4,11 +4,12 @@ import org.drools.model.Constraint;
 import org.drools.model.SingleConstraint;
 
 import java.util.Collection;
+import java.util.Collections;
 
 public abstract class AbstractSingleConstraint extends AbstractConstraint implements SingleConstraint {
     @Override
     public Collection<? extends Constraint> getChildren() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

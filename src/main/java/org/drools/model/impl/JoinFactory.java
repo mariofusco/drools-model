@@ -2,6 +2,8 @@ package org.drools.model.impl;
 
 import org.drools.model.Type;
 import org.drools.model.Variable;
+import org.drools.model.patterns.JoinPatternBuilder;
+import org.drools.model.patterns.JoinPatternImpl;
 
 import static org.drools.model.DSL.bind;
 

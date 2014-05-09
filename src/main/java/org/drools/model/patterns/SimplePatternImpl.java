@@ -1,4 +1,4 @@
-package org.drools.model.impl;
+package org.drools.model.patterns;
 
 import org.drools.model.Constraint;
 import org.drools.model.DataSource;
@@ -7,7 +7,7 @@ import org.drools.model.constraints.AbstractConstraint;
 import org.drools.model.constraints.SingleConstraint1;
 import org.drools.model.functions.Predicate1;
 
-public class SimplePatternImpl<T> implements SimplePatternBuilder<T> {
+public class SimplePatternImpl<T> extends AbstractSinglePattern implements SimplePatternBuilder<T> {
     private final Variable<T> variable;
     private DataSource dataSource;
 
@@ -47,11 +47,11 @@ public class SimplePatternImpl<T> implements SimplePatternBuilder<T> {
     }
 
     @Override
-    public Type getType() {
-        return Type.SIMPLE;
+    public Kind getKind() {
+        return Kind.SIMPLE;
     }
 
-    public static class ConstrainedImpl<T> implements SimplePatternBuilder.Constrained<T> {
+    public static class ConstrainedImpl<T> extends AbstractSinglePattern implements SimplePatternBuilder.Constrained<T> {
 
         private final Variable<T> variable;
         private Constraint constraint;
@@ -106,8 +106,8 @@ public class SimplePatternImpl<T> implements SimplePatternBuilder<T> {
         }
 
         @Override
-        public Type getType() {
-            return Type.SIMPLE;
+        public Kind getKind() {
+            return Kind.SIMPLE;
         }
     }
 }

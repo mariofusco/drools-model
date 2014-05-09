@@ -1,6 +1,6 @@
 package org.drools.model;
 
 public interface Consequence {
-    Variable[] getVariables();
+    Variable[] getDeclarations();
     Block getBlock();
 }

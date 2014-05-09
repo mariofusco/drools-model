@@ -1,18 +1,18 @@
-package org.drools.model.impl;
+package org.drools.model.patterns;
 
 import org.drools.model.Constraint;
 import org.drools.model.DataSource;
 import org.drools.model.ExistentialPattern;
 import org.drools.model.JoinPattern;
-import org.drools.model.Pattern;
+import org.drools.model.SinglePattern;
 import org.drools.model.Variable;
 
-public class ExistentialPatternImpl<T> implements ExistentialPattern<T> {
+public class ExistentialPatternImpl<T> extends AbstractSinglePattern implements ExistentialPattern<T> {
 
-    private final Pattern pattern;
+    private final SinglePattern pattern;
     private final ExistentialType existentialType;
 
-    public ExistentialPatternImpl(ExistentialType existentialType, Pattern pattern) {
+    public ExistentialPatternImpl(ExistentialType existentialType, SinglePattern pattern) {
         this.existentialType = existentialType;
         this.pattern = pattern;
     }
@@ -38,8 +38,8 @@ public class ExistentialPatternImpl<T> implements ExistentialPattern<T> {
     }
 
     @Override
-    public Type getType() {
-        return pattern.getType();
+    public Kind getKind() {
+        return pattern.getKind();
     }
 
     @Override

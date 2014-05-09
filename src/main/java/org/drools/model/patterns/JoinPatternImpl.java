@@ -1,4 +1,4 @@
-package org.drools.model.impl;
+package org.drools.model.patterns;
 
 import org.drools.model.Constraint;
 import org.drools.model.DataSource;
@@ -9,7 +9,7 @@ import org.drools.model.constraints.SingleConstraint2;
 import org.drools.model.functions.Predicate1;
 import org.drools.model.functions.Predicate2;
 
-public class JoinPatternImpl<T> implements JoinPatternBuilder<T> {
+public class JoinPatternImpl<T> extends AbstractSinglePattern implements JoinPatternBuilder<T> {
 
     private final Variable[] lhs;
     private final Variable<T> rhs;
@@ -68,11 +68,11 @@ public class JoinPatternImpl<T> implements JoinPatternBuilder<T> {
     }
 
     @Override
-    public Type getType() {
-        return Type.JOIN;
+    public Kind getKind() {
+        return Kind.JOIN;
     }
 
-    public static class ConstrainedImpl<T> implements JoinPatternBuilder.Constrained<T> {
+    public static class ConstrainedImpl<T> extends AbstractSinglePattern implements JoinPatternBuilder.Constrained<T> {
 
         private final Variable[] lhs;
         private final Variable<T> rhs;
@@ -155,8 +155,8 @@ public class JoinPatternImpl<T> implements JoinPatternBuilder<T> {
         }
 
         @Override
-        public Type getType() {
-            return Type.JOIN;
+        public Kind getKind() {
+            return Kind.JOIN;
         }
     }
 }

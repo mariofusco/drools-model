@@ -1,5 +1,5 @@
 package org.drools.model;
 
-public interface JoinPattern<T> extends Pattern<T> {
+public interface JoinPattern<T> extends SinglePattern<T> {
     Variable[] getJoinVariables();
 }

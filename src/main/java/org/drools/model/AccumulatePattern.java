@@ -1,6 +1,6 @@
 package org.drools.model;
 
-public interface AccumulatePattern<T> extends Pattern<T> {
+public interface AccumulatePattern<T> extends SinglePattern<T> {
 
     AccumulateFunction<T, ?, ?>[] getFunctions();
 }

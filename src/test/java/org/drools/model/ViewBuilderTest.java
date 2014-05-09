@@ -8,6 +8,7 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.drools.model.DSL.*;
+import static org.drools.model.DSL.filter;
 import static org.drools.model.functions.accumulate.Average.avg;
 import static org.drools.model.functions.accumulate.Reduce.reduce;
 import static org.drools.model.functions.accumulate.Sum.sum;
@@ -154,5 +155,41 @@ public class ViewBuilderTest {
         assertEquals(77, (int)tuple.get(resultSum));
         assertEquals(38.5, (double)tuple.get(resultAvg), 0.01);
         assertEquals(40, (int)tuple.get(resultMax), 0.01);
+    }
+
+    @Test
+    public void testOr() {
+        DataSource persons = dataSource(sourceOf(new Person("Mark", 37),
+                                                 new Person("Edson", 35),
+                                                 new Person("Mario", 40),
+                                                 new Person("Sofia", 3)));
+
+        Variable<Person> mark = bind(typeOf(Person.class));
+        Variable<Person> other = bind(typeOf(Person.class));
+
+        View view = view(
+                filter(mark)
+                        .with(person -> person.getName().equals("Mark"))
+                        .from(persons),
+                or(
+                        using(mark).filter(other)
+                                .with(other, mark, (p1, p2) -> p1.getAge() > p2.getAge())
+                                .from(persons),
+                        using(mark).filter(other)
+                                .with(other, mark, (p1, p2) -> p1.getName().compareToIgnoreCase(p2.getName()) > 0)
+                                .from(persons)
+                ));
+
+
+        List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
+        assertEquals(2, result.size());
+
+        TupleHandle tuple = result.get(0);
+        assertEquals("Mark", tuple.get(mark).getName());
+        assertEquals("Mario", tuple.get(other).getName());
+
+        tuple = result.get(1);
+        assertEquals("Mark", tuple.get(mark).getName());
+        assertEquals("Sofia", tuple.get(other).getName());
     }
 }

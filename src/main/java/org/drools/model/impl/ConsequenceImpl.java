@@ -5,17 +5,17 @@ import org.drools.model.Consequence;
 import org.drools.model.Variable;
 
 public class ConsequenceImpl implements Consequence {
-    private final Variable[] variables;
+    private final Variable[] declarations;
     private final Block block;
 
-    public ConsequenceImpl(Block block, Variable... variables) {
-        this.variables = variables;
+    public ConsequenceImpl(Block block, Variable... declarations) {
+        this.declarations = declarations;
         this.block = block;
     }
 
     @Override
-    public Variable[] getVariables() {
-        return variables;
+    public Variable[] getDeclarations() {
+        return declarations;
     }
 
     @Override

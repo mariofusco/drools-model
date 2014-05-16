@@ -13,6 +13,10 @@ import static org.junit.Assert.assertEquals;
 
 public class RuleExecutionTest {
 
+    // TODO: add consequence metadata
+    // TODO: implement insert, modify, delete in consequence
+    // TODO: implement DataStore as a writable DataSource
+
     @Test
     public void testSimpleRule() {
 
@@ -25,9 +29,9 @@ public class RuleExecutionTest {
         Variable<Person> mark = bind(typeOf(Person.class));
 
         Rule rule = rule(
-            filter(mark)
-                    .with(person -> person.getName().equals("Mark"))
-                    .from(persons),
+            pattern(p -> p.filter(mark)
+                          .with(person -> person.getName().equals("Mark"))
+                          .from(persons)),
             then(mark, p -> list.add(p.getName()))
         );
 
@@ -50,10 +54,10 @@ public class RuleExecutionTest {
 
         Rule rule = rule(
                 view(
-                        filter(mark)
+                        p -> p.filter(mark)
                                 .with(person -> person.getName().equals("Mark"))
                                 .from(persons),
-                        using(mark).filter(older)
+                        p -> p.using(mark).filter(older)
                                 .with(person -> !person.getName().equals("Mark"))
                                 .and(older, mark, (p1, p2) -> p1.getAge() > p2.getAge())
                                 .from(persons)

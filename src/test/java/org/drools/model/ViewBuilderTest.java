@@ -3,12 +3,13 @@ package org.drools.model;
 import org.drools.model.engine.BruteForceEngine;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.drools.model.DSL.*;
-import static org.drools.model.DSL.filter;
 import static org.drools.model.functions.accumulate.Average.avg;
 import static org.drools.model.functions.accumulate.Reduce.reduce;
 import static org.drools.model.functions.accumulate.Sum.sum;
@@ -30,10 +31,10 @@ public class ViewBuilderTest {
         // Person(name == "Mark" or (age > 18 and age < 65)) from entry-point "persons"
 
         Pattern pattern =
-                filter(typeOf(Person.class))
+                pattern( p -> p.filter(typeOf(Person.class))
                         .with(person -> person.getName().equals("Mark"))
                         .or(person -> person.getAge() > 18 && person.getAge() < 65)
-                        .from(persons);
+                        .from(persons) );
 
         List<TupleHandle> result = BruteForceEngine.get().evaluate(pattern);
 
@@ -57,14 +58,12 @@ public class ViewBuilderTest {
 
         Variable<Person> mark = bind(typeOf(Person.class));
         Variable<Person> older = bind(typeOf(Person.class));
-        View view = view(
-                filter(mark)
-                        .with(person -> person.getName().equals("Mark"))
-                        .from(persons),
-                using(mark).filter(older)
+        View view = view(persons,
+                p -> p.filter(mark)
+                        .with(person -> person.getName().equals("Mark")),
+                p -> p.using(mark).filter(older)
                         .with(person -> !person.getName().equals("Mark"))
                         .and(older, mark, (p1, p2) -> p1.getAge() > p2.getAge())
-                        .from(persons)
         );
 
         List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
@@ -86,10 +85,10 @@ public class ViewBuilderTest {
         Variable<Person> oldest = bind(typeOf(Person.class));
 
         View view = view(
-                filter(oldest).from(persons),
-                not( using(oldest).filter(typeOf(Person.class))
-                             .with(oldest, (p1, p2) -> p1.getAge() > p2.getAge())
-                             .from(persons) )
+                p -> p.filter(oldest).from(persons),
+                not(p -> p.using(oldest).filter(typeOf(Person.class))
+                          .with(oldest, (p1, p2) -> p1.getAge() > p2.getAge())
+                          .from(persons))
         );
 
         List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
@@ -110,8 +109,8 @@ public class ViewBuilderTest {
         Variable<Person> person = bind(typeOf(Person.class));
 
         View view = view(
-                filter(person).from(persons),
-                exists( using(person).filter(typeOf(Person.class))
+                p -> p.filter(person).from(persons),
+                exists( p -> p.using(person).filter(typeOf(Person.class))
                              .with(person, (p1, p2) -> p1.getName().length() > p2.getName().length())
                              .from(persons) )
         );
@@ -141,7 +140,7 @@ public class ViewBuilderTest {
         Variable<Integer> resultMax = bind(typeOf(Integer.class));
 
         View view = view(
-                accumulate( filter(typeOf(Person.class))
+                accumulate( p -> p.filter(typeOf(Person.class))
                                     .with(person -> person.getName().startsWith("M"))
                                     .from(persons),
                             sum(Person::getAge).as(resultSum),
@@ -168,16 +167,16 @@ public class ViewBuilderTest {
         Variable<Person> other = bind(typeOf(Person.class));
 
         View view = view(
-                filter(mark)
-                        .with(person -> person.getName().equals("Mark"))
-                        .from(persons),
+                pattern(p -> p.filter(mark)
+                              .with(person -> person.getName().equals("Mark"))
+                              .from(persons)),
                 or(
-                        using(mark).filter(other)
-                                .with(other, mark, (p1, p2) -> p1.getAge() > p2.getAge())
-                                .from(persons),
-                        using(mark).filter(other)
-                                .with(other, mark, (p1, p2) -> p1.getName().compareToIgnoreCase(p2.getName()) > 0)
-                                .from(persons)
+                        pattern(p -> p.using(mark).filter(other)
+                                      .with(other, mark, (p1, p2) -> p1.getAge() > p2.getAge())
+                                      .from(persons)),
+                        pattern(p -> p.using(mark).filter(other)
+                                      .with(other, mark, (p1, p2) -> p1.getName().compareToIgnoreCase(p2.getName()) > 0)
+                                      .from(persons))
                 ));
 
 

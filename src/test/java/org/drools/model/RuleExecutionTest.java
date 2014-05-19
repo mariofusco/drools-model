@@ -7,32 +7,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.drools.model.DSL.*;
-import static org.drools.model.impl.CollectionObjectSource.sourceOf;
-import static org.drools.model.impl.DataSourceImpl.dataSource;
+import static org.drools.model.impl.DataSourceImpl.sourceOf;
+import static org.drools.model.impl.DataStoreImpl.storeOf;
 import static org.junit.Assert.assertEquals;
 
 public class RuleExecutionTest {
 
-    // TODO: add consequence metadata
-    // TODO: implement insert, modify, delete in consequence
-    // TODO: implement DataStore as a writable DataSource
+    // TODO: add rule metadata
 
     @Test
     public void testSimpleRule() {
 
-        DataSource persons = dataSource(sourceOf(new Person("Mark", 37),
-                                                 new Person("Edson", 35),
-                                                 new Person("Mario", 40),
-                                                 new Person("Sofia", 3)));
+        DataSource persons = sourceOf(new Person("Mark", 37),
+                                      new Person("Edson", 35),
+                                      new Person("Mario", 40),
+                                      new Person("Sofia", 3));
 
         List<String> list = new ArrayList<>();
         Variable<Person> mark = bind(typeOf(Person.class));
 
         Rule rule = rule(
-            pattern(p -> p.filter(mark)
-                          .with(person -> person.getName().equals("Mark"))
-                          .from(persons)),
-            then(mark, p -> list.add(p.getName()))
+                view(p -> p.filter(mark)
+                           .with(person -> person.getName().equals("Mark"))
+                           .from(persons)),
+            then(c -> c.on(mark)
+                       .execute(p -> list.add(p.getName())))
         );
 
         BruteForceEngine.get().evaluate(rule);
@@ -43,10 +42,10 @@ public class RuleExecutionTest {
     @Test
     public void testJoin() {
 
-        DataSource persons = dataSource(sourceOf(new Person("Mark", 37),
-                                                 new Person("Edson", 35),
-                                                 new Person("Mario", 40),
-                                                 new Person("Sofia", 3)));
+        DataSource persons = sourceOf(new Person("Mark", 37),
+                                      new Person("Edson", 35),
+                                      new Person("Mario", 40),
+                                      new Person("Sofia", 3));
 
         List<String> list = new ArrayList<>();
         Variable<Person> mark = bind(typeOf(Person.class));
@@ -62,11 +61,72 @@ public class RuleExecutionTest {
                                 .and(older, mark, (p1, p2) -> p1.getAge() > p2.getAge())
                                 .from(persons)
                     ),
-            then(older, mark, (p1, p2) -> list.add(p1.getName() + " is older than " + p2.getName()))
+            then(c -> c.on(older, mark)
+                       .execute((p1, p2) -> list.add(p1.getName() + " is older than " + p2.getName())))
         );
 
         BruteForceEngine.get().evaluate(rule);
         assertEquals(1, list.size());
         assertEquals("Mario is older than Mark", list.get(0));
+    }
+
+    @Test
+    public void testDelete() {
+        DataStore persons = storeOf(new Person("Mark", 37),
+                                    new Person("Edson", 35),
+                                    new Person("Mario", 40),
+                                    new Person("Sofia", 3));
+
+        Variable<Person> mark = bind(typeOf(Person.class));
+        Variable<Person> younger = bind(typeOf(Person.class));
+
+        Rule rule = rule(
+                view(
+                        p -> p.filter(mark)
+                              .with(person -> person.getName().equals("Mark"))
+                              .from(persons),
+                        p -> p.using(mark).filter(younger)
+                              .with(person -> !person.getName().equals("Mark"))
+                              .and(younger, mark, (p1, p2) -> p1.getAge() < p2.getAge())
+                              .from(persons)
+                    ),
+                then(c -> c.on(younger)
+                           .execute(y -> persons.delete(y))
+                           .deletes(younger))
+        );
+
+        BruteForceEngine.get().evaluate(rule);
+        assertEquals(2, persons.getObjects().size());
+    }
+
+    @Test
+    public void testUpdate() {
+        Person mario = new Person("Mario", 40);
+
+        DataStore<Object> persons = storeOf(new Person("Mark", 37),
+                                            new Person("Edson", 35),
+                                            mario,
+                                            new Person("Sofia", 3));
+
+        Variable<Person> mark = bind(typeOf(Person.class));
+        Variable<Person> other = bind(typeOf(Person.class));
+
+        Rule rule = rule(
+                view(
+                        p -> p.filter(mark)
+                              .with(person -> person.getName().equals("Mark"))
+                              .from(persons),
+                        p -> p.using(mark).filter(other)
+                              .with(person -> !person.getName().equals("Mark"))
+                              .and(other, mark, (p1, p2) -> p1.getAge() > p2.getAge())
+                              .from(persons)
+                    ),
+                then(c -> c.on(other)
+                           .execute(o -> persons.update(o, p -> p.setAge(p.getAge()-1)))
+                           .updates(other, "age"))
+        );
+
+        BruteForceEngine.get().evaluate(rule);
+        assertEquals(37, mario.getAge());
     }
 }

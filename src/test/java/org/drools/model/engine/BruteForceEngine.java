@@ -35,12 +35,23 @@ public class BruteForceEngine {
         return INSTANCE;
     }
 
-    public void evaluate(Rule rule) {
-        List<TupleHandle> matches = evaluate(rule.getView());
-        matches.forEach(match -> {
-            rule.getConsequence().getBlock().execute(
-                    stream(rule.getConsequence().getDeclarations()).map(match::get).toArray());
-        });
+    public void evaluate(Rule... rules) {
+        List<Rule> firedRules = stream(rules).filter(rule -> {
+            List<TupleHandle> matches = evaluate(rule.getView());
+            matches.forEach(match -> {
+                rule.getConsequence().getBlock().execute(
+                        stream(rule.getConsequence().getDeclarations()).map(match::get).toArray());
+            });
+            return !matches.isEmpty();
+        }).collect(toList());
+
+        // TODO: implement conflict resulution strategy (?)
+
+        if ( firedRules.stream()
+                       .filter(rule -> rule.getConsequence().isChangingWorkingMemory())
+                       .findFirst().isPresent() ) {
+            evaluate(rules);
+        }
     }
 
     public List<TupleHandle> evaluate(View view) {
@@ -136,8 +147,7 @@ public class BruteForceEngine {
     }
 
     private Stream<Object> getObjectsOfType(DataSource dataSource, Type type) {
-        return dataSource.getObjectSources().parallelStream()
-                .flatMap(source -> source.getObjects().stream())
+        return dataSource.getObjects().parallelStream()
                 .filter(type::isInstance);
     }
 

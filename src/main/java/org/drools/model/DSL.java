@@ -1,14 +1,10 @@
 package org.drools.model;
 
-import org.drools.model.patterns.PatternBuilder;
+import org.drools.model.consequences.ConsequenceBuilder;
 import org.drools.model.constraints.AbstractConstraint;
 import org.drools.model.constraints.SingleConstraint1;
-import org.drools.model.functions.Block0;
-import org.drools.model.functions.Block1;
-import org.drools.model.functions.Block2;
 import org.drools.model.functions.Function1;
 import org.drools.model.functions.Predicate1;
-import org.drools.model.impl.ConsequenceImpl;
 import org.drools.model.impl.JavaClassType;
 import org.drools.model.impl.RuleImpl;
 import org.drools.model.impl.VariableImpl;
@@ -16,6 +12,7 @@ import org.drools.model.patterns.AccumulatePatternImpl;
 import org.drools.model.patterns.AndPatterns;
 import org.drools.model.patterns.ExistentialPatternImpl;
 import org.drools.model.patterns.OrPatterns;
+import org.drools.model.patterns.PatternBuilder;
 
 public class DSL {
 
@@ -62,7 +59,7 @@ public class DSL {
     public static View view(Function1<PatternBuilder, PatternBuilder.ValidBuilder>... builders) {
         Pattern[] patterns = new Pattern[builders.length];
         for (int i = 0; i < builders.length; i++) {
-            patterns[i] = pattern(builders[i]);
+            patterns[i] = builders[i].apply(new PatternBuilder()).get();
         }
         return view(patterns);
     }
@@ -125,31 +122,8 @@ public class DSL {
         };
     }
 
-    public static Consequence then(Block0 block) {
-        return new ConsequenceImpl(new Block() {
-            @Override
-            public void execute(Object... objs) {
-                block.execute();
-            }
-        });
-    }
-
-    public static <A> Consequence then(Variable<A> variable, Block1<A> block) {
-        return new ConsequenceImpl(new Block() {
-            @Override
-            public void execute(Object... objs) {
-                block.execute((A)objs[0]);
-            }
-        }, variable);
-    }
-
-    public static <A, B> Consequence then(Variable<A> var1, Variable<B> var2, Block2<A, B> block) {
-        return new ConsequenceImpl(new Block() {
-            @Override
-            public void execute(Object... objs) {
-                block.execute((A)objs[0], (B)objs[1]);
-            }
-        }, var1, var2);
+    public static Consequence then(Function1<ConsequenceBuilder, ConsequenceBuilder.ValidBuilder> builder) {
+        return builder.apply(new ConsequenceBuilder()).get();
     }
 
     public static Rule rule(View view, Consequence consequence) {

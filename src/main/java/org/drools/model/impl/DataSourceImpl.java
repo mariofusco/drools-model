@@ -4,27 +4,27 @@ import org.drools.model.*;
 
 import java.util.*;
 
-public class DataSourceImpl implements DataSource {
+public class DataSourceImpl<T> implements DataSource<T> {
 
-    private final Collection<ObjectSource> sources = new ArrayList<ObjectSource>();
+    protected final Collection<T> source;
 
-    private DataSourceImpl() { }
-
-    @Override
-    public Collection<ObjectSource> getObjectSources() {
-        return sources;
+    protected DataSourceImpl(Collection source) {
+        this.source = source;
     }
 
-    public DataSourceImpl addObjectSource(ObjectSource source) {
-        sources.add(source);
-        return this;
-    }
-
-    public static final DataSource dataSource(ObjectSource... sources) {
-        DataSourceImpl dataSource = new DataSourceImpl();
-        for (ObjectSource source : sources) {
-            dataSource.addObjectSource(source);
+    public static <T> DataSource<T> sourceOf(T... items) {
+        DataSource<T> dataSource = new DataSourceImpl(new ArrayList<T>());
+        for (T item : items) {
+            dataSource.insert(item);
         }
         return dataSource;
+    }
+
+    public Collection<T> getObjects() {
+        return source;
+    }
+
+    public void insert(T item) {
+        source.add(item);
     }
 }

@@ -10,11 +10,11 @@ import java.util.Map;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.drools.model.DSL.*;
+import static org.drools.model.DSL.view;
 import static org.drools.model.functions.accumulate.Average.avg;
 import static org.drools.model.functions.accumulate.Reduce.reduce;
 import static org.drools.model.functions.accumulate.Sum.sum;
-import static org.drools.model.impl.CollectionObjectSource.sourceOf;
-import static org.drools.model.impl.DataSourceImpl.dataSource;
+import static org.drools.model.impl.DataSourceImpl.sourceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -23,20 +23,21 @@ public class ViewBuilderTest {
     @Test
     public void testSimpleView() {
 
-        DataSource persons = dataSource(sourceOf(new Person("Mark", 37),
-                                                 new Person("Edson", 35),
-                                                 new Person("Mario", 40),
-                                                 new Person("Sofia", 3)));
+        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+                                              new Person("Edson", 35));
+
+        persons.insert(new Person("Mario", 40));
+        persons.insert(new Person("Sofia", 3));
 
         // Person(name == "Mark" or (age > 18 and age < 65)) from entry-point "persons"
 
-        Pattern pattern =
-                pattern( p -> p.filter(typeOf(Person.class))
-                        .with(person -> person.getName().equals("Mark"))
-                        .or(person -> person.getAge() > 18 && person.getAge() < 65)
-                        .from(persons) );
+        View view =
+                view(p -> p.filter(typeOf(Person.class))
+                           .with(person -> person.getName().equals("Mark"))
+                           .or(person -> person.getAge() > 18 && person.getAge() < 65)
+                           .from(persons));
 
-        List<TupleHandle> result = BruteForceEngine.get().evaluate(pattern);
+        List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
 
         assertEquals(3, result.size());
         List<String> names = result.stream()
@@ -49,9 +50,10 @@ public class ViewBuilderTest {
     @Test
     public void testJoin() {
 
-        DataSource persons = dataSource(sourceOf(new Person("Mark", 37),
-                                                 new Person("Edson", 35),
-                                                 new Person("Mario", 40)));
+        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+                                              new Person("Edson", 35),
+                                              new Person("Mario", 40),
+                                              new Person("Sofia", 3));
 
         // $mark: Person(name == "Mark") from entry-point "persons"
         // $older: Person(name != "Mark" && age > $mark.age) from entry-point "persons"
@@ -75,9 +77,10 @@ public class ViewBuilderTest {
 
     @Test
     public void testNot() {
-        DataSource persons = dataSource(sourceOf(new Person("Mark", 37),
-                                                 new Person("Edson", 35),
-                                                 new Person("Mario", 40)));
+        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+                                              new Person("Edson", 35),
+                                              new Person("Mario", 40),
+                                              new Person("Sofia", 3));
 
         // $oldest: Person()
         // not( Person(age > $oldest.age) )
@@ -99,9 +102,10 @@ public class ViewBuilderTest {
 
     @Test
     public void testExists() {
-        DataSource persons = dataSource(sourceOf(new Person("Mark", 37),
-                                                 new Person("Edson", 35),
-                                                 new Person("Mario", 40)));
+        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+                                              new Person("Edson", 35),
+                                              new Person("Mario", 40),
+                                              new Person("Sofia", 3));
 
         // $person: Person()
         // exists( Person(name.length > $person.name.length) )
@@ -123,9 +127,10 @@ public class ViewBuilderTest {
 
     @Test
     public void testAccumulate() {
-        DataSource persons = dataSource(sourceOf(new Person("Mark", 37),
-                                                 new Person("Edson", 35),
-                                                 new Person("Mario", 40)));
+        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+                                              new Person("Edson", 35),
+                                              new Person("Mario", 40),
+                                              new Person("Sofia", 3));
 
         // accumulate( $p : Person(name.startsWith("M"));
         //             $sum : sum( $p.age ),
@@ -158,10 +163,10 @@ public class ViewBuilderTest {
 
     @Test
     public void testOr() {
-        DataSource persons = dataSource(sourceOf(new Person("Mark", 37),
-                                                 new Person("Edson", 35),
-                                                 new Person("Mario", 40),
-                                                 new Person("Sofia", 3)));
+        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+                                              new Person("Edson", 35),
+                                              new Person("Mario", 40),
+                                              new Person("Sofia", 3));
 
         Variable<Person> mark = bind(typeOf(Person.class));
         Variable<Person> other = bind(typeOf(Person.class));

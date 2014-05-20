@@ -2,14 +2,20 @@ package org.drools.model.patterns;
 
 import org.drools.model.Constraint;
 import org.drools.model.DataSource;
+import org.drools.model.Index;
+import org.drools.model.SingleConstraint;
 import org.drools.model.SinglePattern;
 import org.drools.model.Type;
 import org.drools.model.Variable;
 import org.drools.model.constraints.AbstractConstraint;
+import org.drools.model.constraints.AbstractSingleConstraint;
 import org.drools.model.constraints.SingleConstraint1;
 import org.drools.model.constraints.SingleConstraint2;
+import org.drools.model.functions.Function1;
 import org.drools.model.functions.Predicate1;
 import org.drools.model.functions.Predicate2;
+import org.drools.model.index.AlphaIndexImpl;
+import org.drools.model.index.BetaIndexImpl;
 
 import static org.drools.model.DSL.bind;
 
@@ -60,8 +66,8 @@ public class PatternBuilder {
             return with(new SingleConstraint1<T>(variable, predicate));
         }
 
-        public ConstrainedPatternBuilder<T> with(Constraint constraint) {
-            return new ConstrainedPatternBuilder(variable, joinVars, constraint, dataSource);
+        public ConstrainedPatternBuilder<T> with(SingleConstraint constraint) {
+            return new ConstrainedPatternBuilder(variable, joinVars, (AbstractSingleConstraint)constraint, dataSource);
         }
 
         public <A, B> ConstrainedPatternBuilder<T> with(Variable<A> var1, Variable<B> var2, Predicate2<A, B> predicate) {
@@ -85,11 +91,13 @@ public class PatternBuilder {
         private final Variable[] joinVars;
         private Constraint constraint;
         private DataSource dataSource;
+        private AbstractSingleConstraint lastConstraint;
 
-        private ConstrainedPatternBuilder(Variable<T> variable, Variable[] joinVars, Constraint constraint, DataSource dataSource) {
+        private ConstrainedPatternBuilder(Variable<T> variable, Variable[] joinVars, AbstractSingleConstraint constraint, DataSource dataSource) {
             this.variable = variable;
             this.joinVars = joinVars;
             this.constraint = constraint;
+            this.lastConstraint = constraint;
             this.dataSource = dataSource;
         }
 
@@ -117,11 +125,11 @@ public class PatternBuilder {
         }
 
         public <A, B> ConstrainedPatternBuilder<T> and(Variable<A> var1, Variable<B> var2, Predicate2<A, B> predicate) {
-            return and(new SingleConstraint2<A, B>(var1, var2, predicate));
+            return and(lastConstraint = new SingleConstraint2<A, B>(var1, var2, predicate));
         }
 
         public <A> ConstrainedPatternBuilder<T> and(Variable<A> var1, Predicate2<T, A> predicate) {
-            return and(new SingleConstraint2<T, A>(variable, var1, predicate));
+            return and(lastConstraint = new SingleConstraint2<T, A>(variable, var1, predicate));
         }
 
         public ConstrainedPatternBuilder<T> and(AbstractConstraint constraint) {
@@ -130,15 +138,25 @@ public class PatternBuilder {
         }
 
         public <A, B> ConstrainedPatternBuilder<T> or(Variable<A> var1, Variable<B> var2, Predicate2<A, B> predicate) {
-            return or(new SingleConstraint2<A, B>(var1, var2, predicate));
+            return or(lastConstraint = new SingleConstraint2<A, B>(var1, var2, predicate));
         }
 
         public <A> ConstrainedPatternBuilder<T> or(Variable<A> var1, Predicate2<T, A> predicate) {
-            return or(new SingleConstraint2<T, A>(variable, var1, predicate));
+            return or(lastConstraint = new SingleConstraint2<T, A>(variable, var1, predicate));
         }
 
         public ConstrainedPatternBuilder<T> or(AbstractConstraint constraint) {
             this.constraint = ((AbstractConstraint)this.constraint).or(constraint);
+            return this;
+        }
+
+        public ConstrainedPatternBuilder<T> indexedBy(Index.ConstraintType constraintType, Function1<T, ?> leftOperandExtractor, Object rightValue) {
+            lastConstraint.setIndex(new AlphaIndexImpl<T>(constraintType, leftOperandExtractor, rightValue));
+            return this;
+        }
+
+        public <A> ConstrainedPatternBuilder<T> indexedBy(Index.ConstraintType constraintType, Function1<T, ?> leftOperandExtractor, Function1<A, ?> rightOperandExtractor) {
+            lastConstraint.setIndex(new BetaIndexImpl<T>(constraintType, leftOperandExtractor, rightOperandExtractor));
             return this;
         }
 

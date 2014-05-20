@@ -1,5 +1,7 @@
 package org.drools.model;
 
+import org.drools.model.functions.Block;
+
 public interface Consequence {
 
     Variable[] getDeclarations();

@@ -4,4 +4,6 @@ public interface SingleConstraint extends Constraint {
     Variable[] getVariables();
 
     Object getPredicate();
+
+    Index getIndex();
 }

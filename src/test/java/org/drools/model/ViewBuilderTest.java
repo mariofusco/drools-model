@@ -61,18 +61,42 @@ public class ViewBuilderTest {
         Variable<Person> mark = bind(typeOf(Person.class));
         Variable<Person> older = bind(typeOf(Person.class));
         View view = view(persons,
-                p -> p.filter(mark)
-                        .with(person -> person.getName().equals("Mark")),
-                p -> p.using(mark).filter(older)
-                        .with(person -> !person.getName().equals("Mark"))
-                        .and(older, mark, (p1, p2) -> p1.getAge() > p2.getAge())
-        );
+                         p -> p.filter(mark)
+                               .with(person -> person.getName().equals("Mark"))
+                               .indexedBy(Index.ConstraintType.EQUAL, Person::getName, "Mark"),
+                         p -> p.using(mark).filter(older)
+                               .with(person -> !person.getName().equals("Mark"))
+                               .indexedBy(Index.ConstraintType.NOT_EQUAL, Person::getName, "Mark")
+                               .and(older, mark, (p1, p2) -> p1.getAge() > p2.getAge())
+                               .indexedBy(Index.ConstraintType.GREATER_THAN, Person::getAge, Person::getAge)
+                        );
 
         List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
         assertEquals(1, result.size());
         TupleHandle tuple = result.get(0);
         assertEquals("Mark", tuple.get(mark).getName());
         assertEquals("Mario", tuple.get(older).getName());
+        
+        List<Pattern> patterns = view.getPatterns();
+        assertEquals(2, patterns.size());
+
+        Index index = ((SingleConstraint)((SinglePattern)patterns.get(0)).getConstraint()).getIndex();
+        assertEquals(Index.ConstraintType.EQUAL, index.getConstraintType());
+        assertEquals(Index.IndexType.ALPHA, index.getIndexType());
+        assertEquals("Mark", index.getLeftOperandExtractor().apply(new Person("Mark", 37)));
+        assertEquals("Mark", ((AlphaIndex)index).getRightValue());
+
+        index = ((SingleConstraint)((SinglePattern)patterns.get(1)).getConstraint().getChildren().get(0)).getIndex();
+        assertEquals(Index.ConstraintType.NOT_EQUAL, index.getConstraintType());
+        assertEquals(Index.IndexType.ALPHA, index.getIndexType());
+        assertEquals("Mark", index.getLeftOperandExtractor().apply(new Person("Mark", 37)));
+        assertEquals("Mark", ((AlphaIndex)index).getRightValue());
+
+        index = ((SingleConstraint)((SinglePattern)patterns.get(1)).getConstraint().getChildren().get(1)).getIndex();
+        assertEquals(Index.ConstraintType.GREATER_THAN, index.getConstraintType());
+        assertEquals(Index.IndexType.BETA, index.getIndexType());
+        assertEquals(37, index.getLeftOperandExtractor().apply(new Person("Mark", 37)));
+        assertEquals(37, ((BetaIndex)index).getRightOperandExtractor().apply(new Person("Mark", 37)));
     }
 
     @Test

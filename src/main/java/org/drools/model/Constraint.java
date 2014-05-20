@@ -1,17 +1,17 @@
 package org.drools.model;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface Constraint {
     enum Type { TRUE, SINGLE, OR, AND }
 
-    Collection<? extends Constraint> getChildren();
+    List<Constraint> getChildren();
 
     Type getType();
 
     Constraint True = new Constraint() {
         @Override
-        public Collection<? extends Constraint> getChildren() {
+        public List<Constraint> getChildren() {
             return null;
         }
 

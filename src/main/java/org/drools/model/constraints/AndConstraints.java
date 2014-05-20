@@ -3,7 +3,6 @@ package org.drools.model.constraints;
 import org.drools.model.Constraint;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class AndConstraints extends AbstractConstraint {
@@ -23,7 +22,7 @@ public class AndConstraints extends AbstractConstraint {
     }
 
     @Override
-    public Collection<Constraint> getChildren() {
+    public List<Constraint> getChildren() {
         return constraints;
     }
 

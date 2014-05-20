@@ -1,6 +1,6 @@
 package org.drools.model.consequences;
 
-import org.drools.model.Block;
+import org.drools.model.functions.Block;
 import org.drools.model.Consequence;
 import org.drools.model.Type;
 import org.drools.model.Variable;

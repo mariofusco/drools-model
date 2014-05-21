@@ -13,7 +13,8 @@ import static org.junit.Assert.assertEquals;
 
 public class RuleExecutionTest {
 
-    // TODO: add rule metadata
+    // TODO: add eval
+    // TODO: implement no LHS with eval(true)
 
     @Test
     public void testSimpleRule() {
@@ -27,16 +28,22 @@ public class RuleExecutionTest {
         Variable<Person> mark = bind(typeOf(Person.class));
 
         Rule rule = rule(
+                attributes().set(Rule.Attribute.SALIENCE, 10)
+                        .set(Rule.Attribute.AGENDA_GROUP, "myGroup"),
                 view(p -> p.filter(mark)
                            .with(person -> person.getName().equals("Mark"))
                            .from(persons)),
-            then(c -> c.on(mark)
-                       .execute(p -> list.add(p.getName())))
+                then(c -> c.on(mark)
+                           .execute(p -> list.add(p.getName())))
         );
 
         BruteForceEngine.get().evaluate(rule);
         assertEquals(1, list.size());
         assertEquals("Mark", list.get(0));
+
+        assertEquals(10, rule.getAttribute(Rule.Attribute.SALIENCE));
+        assertEquals("myGroup", rule.getAttribute(Rule.Attribute.AGENDA_GROUP));
+        assertEquals(false, rule.getAttribute(Rule.Attribute.NO_LOOP));
     }
 
     @Test

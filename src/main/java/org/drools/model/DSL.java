@@ -73,7 +73,7 @@ public class DSL {
         return new ExistentialPatternImpl<T>(ExistentialPattern.ExistentialType.NOT, pattern);
     }
 
-    public static <T> Function1<PatternBuilder, PatternBuilder.ValidBuilder> not(Function1<PatternBuilder, PatternBuilder.ValidBuilder<T>> builder) {
+    public static <T> Function1<PatternBuilder, PatternBuilder.ValidBuilder> not(final Function1<PatternBuilder, PatternBuilder.ValidBuilder<T>> builder) {
         return new Function1<PatternBuilder, PatternBuilder.ValidBuilder>() {
             @Override
             public PatternBuilder.ValidBuilder apply(PatternBuilder patternBuilder) {
@@ -91,7 +91,7 @@ public class DSL {
         return new ExistentialPatternImpl<T>(ExistentialPattern.ExistentialType.EXISTS, pattern);
     }
 
-    public static <T> Function1<PatternBuilder, PatternBuilder.ValidBuilder> exists(Function1<PatternBuilder, PatternBuilder.ValidBuilder<T>> builder) {
+    public static <T> Function1<PatternBuilder, PatternBuilder.ValidBuilder> exists(final Function1<PatternBuilder, PatternBuilder.ValidBuilder<T>> builder) {
         return new Function1<PatternBuilder, PatternBuilder.ValidBuilder>() {
             @Override
             public PatternBuilder.ValidBuilder apply(PatternBuilder patternBuilder) {
@@ -109,7 +109,7 @@ public class DSL {
         return new AccumulatePatternImpl<T>(pattern, functions);
     }
 
-    public static <T> Function1<PatternBuilder, PatternBuilder.ValidBuilder> accumulate(Function1<PatternBuilder, PatternBuilder.ValidBuilder<T>> builder, AccumulateFunction<T, ?, ?>... functions) {
+    public static <T> Function1<PatternBuilder, PatternBuilder.ValidBuilder> accumulate(final Function1<PatternBuilder, PatternBuilder.ValidBuilder<T>> builder, final AccumulateFunction<T, ?, ?>... functions) {
         return new Function1<PatternBuilder, PatternBuilder.ValidBuilder>() {
             @Override
             public PatternBuilder.ValidBuilder apply(PatternBuilder patternBuilder) {

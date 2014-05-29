@@ -32,7 +32,7 @@ public class ConsequenceBuilder {
     public class _0 implements ValidBuilder {
         private final Block block;
 
-        public _0(Block0 block) {
+        public _0(final Block0 block) {
             this.block = new Block() {
                 @Override
                 public void execute(Object... objs) {
@@ -84,7 +84,7 @@ public class ConsequenceBuilder {
             super(declaration);
         }
 
-        public _1<A> execute(Block1<A> block) {
+        public _1<A> execute(final Block1<A> block) {
             this.block = new Block() {
                 @Override
                 public void execute(Object... objs) {
@@ -100,7 +100,7 @@ public class ConsequenceBuilder {
             super(decl1, decl2);
         }
 
-        public _2<A, B> execute(Block2<A, B> block) {
+        public _2<A, B> execute(final Block2<A, B> block) {
             this.block = new Block() {
                 @Override
                 public void execute(Object... objs) {

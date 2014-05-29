@@ -4,15 +4,15 @@ import org.drools.model.AccumulatePattern;
 import org.drools.model.AccumulateFunction;
 import org.drools.model.Constraint;
 import org.drools.model.DataSource;
-import org.drools.model.SinglePattern;
+import org.drools.model.Pattern;
 import org.drools.model.Variable;
 
-public class AccumulatePatternImpl<T> extends AbstractSinglePattern implements AccumulatePattern<T> {
+public class AccumulatePatternImpl<T> extends AbstractPattern implements AccumulatePattern<T> {
 
-    private final SinglePattern<T> pattern;
+    private final Pattern<T> pattern;
     private final AccumulateFunction<T, ?, ?>[] functions;
 
-    public AccumulatePatternImpl(SinglePattern<T> pattern, AccumulateFunction<T, ?, ?>... functions) {
+    public AccumulatePatternImpl(Pattern<T> pattern, AccumulateFunction<T, ?, ?>... functions) {
         this.pattern = pattern;
         this.functions = functions;
     }
@@ -20,6 +20,11 @@ public class AccumulatePatternImpl<T> extends AbstractSinglePattern implements A
     @Override
     public AccumulateFunction<T, ?, ?>[] getFunctions() {
         return functions;
+    }
+
+    @Override
+    public Variable[] getInputVariables() {
+        return pattern.getInputVariables();
     }
 
     @Override
@@ -35,10 +40,5 @@ public class AccumulatePatternImpl<T> extends AbstractSinglePattern implements A
     @Override
     public Constraint getConstraint() {
         return pattern.getConstraint();
-    }
-
-    @Override
-    public Kind getKind() {
-        return pattern.getKind();
     }
 }

@@ -1,4 +1,5 @@
 package org.drools.model;
 
-public interface View extends Pattern {
+// view is the result
+public interface View extends Condition {
 }

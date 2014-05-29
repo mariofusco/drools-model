@@ -25,7 +25,7 @@ public class DSL {
         return new JavaClassType<T>(type);
     }
 
-    public static <T> SinglePattern<T> pattern(Function1<PatternBuilder, PatternBuilder.ValidBuilder> builder) {
+    public static <T> Pattern<T> pattern(Function1<PatternBuilder, PatternBuilder.ValidBuilder> builder) {
         return builder.apply(new PatternBuilder()).get();
     }
 
@@ -41,16 +41,16 @@ public class DSL {
         return AbstractConstraint.or(constraints);
     }
 
-    public static Pattern and(Pattern... patterns) {
+    public static Condition and(Condition... patterns) {
         return new AndPatterns(patterns);
     }
 
-    public static Pattern or(Pattern... patterns) {
+    public static Condition or(Condition... patterns) {
         return new OrPatterns(patterns);
     }
 
     public static View view(DataSource dataSource, Function1<PatternBuilder, PatternBuilder.ValidBuilder>... builders) {
-        Pattern[] patterns = new Pattern[builders.length];
+        Condition[] patterns = new Condition[builders.length];
         for (int i = 0; i < builders.length; i++) {
             patterns[i] = builders[i].apply(new PatternBuilder().from(dataSource)).get();
         }
@@ -58,18 +58,18 @@ public class DSL {
     }
 
     public static View view(Function1<PatternBuilder, PatternBuilder.ValidBuilder>... builders) {
-        Pattern[] patterns = new Pattern[builders.length];
+        Condition[] patterns = new Condition[builders.length];
         for (int i = 0; i < builders.length; i++) {
             patterns[i] = builders[i].apply(new PatternBuilder()).get();
         }
         return view(patterns);
     }
 
-    public static View view(Pattern... patterns) {
+    public static View view(Condition... patterns) {
         return new AndPatterns(patterns);
     }
 
-    public static <T> ExistentialPattern not(SinglePattern<T> pattern) {
+    public static <T> ExistentialPattern not(Pattern<T> pattern) {
         return new ExistentialPatternImpl<T>(ExistentialPattern.ExistentialType.NOT, pattern);
     }
 
@@ -79,7 +79,7 @@ public class DSL {
             public PatternBuilder.ValidBuilder apply(PatternBuilder patternBuilder) {
                 return new PatternBuilder.ValidBuilder() {
                     @Override
-                    public SinglePattern<T> get() {
+                    public Pattern<T> get() {
                         return not(builder.apply(new PatternBuilder()).get());
                     }
                 };
@@ -87,7 +87,7 @@ public class DSL {
         };
     }
 
-    public static <T> ExistentialPattern<T> exists(SinglePattern<T> pattern) {
+    public static <T> ExistentialPattern<T> exists(Pattern<T> pattern) {
         return new ExistentialPatternImpl<T>(ExistentialPattern.ExistentialType.EXISTS, pattern);
     }
 
@@ -97,7 +97,7 @@ public class DSL {
             public PatternBuilder.ValidBuilder apply(PatternBuilder patternBuilder) {
                 return new PatternBuilder.ValidBuilder() {
                     @Override
-                    public SinglePattern<T> get() {
+                    public Pattern<T> get() {
                         return exists(builder.apply(new PatternBuilder()).get());
                     }
                 };
@@ -105,7 +105,7 @@ public class DSL {
         };
     }
 
-    public static <T> AccumulatePattern<T> accumulate(SinglePattern<T> pattern, AccumulateFunction<T, ?, ?>... functions) {
+    public static <T> AccumulatePattern<T> accumulate(Pattern<T> pattern, AccumulateFunction<T, ?, ?>... functions) {
         return new AccumulatePatternImpl<T>(pattern, functions);
     }
 
@@ -115,7 +115,7 @@ public class DSL {
             public PatternBuilder.ValidBuilder apply(PatternBuilder patternBuilder) {
                 return new PatternBuilder.ValidBuilder() {
                     @Override
-                    public SinglePattern<T> get() {
+                    public Pattern<T> get() {
                         return accumulate(builder.apply(new PatternBuilder()).get(), functions);
                     }
                 };

@@ -3,8 +3,8 @@ package org.drools.model.patterns;
 import org.drools.model.Constraint;
 import org.drools.model.DataSource;
 import org.drools.model.Index;
+import org.drools.model.Pattern;
 import org.drools.model.SingleConstraint;
-import org.drools.model.SinglePattern;
 import org.drools.model.Type;
 import org.drools.model.Variable;
 import org.drools.model.constraints.AbstractConstraint;
@@ -43,7 +43,7 @@ public class PatternBuilder {
     }
 
     public interface ValidBuilder<T> {
-        SinglePattern<T> get();
+        Pattern<T> get();
     }
 
     public static class BoundPatternBuilder<T> implements ValidBuilder<T> {
@@ -79,10 +79,8 @@ public class PatternBuilder {
         }
 
         @Override
-        public SinglePattern<T> get() {
-            return joinVars == null ?
-                   new SinglePatternImpl(variable, Constraint.True, dataSource) :
-                   new JoinPatternImpl(variable, joinVars, Constraint.True, dataSource);
+        public Pattern<T> get() {
+            return new PatternImpl(variable, joinVars, Constraint.True, dataSource);
         }
     }
 
@@ -161,10 +159,8 @@ public class PatternBuilder {
         }
 
         @Override
-        public SinglePattern<T> get() {
-            return joinVars == null ?
-                   new SinglePatternImpl(variable, constraint, dataSource) :
-                   new JoinPatternImpl(variable, joinVars, constraint, dataSource);
+        public Pattern<T> get() {
+            return new PatternImpl(variable, joinVars, constraint, dataSource);
         }
     }
 }

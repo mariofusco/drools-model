@@ -15,6 +15,7 @@ public class RuleExecutionTest {
 
     // TODO: add eval
     // TODO: implement no LHS with eval(true)
+    // TODO: globals
 
     @Test
     public void testSimpleRule() {

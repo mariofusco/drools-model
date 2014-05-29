@@ -3,9 +3,7 @@ package org.drools.model;
 import org.drools.model.engine.BruteForceEngine;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
@@ -77,22 +75,22 @@ public class ViewBuilderTest {
         assertEquals("Mark", tuple.get(mark).getName());
         assertEquals("Mario", tuple.get(older).getName());
         
-        List<Pattern> patterns = view.getPatterns();
+        List<Condition> patterns = view.getSubConditions();
         assertEquals(2, patterns.size());
 
-        Index index = ((SingleConstraint)((SinglePattern)patterns.get(0)).getConstraint()).getIndex();
+        Index index = ((SingleConstraint)((Pattern)patterns.get(0)).getConstraint()).getIndex();
         assertEquals(Index.ConstraintType.EQUAL, index.getConstraintType());
         assertEquals(Index.IndexType.ALPHA, index.getIndexType());
         assertEquals("Mark", index.getLeftOperandExtractor().apply(new Person("Mark", 37)));
         assertEquals("Mark", ((AlphaIndex)index).getRightValue());
 
-        index = ((SingleConstraint)((SinglePattern)patterns.get(1)).getConstraint().getChildren().get(0)).getIndex();
+        index = ((SingleConstraint)((Pattern)patterns.get(1)).getConstraint().getChildren().get(0)).getIndex();
         assertEquals(Index.ConstraintType.NOT_EQUAL, index.getConstraintType());
         assertEquals(Index.IndexType.ALPHA, index.getIndexType());
         assertEquals("Mark", index.getLeftOperandExtractor().apply(new Person("Mark", 37)));
         assertEquals("Mark", ((AlphaIndex)index).getRightValue());
 
-        index = ((SingleConstraint)((SinglePattern)patterns.get(1)).getConstraint().getChildren().get(1)).getIndex();
+        index = ((SingleConstraint)((Pattern)patterns.get(1)).getConstraint().getChildren().get(1)).getIndex();
         assertEquals(Index.ConstraintType.GREATER_THAN, index.getConstraintType());
         assertEquals(Index.IndexType.BETA, index.getIndexType());
         assertEquals(37, index.getLeftOperandExtractor().apply(new Person("Mark", 37)));

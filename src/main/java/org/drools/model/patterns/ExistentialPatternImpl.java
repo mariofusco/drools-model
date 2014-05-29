@@ -3,23 +3,22 @@ package org.drools.model.patterns;
 import org.drools.model.Constraint;
 import org.drools.model.DataSource;
 import org.drools.model.ExistentialPattern;
-import org.drools.model.JoinPattern;
-import org.drools.model.SinglePattern;
+import org.drools.model.Pattern;
 import org.drools.model.Variable;
 
-public class ExistentialPatternImpl<T> extends AbstractSinglePattern implements ExistentialPattern<T> {
+public class ExistentialPatternImpl<T> extends AbstractPattern implements ExistentialPattern<T> {
 
-    private final SinglePattern pattern;
+    private final Pattern pattern;
     private final ExistentialType existentialType;
 
-    public ExistentialPatternImpl(ExistentialType existentialType, SinglePattern pattern) {
+    public ExistentialPatternImpl(ExistentialType existentialType, Pattern pattern) {
         this.existentialType = existentialType;
         this.pattern = pattern;
     }
 
     @Override
-    public Variable[] getJoinVariables() {
-        return pattern instanceof JoinPattern ? ((JoinPattern)pattern).getJoinVariables() : null;
+    public Variable[] getInputVariables() {
+        return pattern.getInputVariables();
     }
 
     @Override
@@ -35,11 +34,6 @@ public class ExistentialPatternImpl<T> extends AbstractSinglePattern implements 
     @Override
     public Constraint getConstraint() {
         return pattern.getConstraint();
-    }
-
-    @Override
-    public Kind getKind() {
-        return pattern.getKind();
     }
 
     @Override

@@ -2,13 +2,13 @@ package org.drools.model.engine;
 
 import org.drools.model.AccumulateFunction;
 import org.drools.model.AccumulatePattern;
+import org.drools.model.Condition;
 import org.drools.model.Constraint;
 import org.drools.model.DataSource;
 import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
 import org.drools.model.Rule;
 import org.drools.model.SingleConstraint;
-import org.drools.model.SinglePattern;
 import org.drools.model.TupleHandle;
 import org.drools.model.Type;
 import org.drools.model.Variable;
@@ -55,32 +55,31 @@ public class BruteForceEngine {
     }
 
     public List<TupleHandle> evaluate(View view) {
-        return evaluatePattern(view, initialBindings()).toTupleHandles();
+        return evaluateCondition(view, initialBindings()).toTupleHandles();
     }
 
-    public List<TupleHandle> evaluate(Pattern pattern) {
-        return evaluatePattern(pattern, initialBindings()).toTupleHandles();
+    public List<TupleHandle> evaluate(Condition condition) {
+        return evaluateCondition(condition, initialBindings()).toTupleHandles();
     }
 
-    private Bindings evaluatePattern(Pattern pattern, Bindings bindings) {
-        switch (pattern.getType()) {
-            case SINGLE:
-                return evaluateSinglePattern((SinglePattern)pattern, bindings);
-            case AND:
-                return pattern.getPatterns().stream()
-                       .reduce(bindings,
-                               (b, p) -> evaluatePattern(p, b),
-                               (b1, b2) -> null);
-            case OR:
-                return pattern.getPatterns().stream()
-                              .reduce(new Bindings(),
-                                      (b, p) -> b.append(evaluatePattern(p, bindings)),
-                                      (b1, b2) -> null);
+    private Bindings evaluateCondition(Condition condition, Bindings bindings) {
+        if (condition.getType() instanceof Condition.SingleType) {
+            return evaluateSinglePattern((Pattern)condition, bindings);
+        } else if (condition.getType() instanceof Condition.AndType) {
+            return condition.getSubConditions().stream()
+                            .reduce(bindings,
+                                    (b, p) -> evaluateCondition(p, b),
+                                    (b1, b2) -> null);
+        } else if (condition.getType() instanceof Condition.OrType) {
+            return condition.getSubConditions().stream()
+                            .reduce(new Bindings(),
+                                    (b, p) -> b.append(evaluateCondition(p, bindings)),
+                                    (b1, b2) -> null);
         }
         return null;
     }
 
-    private Bindings evaluateSinglePattern(SinglePattern pattern, Bindings bindings) {
+    private Bindings evaluateSinglePattern(Pattern pattern, Bindings bindings) {
         if (pattern instanceof ExistentialPattern) {
             return evaluateExistential((ExistentialPattern) pattern, bindings);
         }
@@ -151,7 +150,7 @@ public class BruteForceEngine {
                 .filter(type::isInstance);
     }
 
-    private Stream<BoundTuple> generateMatches(SinglePattern pattern, Bindings bindings, Object obj) {
+    private Stream<BoundTuple> generateMatches(Pattern pattern, Bindings bindings, Object obj) {
         return bindings.tuples.parallelStream()
                         .map(t -> t.bind(pattern.getVariable(), obj))
                         .filter(t -> match(pattern.getConstraint(), t));

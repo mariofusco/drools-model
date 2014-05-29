@@ -1,11 +1,12 @@
 package org.drools.model;
 
-import java.util.List;
+public interface Pattern<T> extends Condition {
 
-public interface Pattern {
-    enum Type { SINGLE, OR, AND }
+    DataSource getDataSource();
 
-    List<Pattern> getPatterns();
+    Variable<T> getVariable(); // have more than one variable (?)
 
-    Type getType();
+    Variable[] getInputVariables();
+
+    Constraint getConstraint();
 }

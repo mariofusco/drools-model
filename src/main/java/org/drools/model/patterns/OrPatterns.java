@@ -1,25 +1,25 @@
 package org.drools.model.patterns;
 
-import org.drools.model.Pattern;
+import org.drools.model.Condition;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class OrPatterns implements Pattern {
+public class OrPatterns implements Condition {
 
-    private final List<Pattern> patterns;
+    private final List<Condition> patterns;
 
-    public OrPatterns(Pattern... patterns) {
+    public OrPatterns(Condition... patterns) {
         this.patterns = Arrays.asList(patterns);
     }
 
     @Override
-    public List<Pattern> getPatterns() {
+    public List<Condition> getSubConditions() {
         return patterns;
     }
 
     @Override
     public Type getType() {
-        return Type.OR;
+        return OrType.INSTANCE;
     }
 }

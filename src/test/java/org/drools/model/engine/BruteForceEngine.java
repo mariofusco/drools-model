@@ -15,8 +15,6 @@ import org.drools.model.Variable;
 import org.drools.model.View;
 import org.drools.model.constraints.AndConstraints;
 import org.drools.model.constraints.OrConstraints;
-import org.drools.model.constraints.SingleConstraint1;
-import org.drools.model.constraints.SingleConstraint2;
 import org.drools.model.impl.TupleHandleImpl;
 
 import java.util.ArrayList;
@@ -165,17 +163,16 @@ public class BruteForceEngine {
             case TRUE:
                 return true;
             case SINGLE:
-                Variable[] vars = ((SingleConstraint)constraint).getVariables();
+                SingleConstraint singleCon = (SingleConstraint)constraint;
+                Variable[] vars = singleCon.getVariables();
                 switch (vars.length) {
                     case 1:
                         Object obj = tuple.get(vars[0]);
-                        SingleConstraint1 singleCon = (SingleConstraint1)constraint;
                         return singleCon.getPredicate().test(obj);
                     case 2:
                         Object obj1 = tuple.get(vars[0]);
                         Object obj2 = tuple.get(vars[1]);
-                        SingleConstraint2 singleCon2 = (SingleConstraint2)constraint;
-                        return singleCon2.getPredicate().test(obj1, obj2);
+                        return singleCon.getPredicate().test(obj1, obj2);
                 }
             case AND:
                 AndConstraints andCon = (AndConstraints)constraint;

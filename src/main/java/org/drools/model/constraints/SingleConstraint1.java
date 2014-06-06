@@ -1,6 +1,7 @@
 package org.drools.model.constraints;
 
 import org.drools.model.Variable;
+import org.drools.model.functions.MultiValuePredicate;
 import org.drools.model.functions.Predicate1;
 
 public class SingleConstraint1<A> extends AbstractSingleConstraint {
@@ -24,7 +25,12 @@ public class SingleConstraint1<A> extends AbstractSingleConstraint {
     }
 
     @Override
-    public Predicate1<A> getPredicate() {
-        return predicate;
+    public MultiValuePredicate getPredicate() {
+        return new MultiValuePredicate() {
+            @Override
+            public boolean test(Object... objs) {
+                return predicate.test((A)objs[0]);
+            }
+        };
     }
 }

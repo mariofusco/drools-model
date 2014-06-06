@@ -18,4 +18,9 @@ public class JavaClassType<T> implements Type<T> {
     public String toString() {
         return type.getSimpleName();
     }
+
+    @Override
+    public Class<T> asClass() {
+        return type;
+    }
 }

@@ -1,9 +1,11 @@
 package org.drools.model;
 
+import org.drools.model.functions.MultiValuePredicate;
+
 public interface SingleConstraint extends Constraint {
     Variable[] getVariables();
 
-    Object getPredicate();
+    MultiValuePredicate getPredicate();
 
     Index getIndex();
 }

@@ -2,7 +2,9 @@ package org.drools.model.functions.accumulate;
 
 import org.drools.model.functions.Function2;
 
-public class Reduce<T, R> extends AbstractAccumulateFunction<T, R, R> {
+import java.io.Serializable;
+
+public class Reduce<T, R extends Serializable> extends AbstractAccumulateFunction<T, R, R> {
 
     private final R zero;
     private final Function2<R, T, R> reducingFunction;
@@ -32,7 +34,7 @@ public class Reduce<T, R> extends AbstractAccumulateFunction<T, R, R> {
         return acc;
     }
 
-    public static <T, R> Reduce<T, R> reduce(R zero, Function2<R, T, R> reducingFunction) {
+    public static <T, R extends Serializable> Reduce<T, R> reduce(R zero, Function2<R, T, R> reducingFunction) {
         return new Reduce(zero, reducingFunction);
     }
 }

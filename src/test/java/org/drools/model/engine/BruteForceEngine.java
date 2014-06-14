@@ -17,6 +17,7 @@ import org.drools.model.constraints.AndConstraints;
 import org.drools.model.constraints.OrConstraints;
 import org.drools.model.impl.TupleHandleImpl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -121,11 +122,11 @@ public class BruteForceEngine {
 
     private static class AccumulateReducer {
         private final AccumulateFunction[] functions;
-        private final Object[] accumulators;
+        private final Serializable[] accumulators;
 
         private AccumulateReducer(AccumulatePattern pattern) {
             this.functions = pattern.getFunctions();
-            this.accumulators = stream(functions).map(AccumulateFunction::init).toArray();
+            this.accumulators = (Serializable[]) stream(functions).map(AccumulateFunction::init).toArray();
         }
 
         public AccumulateReducer accumulate(Object obj) {

@@ -1,6 +1,8 @@
 package org.drools.model;
 
-public interface AccumulateFunction<T, A, R> {
+import java.io.Serializable;
+
+public interface AccumulateFunction<T, A extends Serializable, R> {
 
     A init();
 

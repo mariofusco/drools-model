@@ -2,6 +2,8 @@ package org.drools.model.functions.accumulate;
 
 import org.drools.model.functions.Function1;
 
+import java.io.Serializable;
+
 public class Average<T> extends AbstractAccumulateFunction<T, Average.Context, Double> {
 
     private final Function1<T, ? extends Number> mapper;
@@ -34,7 +36,7 @@ public class Average<T> extends AbstractAccumulateFunction<T, Average.Context, D
         return new Average<T>(mapper);
     }
 
-    public static class Context {
+    public static class Context implements Serializable {
         private final double total;
         private final int count;
 

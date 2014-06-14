@@ -2,6 +2,8 @@ package org.drools.model.functions.accumulate;
 
 import org.drools.model.functions.Function1;
 
+import java.io.Serializable;
+
 public class Sum<T, N extends Number> extends AbstractAccumulateFunction<T, Sum.Context<N>, N> {
 
     private final Function1<T, N> mapper;
@@ -34,7 +36,7 @@ public class Sum<T, N extends Number> extends AbstractAccumulateFunction<T, Sum.
         return new Sum<T, N>(mapper);
     }
 
-    public static class Context<N extends Number> {
+    public static class Context<N extends Number> implements Serializable {
         private final N total;
         private final Class<N> clazz;
 

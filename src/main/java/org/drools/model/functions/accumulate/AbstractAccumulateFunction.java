@@ -3,7 +3,9 @@ package org.drools.model.functions.accumulate;
 import org.drools.model.AccumulateFunction;
 import org.drools.model.Variable;
 
-public abstract class AbstractAccumulateFunction<T, A, R> implements AccumulateFunction<T, A, R> {
+import java.io.Serializable;
+
+public abstract class AbstractAccumulateFunction<T, A extends Serializable, R> implements AccumulateFunction<T, A, R> {
     private Variable<R> var;
 
     @Override

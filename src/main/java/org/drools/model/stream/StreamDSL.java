@@ -64,10 +64,10 @@ public class StreamDSL {
     }
 
     public static <T> ViewItem expr(Variable<T> var, Predicate1<T> predicate) {
-        return new Expr1ViewItem<>(var, predicate);
+        return new Expr1ViewItem<T>(var, predicate);
     }
 
     public static <T, U> ViewItem expr(Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
-        return new Expr2ViewItem<>(var1, var2, predicate);
+        return new Expr2ViewItem<T, U>(var1, var2, predicate);
     }
 }

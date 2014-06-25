@@ -27,8 +27,13 @@ public class ExistentialPatternImpl<T> extends AbstractPattern implements Existe
     }
 
     @Override
-    public Variable<T> getVariable() {
-        return pattern.getVariable();
+    public Variable<T> getPatternVariable() {
+        return pattern.getPatternVariable();
+    }
+
+    @Override
+    public Variable[] getBoundVariables() {
+        return new Variable[0];
     }
 
     @Override

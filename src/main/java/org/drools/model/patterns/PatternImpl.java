@@ -29,8 +29,18 @@ public class PatternImpl<T> implements Pattern<T> {
     }
 
     @Override
-    public Variable<T> getVariable() {
+    public Variable<T> getPatternVariable() {
         return variable;
+    }
+
+    @Override
+    public Variable[] getBoundVariables() {
+        return new Variable[] { variable };
+    }
+
+    @Override
+    public Variable[] getInputVariables() {
+        return inputVariables;
     }
 
     @Override
@@ -46,10 +56,5 @@ public class PatternImpl<T> implements Pattern<T> {
     @Override
     public Type getType() {
         return SingleType.INSTANCE;
-    }
-
-    @Override
-    public Variable[] getInputVariables() {
-        return inputVariables;
     }
 }

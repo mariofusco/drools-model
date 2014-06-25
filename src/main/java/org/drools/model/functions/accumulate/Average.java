@@ -23,13 +23,13 @@ public class Average<T> extends AbstractAccumulateFunction<T, Average.Context, D
     }
 
     @Override
-    public Context reverse(Context acc, T obj) {
-        return acc.subtract(mapper.apply(obj));
+    public void reverse(Context acc, T obj) {
+        acc.subtract(mapper.apply(obj));
     }
 
     @Override
-    public Context action(Context acc, T obj) {
-        return acc.add(mapper.apply(obj));
+    public void action(Context acc, T obj) {
+        acc.add(mapper.apply(obj));
     }
 
     public static <T> Average<T> avg(Function1<T, ? extends Number> mapper) {
@@ -37,8 +37,8 @@ public class Average<T> extends AbstractAccumulateFunction<T, Average.Context, D
     }
 
     public static class Context implements Serializable {
-        private final double total;
-        private final int count;
+        private double total;
+        private int count;
 
         private Context() {
             this(0.0, 0);
@@ -49,12 +49,14 @@ public class Average<T> extends AbstractAccumulateFunction<T, Average.Context, D
             this.count = count;
         }
 
-        private Context add(Number value) {
-            return new Context(total + value.doubleValue(), count+1);
+        private void add(Number value) {
+            total += value.doubleValue();
+            count++;
         }
 
-        private Context subtract(Number value) {
-            return new Context(total - value.doubleValue(), count-1);
+        private void subtract(Number value) {
+            total -= value.doubleValue();
+            count--;
         }
 
         private double result() {

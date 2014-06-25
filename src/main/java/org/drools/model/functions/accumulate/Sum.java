@@ -18,13 +18,13 @@ public class Sum<T, N extends Number> extends AbstractAccumulateFunction<T, Sum.
     }
 
     @Override
-    public Context action(Context<N> acc, T obj) {
-        return acc.add(mapper.apply(obj));
+    public void action(Context<N> acc, T obj) {
+        acc.add(mapper.apply(obj));
     }
 
     @Override
-    public Context reverse(Context<N> acc, T obj) {
-        return acc.subtract(mapper.apply(obj));
+    public void reverse(Context<N> acc, T obj) {
+        acc.subtract(mapper.apply(obj));
     }
 
     @Override
@@ -37,33 +37,33 @@ public class Sum<T, N extends Number> extends AbstractAccumulateFunction<T, Sum.
     }
 
     public static class Context<N extends Number> implements Serializable {
-        private final N total;
-        private final Class<N> clazz;
+        private Double total;
+        private Class<N> clazz;
 
         public Context() {
             this(null, null);
         }
 
-        public Context(N total, Class<N> clazz) {
+        public Context(Double total, Class<N> clazz) {
             this.total = total;
             this.clazz = clazz;
         }
 
-        private Context add(N value) {
-            if (value == null) {
-                return this;
+        private void add(N value) {
+            if (value != null) {
+                if (total == null) {
+                    total = value.doubleValue();
+                    clazz = (Class<N>)value.getClass();
+                } else {
+                    total = total + value.doubleValue();
+                }
             }
-            if (total == null) {
-                return new Context(value, value.getClass());
-            }
-            return new Context(total.doubleValue() + value.doubleValue(), clazz);
         }
 
-        private Context subtract(N value) {
-            if (value == null) {
-                return this;
+        private void subtract(N value) {
+            if (value != null) {
+                total = total - value.doubleValue();
             }
-            return new Context(total.doubleValue() - value.doubleValue(), clazz);
         }
 
         private N result() {
@@ -73,7 +73,7 @@ public class Sum<T, N extends Number> extends AbstractAccumulateFunction<T, Sum.
             if (clazz == Long.class || clazz == long.class) {
                 return (N) new Long(total.longValue());
             }
-            return total;
+            return (N) total;
         }
     }
 }

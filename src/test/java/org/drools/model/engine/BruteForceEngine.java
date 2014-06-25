@@ -85,7 +85,7 @@ public class BruteForceEngine {
         if (pattern instanceof AccumulatePattern) {
             return evaluateAccumulate((AccumulatePattern) pattern, bindings);
         }
-        Stream<Object> objects = getObjectsOfType(pattern.getDataSource(), pattern.getVariable().getType());
+        Stream<Object> objects = getObjectsOfType(pattern.getDataSource(), pattern.getPatternVariable().getType());
         List<BoundTuple> tuples =
                 objects.flatMap(obj -> generateMatches(pattern, bindings, obj))
                        .collect(toList());
@@ -93,10 +93,10 @@ public class BruteForceEngine {
     }
 
     private Bindings evaluateExistential(ExistentialPattern pattern, Bindings bindings) {
-        List<Object> objects = getObjectsOfType(pattern.getDataSource(), pattern.getVariable().getType()).collect(toList());
+        List<Object> objects = getObjectsOfType(pattern.getDataSource(), pattern.getPatternVariable().getType()).collect(toList());
         Predicate<BoundTuple> existentialPredicate =
                 tuple -> objects.stream()
-                                 .map(obj -> tuple.bind(pattern.getVariable(), obj))
+                                 .map(obj -> tuple.bind(pattern.getPatternVariable(), obj))
                                  .anyMatch(t -> match(pattern.getConstraint(), t));
         if (pattern.getExistentialType() == ExistentialPattern.ExistentialType.NOT) {
             existentialPredicate = existentialPredicate.negate();
@@ -109,11 +109,11 @@ public class BruteForceEngine {
     }
 
     private Bindings evaluateAccumulate(AccumulatePattern pattern, Bindings bindings) {
-        List<Object> objects = getObjectsOfType(pattern.getDataSource(), pattern.getVariable().getType()).collect(toList());
+        List<Object> objects = getObjectsOfType(pattern.getDataSource(), pattern.getPatternVariable().getType()).collect(toList());
         List<BoundTuple> tuples =
                 bindings.tuples.parallelStream()
                         .map(tuple -> objects.stream()
-                                             .filter(obj -> match(pattern.getConstraint(), tuple.bind(pattern.getVariable(), obj)))
+                                             .filter(obj -> match(pattern.getConstraint(), tuple.bind(pattern.getPatternVariable(), obj)))
                                              .reduce(new AccumulateReducer(pattern), AccumulateReducer::accumulate, (a1, a2) -> null)
                                              .bindAllResults(tuple))
                         .collect(toList());
@@ -126,12 +126,12 @@ public class BruteForceEngine {
 
         private AccumulateReducer(AccumulatePattern pattern) {
             this.functions = pattern.getFunctions();
-            this.accumulators = (Serializable[]) stream(functions).map(AccumulateFunction::init).toArray();
+            this.accumulators = stream(functions).map(AccumulateFunction::init).toArray(Serializable[]::new);
         }
 
         public AccumulateReducer accumulate(Object obj) {
             for (int i = 0; i < functions.length; i++) {
-                accumulators[i] = functions[i].action(accumulators[i], obj);
+                functions[i].action(accumulators[i], obj);
             }
             return this;
         }
@@ -151,7 +151,7 @@ public class BruteForceEngine {
 
     private Stream<BoundTuple> generateMatches(Pattern pattern, Bindings bindings, Object obj) {
         return bindings.tuples.parallelStream()
-                        .map(t -> t.bind(pattern.getVariable(), obj))
+                        .map(t -> t.bind(pattern.getPatternVariable(), obj))
                         .filter(t -> match(pattern.getConstraint(), t));
     }
 

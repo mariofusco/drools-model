@@ -11,10 +11,15 @@ public class AccumulatePatternImpl<T> extends AbstractPattern implements Accumul
 
     private final Pattern<T> pattern;
     private final AccumulateFunction<T, ?, ?>[] functions;
+    private final Variable[] boundVariables;
 
     public AccumulatePatternImpl(Pattern<T> pattern, AccumulateFunction<T, ?, ?>... functions) {
         this.pattern = pattern;
         this.functions = functions;
+        boundVariables = new Variable[functions.length];
+        for (int i = 0; i < functions.length; i++) {
+            boundVariables[i] = functions[i].getVariable();
+        }
     }
 
     @Override
@@ -33,8 +38,13 @@ public class AccumulatePatternImpl<T> extends AbstractPattern implements Accumul
     }
 
     @Override
-    public Variable<T> getVariable() {
-        return pattern.getVariable();
+    public Variable<T> getPatternVariable() {
+        return pattern.getPatternVariable();
+    }
+
+    @Override
+    public Variable[] getBoundVariables() {
+        return boundVariables;
     }
 
     @Override

@@ -29,17 +29,12 @@ public class PatternBuilder {
         return this;
     }
 
-    public PatternBuilder using(Variable... joinVars) {
-        this.joinVars = joinVars;
-        return this;
-    }
-
     public <T> BoundPatternBuilder<T> filter(Type<T> type) {
         return filter((Variable<T>) bind(type));
     }
 
     public <T> BoundPatternBuilder<T> filter(Variable<T> var) {
-        return new BoundPatternBuilder<T>(var, joinVars, dataSource);
+        return new BoundPatternBuilder<T>(var, dataSource);
     }
 
     public interface ValidBuilder<T> {
@@ -48,12 +43,10 @@ public class PatternBuilder {
 
     public static class BoundPatternBuilder<T> implements ValidBuilder<T> {
         private final Variable<T> variable;
-        private final Variable[] joinVars;
         private DataSource dataSource;
 
-        private BoundPatternBuilder(Variable<T> variable, Variable[] joinVars, DataSource dataSource) {
+        private BoundPatternBuilder(Variable<T> variable, DataSource dataSource) {
             this.variable = variable;
-            this.joinVars = joinVars;
             this.dataSource = dataSource;
         }
 
@@ -67,7 +60,7 @@ public class PatternBuilder {
         }
 
         public ConstrainedPatternBuilder<T> with(SingleConstraint constraint) {
-            return new ConstrainedPatternBuilder(variable, joinVars, (AbstractSingleConstraint)constraint, dataSource);
+            return new ConstrainedPatternBuilder(variable, (AbstractSingleConstraint)constraint, dataSource);
         }
 
         public <A, B> ConstrainedPatternBuilder<T> with(Variable<A> var1, Variable<B> var2, Predicate2<A, B> predicate) {
@@ -80,20 +73,18 @@ public class PatternBuilder {
 
         @Override
         public Pattern<T> get() {
-            return new PatternImpl(variable, joinVars, Constraint.True, dataSource);
+            return new PatternImpl(variable, Constraint.True, dataSource);
         }
     }
 
     public static class ConstrainedPatternBuilder<T> implements ValidBuilder<T> {
         private final Variable<T> variable;
-        private final Variable[] joinVars;
         private Constraint constraint;
         private DataSource dataSource;
         private AbstractSingleConstraint lastConstraint;
 
-        private ConstrainedPatternBuilder(Variable<T> variable, Variable[] joinVars, AbstractSingleConstraint constraint, DataSource dataSource) {
+        private ConstrainedPatternBuilder(Variable<T> variable, AbstractSingleConstraint constraint, DataSource dataSource) {
             this.variable = variable;
-            this.joinVars = joinVars;
             this.constraint = constraint;
             this.lastConstraint = constraint;
             this.dataSource = dataSource;
@@ -160,7 +151,7 @@ public class PatternBuilder {
 
         @Override
         public Pattern<T> get() {
-            return new PatternImpl(variable, joinVars, constraint, dataSource);
+            return new PatternImpl(variable, constraint, dataSource);
         }
     }
 }

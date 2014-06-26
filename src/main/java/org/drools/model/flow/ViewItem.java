@@ -1,4 +1,4 @@
-package org.drools.model.stream;
+package org.drools.model.flow;
 
 import org.drools.model.Variable;
 

@@ -62,7 +62,7 @@ public class ViewBuilderTest {
                          p -> p.filter(mark)
                                .with(person -> person.getName().equals("Mark"))
                                .indexedBy(Index.ConstraintType.EQUAL, Person::getName, "Mark"),
-                         p -> p.using(mark).filter(older)
+                         p -> p.filter(older)
                                .with(person -> !person.getName().equals("Mark"))
                                .indexedBy(Index.ConstraintType.NOT_EQUAL, Person::getName, "Mark")
                                .and(older, mark, (p1, p2) -> p1.getAge() > p2.getAge())
@@ -111,7 +111,7 @@ public class ViewBuilderTest {
 
         View view = view(
                 p -> p.filter(oldest).from(persons),
-                not(p -> p.using(oldest).filter(typeOf(Person.class))
+                not(p -> p.filter(typeOf(Person.class))
                           .with(oldest, (p1, p2) -> p1.getAge() > p2.getAge())
                           .from(persons))
         );
@@ -136,7 +136,7 @@ public class ViewBuilderTest {
 
         View view = view(
                 p -> p.filter(person).from(persons),
-                exists( p -> p.using(person).filter(typeOf(Person.class))
+                exists( p -> p.filter(typeOf(Person.class))
                              .with(person, (p1, p2) -> p1.getName().length() > p2.getName().length())
                              .from(persons) )
         );
@@ -198,10 +198,10 @@ public class ViewBuilderTest {
                               .with(person -> person.getName().equals("Mark"))
                               .from(persons)),
                 or(
-                        pattern(p -> p.using(mark).filter(other)
+                        pattern(p -> p.filter(other)
                                       .with(other, mark, (p1, p2) -> p1.getAge() > p2.getAge())
                                       .from(persons)),
-                        pattern(p -> p.using(mark).filter(other)
+                        pattern(p -> p.filter(other)
                                       .with(other, mark, (p1, p2) -> p1.getName().compareToIgnoreCase(p2.getName()) > 0)
                                       .from(persons))
                 ));

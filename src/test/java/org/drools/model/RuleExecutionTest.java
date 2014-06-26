@@ -64,7 +64,7 @@ public class RuleExecutionTest {
                         p -> p.filter(mark)
                                 .with(person -> person.getName().equals("Mark"))
                                 .from(persons),
-                        p -> p.using(mark).filter(older)
+                        p -> p.filter(older)
                                 .with(person -> !person.getName().equals("Mark"))
                                 .and(older, mark, (p1, p2) -> p1.getAge() > p2.getAge())
                                 .from(persons)
@@ -93,7 +93,7 @@ public class RuleExecutionTest {
                         p -> p.filter(mark)
                               .with(person -> person.getName().equals("Mark"))
                               .from(persons),
-                        p -> p.using(mark).filter(younger)
+                        p -> p.filter(younger)
                               .with(person -> !person.getName().equals("Mark"))
                               .and(younger, mark, (p1, p2) -> p1.getAge() < p2.getAge())
                               .from(persons)
@@ -124,7 +124,7 @@ public class RuleExecutionTest {
                         p -> p.filter(mark)
                               .with(person -> person.getName().equals("Mark"))
                               .from(persons),
-                        p -> p.using(mark).filter(other)
+                        p -> p.filter(other)
                               .with(person -> !person.getName().equals("Mark"))
                               .and(other, mark, (p1, p2) -> p1.getAge() > p2.getAge())
                               .from(persons)

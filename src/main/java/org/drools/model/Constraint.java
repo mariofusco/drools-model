@@ -1,5 +1,6 @@
 package org.drools.model;
 
+import java.util.Collections;
 import java.util.List;
 
 public interface Constraint {
@@ -12,7 +13,7 @@ public interface Constraint {
     Constraint True = new Constraint() {
         @Override
         public List<Constraint> getChildren() {
-            return null;
+            return Collections.emptyList();
         }
 
         @Override

@@ -1,8 +1,8 @@
-package org.drools.model.stream;
+package org.drools.model.flow;
 
-import org.drools.model.Condition;
 import org.drools.model.DSL;
 import org.drools.model.DataSource;
+import org.drools.model.Pattern;
 import org.drools.model.Variable;
 import org.drools.model.View;
 import org.drools.model.functions.Predicate1;
@@ -13,10 +13,12 @@ import org.drools.model.patterns.PatternBuilder.BoundPatternBuilder;
 import org.drools.model.patterns.PatternBuilder.ConstrainedPatternBuilder;
 import org.drools.model.patterns.PatternBuilder.ValidBuilder;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StreamDSL {
+public class FlowDSL {
 
     public static View view(ViewItem... viewItems) {
         Map<Variable, ValidBuilder> builderMap = new HashMap<Variable, ValidBuilder>();
@@ -51,11 +53,12 @@ public class StreamDSL {
             }
         }
 
-        Condition[] patterns = new Condition[builderMap.size()];
+        Pattern[] patterns = new Pattern[builderMap.size()];
         int i = 0;
         for (ValidBuilder builder : builderMap.values()) {
             patterns[i++] = builder.get();
         }
+        Arrays.sort(patterns, PATTERN_DEPS_COMPARATOR);
         return DSL.view(patterns);
     }
 
@@ -69,5 +72,13 @@ public class StreamDSL {
 
     public static <T, U> ViewItem expr(Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
         return new Expr2ViewItem<T, U>(var1, var2, predicate);
+    }
+
+    private static final PatternDependencyComparator PATTERN_DEPS_COMPARATOR = new PatternDependencyComparator();
+    private static class PatternDependencyComparator implements Comparator<Pattern> {
+        @Override
+        public int compare(Pattern p1, Pattern p2) {
+            return p1.getInputVariables().length - p2.getInputVariables().length;
+        }
     }
 }

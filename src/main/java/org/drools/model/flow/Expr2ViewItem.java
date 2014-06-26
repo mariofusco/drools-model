@@ -1,9 +1,10 @@
 package org.drools.model.flow;
 
+import org.drools.model.Condition;
 import org.drools.model.Variable;
 import org.drools.model.functions.Predicate2;
 
-public class Expr2ViewItem<T, U> implements ViewItem {
+public class Expr2ViewItem<T, U> implements ExprViewItem {
 
     private final Variable<T> var1;
     private final Variable<U> var2;
@@ -26,5 +27,10 @@ public class Expr2ViewItem<T, U> implements ViewItem {
 
     public Variable<U> getSecondVariable() {
         return var2;
+    }
+
+    @Override
+    public Condition.Type getType() {
+        return Condition.SingleType.INSTANCE;
     }
 }

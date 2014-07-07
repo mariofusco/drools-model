@@ -4,18 +4,12 @@ import org.drools.model.Condition;
 import org.drools.model.Variable;
 import org.drools.model.functions.Predicate1;
 
-public class Expr1ViewItem<T> implements ExprViewItem {
-    private final Variable<T> var;
+public class Expr1ViewItem<T> extends AbstractExprViewItem<T> implements ExprViewItem {
     private final Predicate1<T> predicate;
 
     public Expr1ViewItem(Variable<T> var, Predicate1<T> predicate) {
-        this.var = var;
+        super(var);
         this.predicate = predicate;
-    }
-
-    @Override
-    public Variable getFirstVariable() {
-        return var;
     }
 
     public Predicate1<T> getPredicate() {

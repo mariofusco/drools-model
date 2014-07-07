@@ -3,10 +3,10 @@ package org.drools.model;
 import org.drools.model.engine.BruteForceEngine;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.drools.model.DSL.typeOf;
-import static org.drools.model.DSL.bind;
+import static org.drools.model.DSL.*;
 import static org.drools.model.flow.FlowDSL.*;
 import static org.drools.model.impl.DataSourceImpl.sourceOf;
 import static org.junit.Assert.assertEquals;
@@ -24,22 +24,25 @@ public class FlowDSLTest {
         // $mark: Person(name == "Mark") from entry-point "persons"
         // $older: Person(name != "Mark" && age > $mark.age) from entry-point "persons"
 
-        Variable<Person> markV = bind(typeOf(Person.class));
-        Variable<Person> olderV = bind(typeOf(Person.class));
+        List<String> list = new ArrayList<>();
+        Variable<Person> markV = any(Person.class);
+        Variable<Person> olderV = any(Person.class);
 
-        View view = view(
-            input(markV, () -> persons),
-            input(olderV, () -> persons),
-            expr(markV, mark -> mark.getName().equals("Mark")),
-            expr(olderV, older -> !older.getName().equals("Mark")),
-            expr(olderV, markV, (older, mark) -> older.getAge() > mark.getAge())
-        );
+        Rule rule = rule(
+                view(
+                    input(markV, () -> persons),
+                    input(olderV, () -> persons),
+                    expr(markV, mark -> mark.getName().equals("Mark")),
+                    expr(olderV, older -> !older.getName().equals("Mark")),
+                    expr(olderV, markV, (older, mark) -> older.getAge() > mark.getAge())
+                ),
+                then(c -> c.on(olderV, markV)
+                   .execute((p1, p2) -> list.add(p1.getName() + " is older than " + p2.getName())))
+                );
 
-        List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
-        assertEquals(1, result.size());
-        TupleHandle tuple = result.get(0);
-        assertEquals("Mark", tuple.get(markV).getName());
-        assertEquals("Mario", tuple.get(olderV).getName());
+        BruteForceEngine.get().evaluate(rule);
+        assertEquals(1, list.size());
+        assertEquals("Mario is older than Mark", list.get(0));
     }
 
     @Test
@@ -53,8 +56,8 @@ public class FlowDSLTest {
         // $mark: Person(name == "Mark") from entry-point "persons"
         // $older: Person(name != "Mark" && age > $mark.age) from entry-point "persons"
 
-        Variable<Person> markV = bind(typeOf(Person.class));
-        Variable<Person> olderV = bind(typeOf(Person.class));
+        Variable<Person> markV = any(Person.class);
+        Variable<Person> olderV = any(Person.class);
 
         View view = view(
             input(markV, () -> persons),
@@ -78,8 +81,8 @@ public class FlowDSLTest {
                                               new Person("Mario", 40),
                                               new Person("Sofia", 3));
 
-        Variable<Person> markV = bind(typeOf(Person.class));
-        Variable<Person> otherV = bind(typeOf(Person.class));
+        Variable<Person> markV = any(Person.class);
+        Variable<Person> otherV = any(Person.class);
 
         View view = view(
                 input(markV, () -> persons),
@@ -100,5 +103,31 @@ public class FlowDSLTest {
         tuple = result.get(1);
         assertEquals("Mark", tuple.get(markV).getName());
         assertEquals("Sofia", tuple.get(otherV).getName());
+    }
+
+    @Test
+    public void testNot() {
+        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+                                              new Person("Edson", 35),
+                                              new Person("Mario", 40),
+                                              new Person("Sofia", 3));
+
+        // $oldest: Person()
+        // not( Person(age > $oldest.age) )
+
+        Variable<Person> oldestV = any(Person.class);
+        Variable<Person> otherV = any(Person.class);
+
+        View view = view(
+                input(oldestV, () -> persons),
+                input(otherV, () -> persons),
+                expr(oldestV, p -> true),
+                not(otherV, oldestV, (p1, p2) -> p1.getAge() > p2.getAge())
+        );
+
+        List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
+        assertEquals(1, result.size());
+        TupleHandle tuple = result.get(0);
+        assertEquals("Mario", tuple.get(oldestV).getName());
     }
 }

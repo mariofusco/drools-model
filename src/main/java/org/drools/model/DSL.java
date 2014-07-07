@@ -17,6 +17,10 @@ import org.drools.model.patterns.PatternBuilder;
 
 public class DSL {
 
+    public static <T> Variable<T> any(Class<T> type) {
+        return bind(typeOf(type));
+    }
+
     public static <T> Variable<T> bind(Type<T> type) {
         return new VariableImpl<T>(type);
     }

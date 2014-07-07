@@ -3,6 +3,7 @@ package org.drools.model.flow;
 import org.drools.model.Condition;
 import org.drools.model.DSL;
 import org.drools.model.DataSource;
+import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
 import org.drools.model.Variable;
 import org.drools.model.View;
@@ -42,6 +43,10 @@ public class FlowDSL {
         return new Expr2ViewItem<T, U>(var1, var2, predicate);
     }
 
+    public static <T, U> ExprViewItem not(Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
+        return new Expr2ViewItem<T, U>(var1, var2, predicate).setExistentialType(ExistentialPattern.ExistentialType.NOT);
+    }
+
     public static ExprViewItem or(ExprViewItem... expressions) {
         return new CombinedExprViewItem(Condition.OrType.INSTANCE, expressions);
     }
@@ -79,20 +84,27 @@ public class FlowDSL {
                                                      .from(inputs.get(var).getDataSource());
                 builderMap.put(var, patternBuilder);
             }
-            if (viewItem instanceof Expr1ViewItem) {
-                Expr1ViewItem expr = (Expr1ViewItem)viewItem;
-                if (patternBuilder instanceof BoundPatternBuilder) {
-                    builderMap.put(var, ((BoundPatternBuilder) patternBuilder).with(expr.getPredicate()));
-                } else if (patternBuilder instanceof ConstrainedPatternBuilder) {
-                    builderMap.put(var, ((ConstrainedPatternBuilder) patternBuilder).and(expr.getPredicate()));
+            if (viewItem instanceof ExprViewItem) {
+                if (viewItem instanceof Expr1ViewItem) {
+                    Expr1ViewItem expr = (Expr1ViewItem)viewItem;
+                    if (patternBuilder instanceof BoundPatternBuilder) {
+                        builderMap.put(var, ((BoundPatternBuilder) patternBuilder).with(expr.getPredicate()));
+                    } else if (patternBuilder instanceof ConstrainedPatternBuilder) {
+                        builderMap.put(var, ((ConstrainedPatternBuilder) patternBuilder).and(expr.getPredicate()));
+                    }
+                } else if (viewItem instanceof Expr2ViewItem) {
+                    Expr2ViewItem expr = (Expr2ViewItem)viewItem;
+                    if (patternBuilder instanceof BoundPatternBuilder) {
+                        builderMap.put(var, ((BoundPatternBuilder)patternBuilder).with(expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate()));
+                    } else if (patternBuilder instanceof ConstrainedPatternBuilder) {
+                        builderMap.put(var, ((ConstrainedPatternBuilder)patternBuilder).and(expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate()));
+                    }
                 }
-            } else if (viewItem instanceof Expr2ViewItem) {
-                Expr2ViewItem expr = (Expr2ViewItem)viewItem;
-                if (patternBuilder instanceof BoundPatternBuilder) {
-                    builderMap.put(var, ((BoundPatternBuilder)patternBuilder).with(expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate()));
-                } else if (patternBuilder instanceof ConstrainedPatternBuilder) {
-                    builderMap.put(var, ((ConstrainedPatternBuilder)patternBuilder).and(expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate()));
-                }
+            }
+            if (((ExprViewItem)viewItem).getExistentialType() == ExistentialPattern.ExistentialType.NOT) {
+                builderMap.put(var, new NotBuilder(builderMap.get(var)));
+            } else if (((ExprViewItem)viewItem).getExistentialType() == ExistentialPattern.ExistentialType.EXISTS) {
+
             }
         }
 
@@ -102,6 +114,19 @@ public class FlowDSL {
         }
 
         return aggregateConditions(inputs, combinedExpressions, patterns);
+    }
+
+    private static class NotBuilder implements ValidBuilder {
+        private final ValidBuilder builder;
+
+        private NotBuilder(ValidBuilder builder) {
+            this.builder = builder;
+        }
+
+        @Override
+        public Pattern get() {
+            return DSL.not(builder.get());
+        }
     }
 
     private static Condition createPatternForCombinedExpression(Map<Variable, InputViewItem> inputs, CombinedExprViewItem combinedExpression) {

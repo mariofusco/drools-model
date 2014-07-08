@@ -43,8 +43,28 @@ public class FlowDSL {
         return new Expr2ViewItem<T, U>(var1, var2, predicate);
     }
 
+    public static <T> ExprViewItem not(ExprViewItem expr) {
+        return expr.setExistentialType(ExistentialPattern.ExistentialType.NOT);
+    }
+
+    public static <T> ExprViewItem not(Variable<T> var, Predicate1<T> predicate) {
+        return not(new Expr1ViewItem<T>(var, predicate));
+    }
+
     public static <T, U> ExprViewItem not(Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
-        return new Expr2ViewItem<T, U>(var1, var2, predicate).setExistentialType(ExistentialPattern.ExistentialType.NOT);
+        return not(new Expr2ViewItem<T, U>(var1, var2, predicate));
+    }
+
+    public static <T> ExprViewItem exists(ExprViewItem expr) {
+        return expr.setExistentialType(ExistentialPattern.ExistentialType.EXISTS);
+    }
+
+    public static <T> ExprViewItem exists(Variable<T> var, Predicate1<T> predicate) {
+        return exists(new Expr1ViewItem<T>(var, predicate));
+    }
+
+    public static <T, U> ExprViewItem exists(Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
+        return exists(new Expr2ViewItem<T, U>(var1, var2, predicate));
     }
 
     public static ExprViewItem or(ExprViewItem... expressions) {
@@ -84,6 +104,7 @@ public class FlowDSL {
                                                      .from(inputs.get(var).getDataSource());
                 builderMap.put(var, patternBuilder);
             }
+
             if (viewItem instanceof ExprViewItem) {
                 if (viewItem instanceof Expr1ViewItem) {
                     Expr1ViewItem expr = (Expr1ViewItem)viewItem;
@@ -100,11 +121,12 @@ public class FlowDSL {
                         builderMap.put(var, ((ConstrainedPatternBuilder)patternBuilder).and(expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate()));
                     }
                 }
-            }
-            if (((ExprViewItem)viewItem).getExistentialType() == ExistentialPattern.ExistentialType.NOT) {
-                builderMap.put(var, new NotBuilder(builderMap.get(var)));
-            } else if (((ExprViewItem)viewItem).getExistentialType() == ExistentialPattern.ExistentialType.EXISTS) {
 
+                if (((ExprViewItem)viewItem).getExistentialType() == ExistentialPattern.ExistentialType.NOT) {
+                    builderMap.put(var, new NotBuilder(builderMap.get(var)));
+                } else if (((ExprViewItem)viewItem).getExistentialType() == ExistentialPattern.ExistentialType.EXISTS) {
+                    builderMap.put(var, new ExistsBuilder(builderMap.get(var)));
+                }
             }
         }
 
@@ -126,6 +148,19 @@ public class FlowDSL {
         @Override
         public Pattern get() {
             return DSL.not(builder.get());
+        }
+    }
+
+    private static class ExistsBuilder implements ValidBuilder {
+        private final ValidBuilder builder;
+
+        private ExistsBuilder(ValidBuilder builder) {
+            this.builder = builder;
+        }
+
+        @Override
+        public Pattern get() {
+            return DSL.exists(builder.get());
         }
     }
 

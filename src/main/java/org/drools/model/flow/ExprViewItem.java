@@ -7,4 +7,6 @@ public interface ExprViewItem extends ViewItem {
     Condition.Type getType();
 
     ExistentialPattern.ExistentialType getExistentialType();
+
+    ExprViewItem setExistentialType(ExistentialPattern.ExistentialType existentialType);
 }

@@ -22,6 +22,7 @@ public abstract class AbstractExprViewItem<T> implements ExprViewItem  {
         return existentialType;
     }
 
+    @Override
     public AbstractExprViewItem<T> setExistentialType(ExistentialPattern.ExistentialType existentialType) {
         this.existentialType = existentialType;
         return this;

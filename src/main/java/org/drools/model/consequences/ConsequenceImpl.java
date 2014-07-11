@@ -1,26 +1,26 @@
 package org.drools.model.consequences;
 
-import org.drools.model.functions.Block;
 import org.drools.model.Consequence;
-import org.drools.model.Type;
 import org.drools.model.Variable;
+import org.drools.model.functions.BlockN;
+import org.drools.model.functions.FunctionN;
 
 public class ConsequenceImpl implements Consequence {
     private final Variable[] declarations;
-    private final Block block;
+    private final BlockN block;
 
-    private final Type[] inserts;
+    private final FunctionN[] inserts;
     private final Update[] updates;
     private final Variable[] deletes;
 
-    ConsequenceImpl(Block block) {
+    ConsequenceImpl(BlockN block) {
         this(block, null, null, null, null);
     }
 
-    ConsequenceImpl(Block block, Variable[] declarations, Type[] inserts, Update[] updates, Variable[] deletes) {
+    ConsequenceImpl(BlockN block, Variable[] declarations, FunctionN[] inserts, Update[] updates, Variable[] deletes) {
         this.declarations = declarations;
         this.block = block;
-        this.inserts = inserts == null ? new Type[0] : inserts;
+        this.inserts = inserts == null ? new FunctionN[0] : inserts;
         this.updates = updates == null ? new Update[0] : updates;
         this.deletes = deletes == null ? new Variable[0] : deletes;
     }
@@ -31,12 +31,12 @@ public class ConsequenceImpl implements Consequence {
     }
 
     @Override
-    public Block getBlock() {
+    public BlockN getBlock() {
         return block;
     }
 
     @Override
-    public Type[] getInserts() {
+    public FunctionN[] getInserts() {
         return inserts;
     }
 

@@ -1,5 +1,5 @@
 package org.drools.model.functions;
 
-public interface MultiValuePredicate {
+public interface PredicateN {
     boolean test(Object... objs);
 }

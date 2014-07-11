@@ -1,5 +1,5 @@
 package org.drools.model.functions;
 
-public interface Block {
+public interface BlockN {
     void execute(Object... objs);
 }

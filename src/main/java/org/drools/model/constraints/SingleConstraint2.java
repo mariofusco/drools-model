@@ -1,7 +1,7 @@
 package org.drools.model.constraints;
 
 import org.drools.model.Variable;
-import org.drools.model.functions.MultiValuePredicate;
+import org.drools.model.functions.PredicateN;
 import org.drools.model.functions.Predicate2;
 
 public class SingleConstraint2<A, B> extends AbstractSingleConstraint {
@@ -22,8 +22,8 @@ public class SingleConstraint2<A, B> extends AbstractSingleConstraint {
     }
 
     @Override
-    public MultiValuePredicate getPredicate() {
-        return new MultiValuePredicate() {
+    public PredicateN getPredicate() {
+        return new PredicateN() {
             @Override
             public boolean test(Object... objs) {
                 return predicate.test((A)objs[0], (B)objs[1]);

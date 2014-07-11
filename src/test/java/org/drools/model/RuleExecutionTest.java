@@ -100,7 +100,7 @@ public class RuleExecutionTest {
                     ),
                 then(c -> c.on(younger)
                            .execute(y -> persons.delete(y))
-                           .deletes(younger))
+                           .delete(younger))
         );
 
         BruteForceEngine.get().evaluate(rule);
@@ -131,7 +131,7 @@ public class RuleExecutionTest {
                     ),
                 then(c -> c.on(other)
                            .execute(o -> persons.update(o, p -> p.setAge(p.getAge()-1)))
-                           .updates(other, "age"))
+                           .update(other, "age"))
         );
 
         BruteForceEngine.get().evaluate(rule);

@@ -7,9 +7,9 @@ import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
 import org.drools.model.Variable;
 import org.drools.model.View;
+import org.drools.model.functions.Function0;
 import org.drools.model.functions.Predicate1;
 import org.drools.model.functions.Predicate2;
-import org.drools.model.functions.Provider;
 import org.drools.model.patterns.AndPatterns;
 import org.drools.model.patterns.OrPatterns;
 import org.drools.model.patterns.PatternBuilder;
@@ -31,7 +31,7 @@ public class FlowDSL {
         return DSL.view(conditions.toArray(new Condition[conditions.size()]));
     }
 
-    public static <T> ViewItem input(Variable<T> var, Provider<DataSource<T>> provider) {
+    public static <T> ViewItem input(Variable<T> var, Function0<DataSource<T>> provider) {
         return new InputViewItem(var, provider);
     }
 

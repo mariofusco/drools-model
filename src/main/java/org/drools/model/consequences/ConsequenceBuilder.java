@@ -1,12 +1,15 @@
 package org.drools.model.consequences;
 
-import org.drools.model.functions.Block;
 import org.drools.model.Consequence;
-import org.drools.model.Type;
 import org.drools.model.Variable;
 import org.drools.model.functions.Block0;
 import org.drools.model.functions.Block1;
 import org.drools.model.functions.Block2;
+import org.drools.model.functions.BlockN;
+import org.drools.model.functions.Function0;
+import org.drools.model.functions.Function1;
+import org.drools.model.functions.Function2;
+import org.drools.model.functions.FunctionN;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +32,45 @@ public class ConsequenceBuilder {
         Consequence get();
     }
 
-    public class _0 implements ValidBuilder {
-        private final Block block;
+    public static abstract class AbstractValidBuilder implements ValidBuilder {
+        private final Variable[] declarations;
+        protected BlockN block;
+        private List<FunctionN> inserts = new ArrayList<FunctionN>();
+        private List<Consequence.Update> updates = new ArrayList<Consequence.Update>();
+        private Variable[] deletes;
 
+        protected AbstractValidBuilder(Variable... declarations) {
+            this.declarations = declarations;
+        }
+
+        @Override
+        public Consequence get() {
+            return new ConsequenceImpl(block,
+                                       declarations,
+                                       inserts.toArray(new FunctionN[inserts.size()]),
+                                       updates.toArray(new Consequence.Update[updates.size()]),
+                                       deletes);
+        }
+
+        public AbstractValidBuilder update(Variable updatedVariable, String... updatedFields) {
+            updates.add(new ConsequenceImpl.UpdateImpl(updatedVariable, updatedFields));
+            return this;
+        }
+
+        public AbstractValidBuilder delete(Variable... deletes) {
+            this.deletes = deletes;
+            return this;
+        }
+
+        protected void addInsert(FunctionN f) {
+            inserts.add(f);
+        }
+    }
+
+    public static class _0 extends AbstractValidBuilder {
         public _0(final Block0 block) {
-            this.block = new Block() {
+            super(new Variable[0]);
+            this.block = new BlockN() {
                 @Override
                 public void execute(Object... objs) {
                     block.execute();
@@ -41,40 +78,13 @@ public class ConsequenceBuilder {
             };
         }
 
-        @Override
-        public Consequence get() {
-            return new ConsequenceImpl(block);
-        }
-    }
-
-    public static abstract class AbstractValidBuilder implements ValidBuilder {
-        private final Variable[] declarations;
-        protected Block block;
-        private Type[] inserts;
-        private List<Consequence.Update> updates = new ArrayList<Consequence.Update>();
-        private Variable[] deletes;
-
-        private AbstractValidBuilder(Variable... declarations) {
-            this.declarations = declarations;
-        }
-
-        @Override
-        public Consequence get() {
-            return new ConsequenceImpl(block, declarations, inserts, updates.toArray(new Consequence.Update[updates.size()]), deletes);
-        }
-
-        public AbstractValidBuilder inserts(Type... inserts) {
-            this.inserts = inserts;
-            return this;
-        }
-
-        public AbstractValidBuilder updates(Variable updatedVariable, String... updatedFields) {
-            updates.add(new ConsequenceImpl.UpdateImpl(updatedVariable, updatedFields));
-            return this;
-        }
-
-        public AbstractValidBuilder deletes(Variable... deletes) {
-            this.deletes = deletes;
+        public <R> _0 insert(final Function0<R> f) {
+            addInsert(new FunctionN() {
+                @Override
+                public R apply(Object... objs) {
+                    return f.apply();
+                }
+            });
             return this;
         }
     }
@@ -85,12 +95,22 @@ public class ConsequenceBuilder {
         }
 
         public _1<A> execute(final Block1<A> block) {
-            this.block = new Block() {
+            this.block = new BlockN() {
                 @Override
                 public void execute(Object... objs) {
                     block.execute((A)objs[0]);
                 }
             };
+            return this;
+        }
+
+        public <R> _1 insert(final Function1<A, R> f) {
+            addInsert(new FunctionN() {
+                @Override
+                public R apply(Object... objs) {
+                    return f.apply((A)objs[0]);
+                }
+            });
             return this;
         }
     }
@@ -101,12 +121,22 @@ public class ConsequenceBuilder {
         }
 
         public _2<A, B> execute(final Block2<A, B> block) {
-            this.block = new Block() {
+            this.block = new BlockN() {
                 @Override
                 public void execute(Object... objs) {
                     block.execute((A)objs[0], (B)objs[1]);
                 }
             };
+            return this;
+        }
+
+        public <R> _2 insert(final Function2<A, B, R> f) {
+            addInsert(new FunctionN() {
+                @Override
+                public R apply(Object... objs) {
+                    return f.apply((A)objs[0], (B)objs[1]);
+                }
+            });
             return this;
         }
     }

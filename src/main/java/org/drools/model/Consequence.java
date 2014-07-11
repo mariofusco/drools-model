@@ -1,14 +1,15 @@
 package org.drools.model;
 
-import org.drools.model.functions.Block;
+import org.drools.model.functions.BlockN;
+import org.drools.model.functions.FunctionN;
 
 public interface Consequence {
 
     Variable[] getDeclarations();
 
-    Block getBlock();
+    BlockN getBlock();
 
-    Type[] getInserts();
+    FunctionN[] getInserts();
 
     Update[] getUpdates();
 

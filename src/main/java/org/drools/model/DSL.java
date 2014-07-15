@@ -1,13 +1,11 @@
 package org.drools.model;
 
-import org.drools.model.consequences.ConsequenceBuilder;
 import org.drools.model.constraints.AbstractConstraint;
 import org.drools.model.constraints.SingleConstraint1;
 import org.drools.model.functions.Function1;
 import org.drools.model.functions.Predicate1;
 import org.drools.model.impl.JavaClassType;
-import org.drools.model.impl.RuleAttributesBuilder;
-import org.drools.model.impl.RuleImpl;
+import org.drools.model.impl.RuleBuilder;
 import org.drools.model.impl.VariableImpl;
 import org.drools.model.patterns.AccumulatePatternImpl;
 import org.drools.model.patterns.AndPatterns;
@@ -127,19 +125,7 @@ public class DSL {
         };
     }
 
-    public static Consequence then(Function1<ConsequenceBuilder, ConsequenceBuilder.ValidBuilder> builder) {
-        return builder.apply(new ConsequenceBuilder()).get();
-    }
-
-    public static Rule rule(View view, Consequence consequence) {
-        return new RuleImpl(view, consequence);
-    }
-
-    public static Rule rule(RuleAttributesBuilder attributeBuilder, View view, Consequence consequence) {
-        return new RuleImpl(view, consequence, attributeBuilder.get());
-    }
-
-    public static RuleAttributesBuilder attributes() {
-        return new RuleAttributesBuilder();
+    public static RuleBuilder rule(String name) {
+        return new RuleBuilder(name);
     }
 }

@@ -28,20 +28,20 @@ public class RuleExecutionTest {
         List<String> list = new ArrayList<>();
         Variable<Person> mark = bind(typeOf(Person.class));
 
-        Rule rule = rule(
-                attributes().set(Rule.Attribute.SALIENCE, 10)
-                        .set(Rule.Attribute.AGENDA_GROUP, "myGroup"),
-                view(p -> p.filter(mark)
-                           .with(person -> person.getName().equals("Mark"))
-                           .from(persons)),
-                then(c -> c.on(mark)
-                           .execute(p -> list.add(p.getName())))
-        );
+        Rule rule = rule("rule")
+                .attribute(Rule.Attribute.SALIENCE, 10)
+                .attribute(Rule.Attribute.AGENDA_GROUP, "myGroup")
+                .when(p -> p.filter(mark)
+                            .with(person -> person.getName().equals("Mark"))
+                            .from(persons))
+                .then(c -> c.on(mark)
+                            .execute(p -> list.add(p.getName())));
 
         BruteForceEngine.get().evaluate(rule);
         assertEquals(1, list.size());
         assertEquals("Mark", list.get(0));
 
+        assertEquals("rule", rule.getName());
         assertEquals(10, rule.getAttribute(Rule.Attribute.SALIENCE));
         assertEquals("myGroup", rule.getAttribute(Rule.Attribute.AGENDA_GROUP));
         assertEquals(false, rule.getAttribute(Rule.Attribute.NO_LOOP));
@@ -59,19 +59,18 @@ public class RuleExecutionTest {
         Variable<Person> mark = bind(typeOf(Person.class));
         Variable<Person> older = bind(typeOf(Person.class));
 
-        Rule rule = rule(
-                view(
+        Rule rule = rule("join")
+                .when(
                         p -> p.filter(mark)
-                                .with(person -> person.getName().equals("Mark"))
-                                .from(persons),
+                              .with(person -> person.getName().equals("Mark"))
+                              .from(persons),
                         p -> p.filter(older)
-                                .with(person -> !person.getName().equals("Mark"))
-                                .and(older, mark, (p1, p2) -> p1.getAge() > p2.getAge())
-                                .from(persons)
-                    ),
-            then(c -> c.on(older, mark)
-                       .execute((p1, p2) -> list.add(p1.getName() + " is older than " + p2.getName())))
-        );
+                              .with(person -> !person.getName().equals("Mark"))
+                              .and(older, mark, (p1, p2) -> p1.getAge() > p2.getAge())
+                              .from(persons)
+                     )
+                .then(c -> c.on(older, mark)
+                            .execute((p1, p2) -> list.add(p1.getName() + " is older than " + p2.getName())));
 
         BruteForceEngine.get().evaluate(rule);
         assertEquals(1, list.size());
@@ -88,8 +87,8 @@ public class RuleExecutionTest {
         Variable<Person> mark = bind(typeOf(Person.class));
         Variable<Person> younger = bind(typeOf(Person.class));
 
-        Rule rule = rule(
-                view(
+        Rule rule = rule("delete")
+                .when(
                         p -> p.filter(mark)
                               .with(person -> person.getName().equals("Mark"))
                               .from(persons),
@@ -97,11 +96,10 @@ public class RuleExecutionTest {
                               .with(person -> !person.getName().equals("Mark"))
                               .and(younger, mark, (p1, p2) -> p1.getAge() < p2.getAge())
                               .from(persons)
-                    ),
-                then(c -> c.on(younger)
-                           .execute(y -> persons.delete(y))
-                           .delete(younger))
-        );
+                     )
+                .then(c -> c.on(younger)
+                            .execute(y -> persons.delete(y))
+                            .delete(younger));
 
         BruteForceEngine.get().evaluate(rule);
         assertEquals(2, persons.getObjects().size());
@@ -119,8 +117,8 @@ public class RuleExecutionTest {
         Variable<Person> mark = bind(typeOf(Person.class));
         Variable<Person> other = bind(typeOf(Person.class));
 
-        Rule rule = rule(
-                view(
+        Rule rule = rule("update")
+                .when(
                         p -> p.filter(mark)
                               .with(person -> person.getName().equals("Mark"))
                               .from(persons),
@@ -128,11 +126,10 @@ public class RuleExecutionTest {
                               .with(person -> !person.getName().equals("Mark"))
                               .and(other, mark, (p1, p2) -> p1.getAge() > p2.getAge())
                               .from(persons)
-                    ),
-                then(c -> c.on(other)
+                    )
+                .then(c -> c.on(other)
                            .execute(o -> persons.update(o, p -> p.setAge(p.getAge()-1)))
-                           .update(other, "age"))
-        );
+                           .update(other, "age"));
 
         BruteForceEngine.get().evaluate(rule);
         assertEquals(37, mario.getAge());

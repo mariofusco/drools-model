@@ -6,7 +6,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.drools.model.DSL.*;
+import static org.drools.model.DSL.any;
+import static org.drools.model.DSL.rule;
 import static org.drools.model.flow.FlowDSL.*;
 import static org.drools.model.impl.DataSourceImpl.sourceOf;
 import static org.junit.Assert.assertEquals;
@@ -28,21 +29,27 @@ public class FlowDSLTest {
         Variable<Person> markV = any(Person.class);
         Variable<Person> olderV = any(Person.class);
 
-        Rule rule = rule(
-                view(
-                    input(markV, () -> persons),
-                    input(olderV, () -> persons),
-                    expr(markV, mark -> mark.getName().equals("Mark")),
-                    expr(olderV, older -> !older.getName().equals("Mark")),
-                    expr(olderV, markV, (older, mark) -> older.getAge() > mark.getAge())
-                ),
-                then(c -> c.on(olderV, markV)
-                   .execute((p1, p2) -> list.add(p1.getName() + " is older than " + p2.getName())))
-                );
+        Rule rule = rule("join")
+                .attribute(Rule.Attribute.SALIENCE, 10)
+                .attribute(Rule.Attribute.AGENDA_GROUP, "myGroup")
+                .view(
+                        input(markV, () -> persons),
+                        input(olderV, () -> persons),
+                        expr(markV, mark -> mark.getName().equals("Mark")),
+                        expr(olderV, older -> !older.getName().equals("Mark")),
+                        expr(olderV, markV, (older, mark) -> older.getAge() > mark.getAge())
+                     )
+                .then(c -> c.on(olderV, markV)
+                            .execute((p1, p2) -> list.add(p1.getName() + " is older than " + p2.getName())));
 
         BruteForceEngine.get().evaluate(rule);
         assertEquals(1, list.size());
         assertEquals("Mario is older than Mark", list.get(0));
+
+        assertEquals("join", rule.getName());
+        assertEquals(10, rule.getAttribute(Rule.Attribute.SALIENCE));
+        assertEquals("myGroup", rule.getAttribute(Rule.Attribute.AGENDA_GROUP));
+        assertEquals(false, rule.getAttribute(Rule.Attribute.NO_LOOP));
     }
 
     @Test

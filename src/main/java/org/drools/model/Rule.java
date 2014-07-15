@@ -23,4 +23,6 @@ public interface Rule {
     Consequence getConsequence();
 
     Object getAttribute(Attribute attribute);
+
+    String getName();
 }

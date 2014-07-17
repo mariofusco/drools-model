@@ -21,6 +21,15 @@ public class FlowDSL {
         return DSL.view(conditions.toArray(new Condition[conditions.size()]));
     }
 
+    public static <T> ViewItem input(Variable<T> var) {
+        return input(var, new Function0<DataSource<T>>() {
+            @Override
+            public DataSource<T> apply() {
+                return DataSource.EMPTY;
+            }
+        });
+    }
+
     public static <T> ViewItem input(Variable<T> var, Function0<DataSource<T>> provider) {
         return new InputViewItem(var, provider);
     }
@@ -37,12 +46,20 @@ public class FlowDSL {
         return expr.setExistentialType(ExistentialPattern.ExistentialType.NOT);
     }
 
+    public static <T> ExprViewItem not(Variable<T> var) {
+        return not(var, Predicate1.TRUE);
+    }
+
     public static <T> ExprViewItem not(Variable<T> var, Predicate1<T> predicate) {
         return not(new Expr1ViewItem<T>(var, predicate));
     }
 
     public static <T, U> ExprViewItem not(Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
         return not(new Expr2ViewItem<T, U>(var1, var2, predicate));
+    }
+
+    public static <T> ExprViewItem exists(Variable<T> var) {
+        return exists(var, Predicate1.TRUE);
     }
 
     public static <T> ExprViewItem exists(ExprViewItem expr) {

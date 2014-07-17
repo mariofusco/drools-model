@@ -73,7 +73,7 @@ public class PatternBuilder {
 
         @Override
         public Pattern<T> get() {
-            return new PatternImpl(variable, Constraint.True, dataSource);
+            return new PatternImpl(variable, AbstractSingleConstraint.EMPTY, dataSource);
         }
     }
 

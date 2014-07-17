@@ -128,7 +128,6 @@ public class FlowDSLTest {
         View view = view(
                 input(oldestV, () -> persons),
                 input(otherV, () -> persons),
-                expr(oldestV, p -> true),
                 not(otherV, oldestV, (p1, p2) -> p1.getAge() > p2.getAge())
         );
 

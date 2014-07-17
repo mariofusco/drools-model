@@ -90,7 +90,7 @@ public class ConsequenceBuilder {
     }
 
     public static class _1<A> extends AbstractValidBuilder {
-        private _1(Variable<A> declaration) {
+        public _1(Variable<A> declaration) {
             super(declaration);
         }
 
@@ -116,7 +116,7 @@ public class ConsequenceBuilder {
     }
 
     public static class _2<A, B> extends AbstractValidBuilder {
-        private _2(Variable<A> decl1, Variable<B> decl2) {
+        public _2(Variable<A> decl1, Variable<B> decl2) {
             super(decl1, decl2);
         }
 

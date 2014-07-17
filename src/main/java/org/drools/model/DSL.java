@@ -1,7 +1,9 @@
 package org.drools.model;
 
+import org.drools.model.consequences.ConsequenceBuilder;
 import org.drools.model.constraints.AbstractConstraint;
 import org.drools.model.constraints.SingleConstraint1;
+import org.drools.model.functions.Block0;
 import org.drools.model.functions.Function1;
 import org.drools.model.functions.Predicate1;
 import org.drools.model.impl.JavaClassType;
@@ -127,5 +129,17 @@ public class DSL {
 
     public static RuleBuilder rule(String name) {
         return new RuleBuilder(name);
+    }
+
+    public static ConsequenceBuilder._0 execute(Block0 block) {
+        return new ConsequenceBuilder._0(block);
+    }
+
+    public static <A> ConsequenceBuilder._1<A> on(Variable<A> dec1) {
+        return new ConsequenceBuilder._1(dec1);
+    }
+
+    public static <A, B> ConsequenceBuilder._2<A, B> on(Variable<A> decl1, Variable<B> decl2) {
+        return new ConsequenceBuilder._2(decl1, decl2);
     }
 }

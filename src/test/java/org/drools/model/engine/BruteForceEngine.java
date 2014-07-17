@@ -161,12 +161,12 @@ public class BruteForceEngine {
     
     private boolean match(Constraint constraint, TupleHandle tuple) {
         switch (constraint.getType()) {
-            case TRUE:
-                return true;
             case SINGLE:
                 SingleConstraint singleCon = (SingleConstraint)constraint;
                 Variable[] vars = singleCon.getVariables();
                 switch (vars.length) {
+                    case 0:
+                        return singleCon.getPredicate().test();
                     case 1:
                         Object obj = tuple.get(vars[0]);
                         return singleCon.getPredicate().test(obj);

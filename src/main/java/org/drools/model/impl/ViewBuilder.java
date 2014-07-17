@@ -19,19 +19,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ViewBuilder {
 
     public static List<Condition> viewItems2Conditions(ViewItem[] viewItems) {
         Map<Variable, InputViewItem> inputs = new HashMap<Variable, InputViewItem>();
-        List<CombinedExprViewItem> combinedExpressions = new ArrayList<CombinedExprViewItem>();
         Map<Variable, PatternBuilder.ValidBuilder> builderMap = new HashMap<Variable, PatternBuilder.ValidBuilder>();
+        List<CombinedExprViewItem> combinedExpressions = new ArrayList<CombinedExprViewItem>();
+        Set<Variable> variablesFromcombinedExpressions = new HashSet<Variable>();
 
         for (ViewItem viewItem : viewItems) {
             if (viewItem instanceof CombinedExprViewItem) {
                 combinedExpressions.add((CombinedExprViewItem)viewItem);
+                variablesFromcombinedExpressions.add(viewItem.getFirstVariable());
                 continue;
             }
             Variable var = viewItem.getFirstVariable();
@@ -68,6 +72,13 @@ public class ViewBuilder {
                 } else if (((ExprViewItem)viewItem).getExistentialType() == ExistentialPattern.ExistentialType.EXISTS) {
                     builderMap.put(var, new ExistsBuilder(builderMap.get(var)));
                 }
+            }
+        }
+
+        for (Variable var : inputs.keySet()) {
+            if (!builderMap.containsKey(var) && !variablesFromcombinedExpressions.contains(var)) {
+                builderMap.put(var, new PatternBuilder().filter(var)
+                                                        .from(inputs.get(var).getDataSource()));
             }
         }
 

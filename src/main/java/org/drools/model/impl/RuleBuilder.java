@@ -72,5 +72,9 @@ public class RuleBuilder {
             Consequence consequence = builder.apply(new ConsequenceBuilder()).get();
             return new RuleImpl(name, view, consequence, attributes);
         }
+
+        public Rule then(ConsequenceBuilder.ValidBuilder builder) {
+            return new RuleImpl(name, view, builder.get(), attributes);
+        }
     }
 }

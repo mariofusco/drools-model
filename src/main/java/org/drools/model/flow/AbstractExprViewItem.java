@@ -3,7 +3,7 @@ package org.drools.model.flow;
 import org.drools.model.ExistentialPattern;
 import org.drools.model.Variable;
 
-public abstract class AbstractExprViewItem<T> implements ExprViewItem  {
+public abstract class AbstractExprViewItem<T> implements ExprViewItem<T>  {
     private final Variable<T> var;
 
     private ExistentialPattern.ExistentialType existentialType;

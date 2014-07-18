@@ -1,10 +1,12 @@
 package org.drools.model.impl;
 
+import org.drools.model.AccumulateFunction;
 import org.drools.model.Condition;
 import org.drools.model.DSL;
 import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
 import org.drools.model.Variable;
+import org.drools.model.flow.AccumulateExprViewItem;
 import org.drools.model.flow.CombinedExprViewItem;
 import org.drools.model.flow.Expr1ViewItem;
 import org.drools.model.flow.Expr2ViewItem;
@@ -51,27 +53,7 @@ public class ViewBuilder {
             }
 
             if (viewItem instanceof ExprViewItem) {
-                if (viewItem instanceof Expr1ViewItem) {
-                    Expr1ViewItem expr = (Expr1ViewItem)viewItem;
-                    if (patternBuilder instanceof PatternBuilder.BoundPatternBuilder) {
-                        builderMap.put(var, ((PatternBuilder.BoundPatternBuilder) patternBuilder).with(expr.getPredicate()));
-                    } else if (patternBuilder instanceof PatternBuilder.ConstrainedPatternBuilder) {
-                        builderMap.put(var, ((PatternBuilder.ConstrainedPatternBuilder) patternBuilder).and(expr.getPredicate()));
-                    }
-                } else if (viewItem instanceof Expr2ViewItem) {
-                    Expr2ViewItem expr = (Expr2ViewItem)viewItem;
-                    if (patternBuilder instanceof PatternBuilder.BoundPatternBuilder) {
-                        builderMap.put(var, ((PatternBuilder.BoundPatternBuilder)patternBuilder).with(expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate()));
-                    } else if (patternBuilder instanceof PatternBuilder.ConstrainedPatternBuilder) {
-                        builderMap.put(var, ((PatternBuilder.ConstrainedPatternBuilder)patternBuilder).and(expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate()));
-                    }
-                }
-
-                if (((ExprViewItem)viewItem).getExistentialType() == ExistentialPattern.ExistentialType.NOT) {
-                    builderMap.put(var, new NotBuilder(builderMap.get(var)));
-                } else if (((ExprViewItem)viewItem).getExistentialType() == ExistentialPattern.ExistentialType.EXISTS) {
-                    builderMap.put(var, new ExistsBuilder(builderMap.get(var)));
-                }
+                builderMap.put(var, expr2PatternBuilder((ExprViewItem)viewItem, patternBuilder));
             }
         }
 
@@ -88,6 +70,34 @@ public class ViewBuilder {
         }
 
         return aggregateConditions(inputs, combinedExpressions, patterns);
+    }
+
+    private static PatternBuilder.ValidBuilder expr2PatternBuilder(ExprViewItem viewItem, PatternBuilder.ValidBuilder patternBuilder) {
+        if (viewItem instanceof Expr1ViewItem) {
+            Expr1ViewItem expr = (Expr1ViewItem)viewItem;
+            if (patternBuilder instanceof PatternBuilder.BoundPatternBuilder) {
+                patternBuilder = ((PatternBuilder.BoundPatternBuilder) patternBuilder).with(expr.getPredicate());
+            } else if (patternBuilder instanceof PatternBuilder.ConstrainedPatternBuilder) {
+                patternBuilder = ((PatternBuilder.ConstrainedPatternBuilder) patternBuilder).and(expr.getPredicate());
+            }
+        } else if (viewItem instanceof Expr2ViewItem) {
+            Expr2ViewItem expr = (Expr2ViewItem)viewItem;
+            if (patternBuilder instanceof PatternBuilder.BoundPatternBuilder) {
+                patternBuilder = ((PatternBuilder.BoundPatternBuilder)patternBuilder).with(expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate());
+            } else if (patternBuilder instanceof PatternBuilder.ConstrainedPatternBuilder) {
+                patternBuilder = ((PatternBuilder.ConstrainedPatternBuilder)patternBuilder).and(expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate());
+            }
+        } else if (viewItem instanceof AccumulateExprViewItem) {
+            AccumulateExprViewItem acc = (AccumulateExprViewItem)viewItem;
+            patternBuilder = new AccumulateBuilder(expr2PatternBuilder(acc.getExpr(), patternBuilder), acc.getFunctions());
+        }
+
+        if (viewItem.getExistentialType() == ExistentialPattern.ExistentialType.NOT) {
+            patternBuilder = new NotBuilder(patternBuilder);
+        } else if (viewItem.getExistentialType() == ExistentialPattern.ExistentialType.EXISTS) {
+            patternBuilder = new ExistsBuilder(patternBuilder);
+        }
+        return patternBuilder;
     }
 
     private static Condition createPatternForCombinedExpression(Map<Variable, InputViewItem> inputs, CombinedExprViewItem combinedExpression) {
@@ -167,6 +177,21 @@ public class ViewBuilder {
         @Override
         public Pattern get() {
             return DSL.exists(builder.get());
+        }
+    }
+
+    private static class AccumulateBuilder implements PatternBuilder.ValidBuilder {
+        private final PatternBuilder.ValidBuilder builder;
+        private final AccumulateFunction[] functions;
+
+        private AccumulateBuilder(PatternBuilder.ValidBuilder builder, AccumulateFunction[] functions) {
+            this.builder = builder;
+            this.functions = functions;
+        }
+
+        @Override
+        public Pattern get() {
+            return DSL.accumulate(builder.get(), functions);
         }
     }
 }

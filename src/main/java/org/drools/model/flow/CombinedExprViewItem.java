@@ -3,7 +3,7 @@ package org.drools.model.flow;
 import org.drools.model.Condition;
 import org.drools.model.Variable;
 
-public class CombinedExprViewItem extends AbstractExprViewItem implements ExprViewItem {
+public class CombinedExprViewItem<T> extends AbstractExprViewItem<T> {
 
     private final Condition.Type type;
     private final ExprViewItem[] expressions;

@@ -16,6 +16,13 @@ public class SingleConstraint2<A, B> extends AbstractSingleConstraint {
         this.predicate = predicate;
     }
 
+    public SingleConstraint2(String exprId, Variable<A> var1, Variable<B> var2, Predicate2<A, B> predicate) {
+        super(exprId);
+        this.var1 = var1;
+        this.var2 = var2;
+        this.predicate = predicate;
+    }
+
     @Override
     public Variable[] getVariables() {
         return new Variable[] { var1, var2 };

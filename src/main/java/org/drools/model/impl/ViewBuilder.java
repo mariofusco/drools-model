@@ -76,16 +76,16 @@ public class ViewBuilder {
         if (viewItem instanceof Expr1ViewItem) {
             Expr1ViewItem expr = (Expr1ViewItem)viewItem;
             if (patternBuilder instanceof PatternBuilder.BoundPatternBuilder) {
-                patternBuilder = ((PatternBuilder.BoundPatternBuilder) patternBuilder).with(expr.getPredicate());
+                patternBuilder = ((PatternBuilder.BoundPatternBuilder) patternBuilder).with(expr.getExprId(), expr.getPredicate());
             } else if (patternBuilder instanceof PatternBuilder.ConstrainedPatternBuilder) {
-                patternBuilder = ((PatternBuilder.ConstrainedPatternBuilder) patternBuilder).and(expr.getPredicate());
+                patternBuilder = ((PatternBuilder.ConstrainedPatternBuilder) patternBuilder).and(expr.getExprId(), expr.getPredicate());
             }
         } else if (viewItem instanceof Expr2ViewItem) {
             Expr2ViewItem expr = (Expr2ViewItem)viewItem;
             if (patternBuilder instanceof PatternBuilder.BoundPatternBuilder) {
-                patternBuilder = ((PatternBuilder.BoundPatternBuilder)patternBuilder).with(expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate());
+                patternBuilder = ((PatternBuilder.BoundPatternBuilder)patternBuilder).with(expr.getExprId(), expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate());
             } else if (patternBuilder instanceof PatternBuilder.ConstrainedPatternBuilder) {
-                patternBuilder = ((PatternBuilder.ConstrainedPatternBuilder)patternBuilder).and(expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate());
+                patternBuilder = ((PatternBuilder.ConstrainedPatternBuilder)patternBuilder).and(expr.getExprId(), expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate());
             }
         } else if (viewItem instanceof AccumulateExprViewItem) {
             AccumulateExprViewItem acc = (AccumulateExprViewItem)viewItem;

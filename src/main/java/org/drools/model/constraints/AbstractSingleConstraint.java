@@ -9,9 +9,21 @@ import org.drools.model.functions.PredicateN;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.UUID.randomUUID;
+
 public abstract class AbstractSingleConstraint extends AbstractConstraint implements SingleConstraint {
 
+    private final String exprId;
+
     private Index index;
+
+    protected AbstractSingleConstraint() {
+        this(randomUUID().toString());
+    }
+
+    protected AbstractSingleConstraint(String exprId) {
+        this.exprId = exprId;
+    }
 
     @Override
     public List<Constraint> getChildren() {
@@ -43,4 +55,9 @@ public abstract class AbstractSingleConstraint extends AbstractConstraint implem
             return PredicateN.True;
         }
     };
+
+    @Override
+    public String getExprId() {
+        return exprId;
+    }
 }

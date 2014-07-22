@@ -14,6 +14,12 @@ public class SingleConstraint1<A> extends AbstractSingleConstraint {
         this.predicate = predicate;
     }
 
+    public SingleConstraint1(String exprId, Variable<A> variable, Predicate1<A> predicate) {
+        super(exprId);
+        this.variable = variable;
+        this.predicate = predicate;
+    }
+
     @Override
     public Type getType() {
         return Type.SINGLE;

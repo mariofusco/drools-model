@@ -12,6 +12,11 @@ public class Expr1ViewItem<T> extends AbstractExprViewItem<T> {
         this.predicate = predicate;
     }
 
+    public Expr1ViewItem(String exprId, Variable<T> var, Predicate1<T> predicate) {
+        super(exprId, var);
+        this.predicate = predicate;
+    }
+
     public Predicate1<T> getPredicate() {
         return predicate;
     }

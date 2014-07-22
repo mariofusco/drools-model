@@ -8,4 +8,6 @@ public interface SingleConstraint extends Constraint {
     PredicateN getPredicate();
 
     Index getIndex();
+
+    String getExprId();
 }

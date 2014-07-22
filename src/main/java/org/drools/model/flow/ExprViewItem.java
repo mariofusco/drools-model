@@ -9,4 +9,6 @@ public interface ExprViewItem<T> extends ViewItem<T> {
     ExistentialPattern.ExistentialType getExistentialType();
 
     ExprViewItem setExistentialType(ExistentialPattern.ExistentialType existentialType);
+
+    String getExprId();
 }

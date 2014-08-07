@@ -6,7 +6,7 @@ import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
 import org.drools.model.Variable;
 
-public class ExistentialPatternImpl<T> extends AbstractPattern implements ExistentialPattern<T> {
+public class ExistentialPatternImpl<T> extends AbstractSinglePattern implements ExistentialPattern<T> {
 
     private final Pattern pattern;
     private final ExistentialType existentialType;

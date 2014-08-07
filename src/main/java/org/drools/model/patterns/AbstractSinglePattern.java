@@ -5,7 +5,7 @@ import org.drools.model.Condition;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class AbstractPattern {
+public abstract class AbstractSinglePattern {
 
     public List<Condition> getSubConditions() {
         return Collections.emptyList();

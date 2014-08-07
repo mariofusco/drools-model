@@ -1,18 +1,15 @@
 package org.drools.model.patterns;
 
-import org.drools.model.Condition;
 import org.drools.model.Constraint;
 import org.drools.model.DataSource;
 import org.drools.model.Pattern;
 import org.drools.model.SingleConstraint;
 import org.drools.model.Variable;
 
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-public class PatternImpl<T> implements Pattern<T> {
+public class PatternImpl<T> extends AbstractSinglePattern implements Pattern<T> {
 
     private final Variable<T> variable;
     private final Variable[] inputVariables;
@@ -49,16 +46,6 @@ public class PatternImpl<T> implements Pattern<T> {
     @Override
     public Constraint getConstraint() {
         return constraint;
-    }
-
-    @Override
-    public List<Condition> getSubConditions() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Type getType() {
-        return SingleType.INSTANCE;
     }
 
     private Variable[] collectInputVariables() {

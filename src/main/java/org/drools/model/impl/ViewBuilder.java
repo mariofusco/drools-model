@@ -12,6 +12,7 @@ import org.drools.model.flow.Expr1ViewItem;
 import org.drools.model.flow.Expr2ViewItem;
 import org.drools.model.flow.ExprViewItem;
 import org.drools.model.flow.InputViewItem;
+import org.drools.model.flow.SetViewItem;
 import org.drools.model.flow.ViewItem;
 import org.drools.model.patterns.AndPatterns;
 import org.drools.model.patterns.OrPatterns;
@@ -40,11 +41,23 @@ public class ViewBuilder {
                 variablesFromcombinedExpressions.add(viewItem.getFirstVariable());
                 continue;
             }
+
             Variable var = viewItem.getFirstVariable();
             if (viewItem instanceof InputViewItem) {
                 inputs.put(var, (InputViewItem)viewItem);
                 continue;
             }
+
+            if (viewItem instanceof SetViewItem) {
+                SetViewItem setViewItem = (SetViewItem)viewItem;
+                PatternBuilder.ValidBuilder patternBuilder = new PatternBuilder.InvokerPatternBuilder(var,
+                                                                                                      null,
+                                                                                                      setViewItem.getInputVariables(),
+                                                                                                      setViewItem.getInvokedFunction());
+                builderMap.put(var, patternBuilder);
+                continue;
+            }
+
             PatternBuilder.ValidBuilder patternBuilder = builderMap.get(var);
             if (patternBuilder == null) {
                 patternBuilder = new PatternBuilder().filter(var)
@@ -150,6 +163,16 @@ public class ViewBuilder {
     private static class PatternDependencyComparator implements Comparator<Pattern> {
         @Override
         public int compare(Pattern p1, Pattern p2) {
+            for (Variable p2Input : p2.getInputVariables()) {
+                if (!p2.getPatternVariable().equals(p2Input) && p1.getPatternVariable().equals(p2Input)) {
+                    return -1;
+                }
+            }
+            for (Variable p1Input : p1.getInputVariables()) {
+                if (!p1.getPatternVariable().equals(p1Input) && p2.getPatternVariable().equals(p1Input)) {
+                    return 1;
+                }
+            }
             return p1.getInputVariables().length - p2.getInputVariables().length;
         }
     }

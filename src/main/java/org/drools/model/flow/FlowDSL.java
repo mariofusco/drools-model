@@ -8,11 +8,14 @@ import org.drools.model.ExistentialPattern;
 import org.drools.model.Variable;
 import org.drools.model.View;
 import org.drools.model.functions.Function0;
+import org.drools.model.functions.Function1;
+import org.drools.model.functions.Function2;
 import org.drools.model.functions.Predicate1;
 import org.drools.model.functions.Predicate2;
 
 import java.util.List;
 
+import static org.drools.model.functions.FunctionUtils.toFunctionN;
 import static org.drools.model.impl.ViewBuilder.viewItems2Conditions;
 
 public class FlowDSL {
@@ -93,5 +96,29 @@ public class FlowDSL {
 
     public static ExprViewItem and(ExprViewItem... expressions) {
         return new CombinedExprViewItem(Condition.AndType.INSTANCE, expressions);
+    }
+
+    public static <T> SetViewItemBuilder<T> set(Variable<T> var) {
+        return new SetViewItemBuilder<T>(var);
+    }
+
+    public static class SetViewItemBuilder<T> {
+        private final Variable<T> var;
+
+        private SetViewItemBuilder(Variable<T> var) {
+            this.var = var;
+        }
+
+        public SetViewItem<T> invoking(Function0<T> f) {
+            return new SetViewItem<T>(toFunctionN(f), var);
+        }
+
+        public <A> SetViewItem<T> invoking(Variable<A> var1, Function1<A, T> f) {
+            return new SetViewItem<T>(toFunctionN(f), var, var1);
+        }
+
+        public <A, B> SetViewItem<T> invoking(Variable<A> var1, Variable<B> var2, Function2<A, B, T> f) {
+            return new SetViewItem<T>(toFunctionN(f), var, var1, var2);
+        }
     }
 }

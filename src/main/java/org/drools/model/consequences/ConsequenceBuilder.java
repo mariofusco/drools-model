@@ -14,6 +14,8 @@ import org.drools.model.functions.FunctionN;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.drools.model.functions.FunctionUtils.toFunctionN;
+
 public class ConsequenceBuilder {
 
     public _0 execute(Block0 block) {
@@ -79,12 +81,7 @@ public class ConsequenceBuilder {
         }
 
         public <R> _0 insert(final Function0<R> f) {
-            addInsert(new FunctionN() {
-                @Override
-                public R apply(Object... objs) {
-                    return f.apply();
-                }
-            });
+            addInsert(toFunctionN(f));
             return this;
         }
     }
@@ -105,12 +102,7 @@ public class ConsequenceBuilder {
         }
 
         public <R> _1 insert(final Function1<A, R> f) {
-            addInsert(new FunctionN() {
-                @Override
-                public R apply(Object... objs) {
-                    return f.apply((A)objs[0]);
-                }
-            });
+            addInsert(toFunctionN(f));
             return this;
         }
     }
@@ -131,12 +123,7 @@ public class ConsequenceBuilder {
         }
 
         public <R> _2 insert(final Function2<A, B, R> f) {
-            addInsert(new FunctionN() {
-                @Override
-                public R apply(Object... objs) {
-                    return f.apply((A)objs[0], (B)objs[1]);
-                }
-            });
+            addInsert(toFunctionN(f));
             return this;
         }
     }

@@ -7,7 +7,7 @@ import org.drools.model.DataSource;
 import org.drools.model.Pattern;
 import org.drools.model.Variable;
 
-public class AccumulatePatternImpl<T> extends AbstractPattern implements AccumulatePattern<T> {
+public class AccumulatePatternImpl<T> extends AbstractSinglePattern implements AccumulatePattern<T> {
 
     private final Pattern<T> pattern;
     private final AccumulateFunction<T, ?, ?>[] functions;

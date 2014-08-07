@@ -11,13 +11,17 @@ import org.drools.model.constraints.AbstractConstraint;
 import org.drools.model.constraints.AbstractSingleConstraint;
 import org.drools.model.constraints.SingleConstraint1;
 import org.drools.model.constraints.SingleConstraint2;
+import org.drools.model.functions.Function0;
 import org.drools.model.functions.Function1;
+import org.drools.model.functions.Function2;
+import org.drools.model.functions.FunctionN;
 import org.drools.model.functions.Predicate1;
 import org.drools.model.functions.Predicate2;
 import org.drools.model.index.AlphaIndexImpl;
 import org.drools.model.index.BetaIndexImpl;
 
 import static org.drools.model.DSL.bind;
+import static org.drools.model.functions.FunctionUtils.toFunctionN;
 
 public class PatternBuilder {
 
@@ -37,8 +41,53 @@ public class PatternBuilder {
         return new BoundPatternBuilder<T>(var, dataSource);
     }
 
+    public <T> InvokerPatternBuilder<T> set(Variable<T> var) {
+        return new InvokerPatternBuilder<T>(var, dataSource);
+    }
+
     public interface ValidBuilder<T> {
         Pattern<T> get();
+    }
+
+    public static class InvokerPatternBuilder<T> implements ValidBuilder<T> {
+        private final Variable<T> variable;
+        private final DataSource dataSource;
+        private Variable[] inputVariables;
+        private FunctionN<T> function;
+
+        private InvokerPatternBuilder(Variable<T> variable, DataSource dataSource) {
+            this.variable = variable;
+            this.dataSource = dataSource;
+        }
+
+        public InvokerPatternBuilder(Variable<T> variable, DataSource dataSource, Variable[] inputVariables, FunctionN<T> function) {
+            this(variable, dataSource);
+            this.inputVariables = inputVariables;
+            this.function = function;
+        }
+
+        public <A> InvokerPatternBuilder<T> invoking(Function0<T> f) {
+            inputVariables = new Variable[0];
+            function = toFunctionN(f);
+            return this;
+        }
+
+        public <A> InvokerPatternBuilder<T> invoking(Variable<A> var, Function1<A, T> f) {
+            inputVariables = new Variable[] { var };
+            function = toFunctionN(f);
+            return this;
+        }
+
+        public <A, B> InvokerPatternBuilder<T> invoking(Variable<A> var1, Variable<B> var2, Function2<A, B, T> f) {
+            inputVariables = new Variable[] { var1, var2 };
+            function = toFunctionN(f);
+            return this;
+        }
+
+        @Override
+        public Pattern<T> get() {
+            return new InvokerPatternImpl(dataSource, function, variable, inputVariables);
+        }
     }
 
     public static class BoundPatternBuilder<T> implements ValidBuilder<T> {

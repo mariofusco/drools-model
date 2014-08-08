@@ -110,15 +110,27 @@ public class FlowDSL {
         }
 
         public SetViewItem<T> invoking(Function0<T> f) {
-            return new SetViewItem<T>(toFunctionN(f), var);
+            return new SetViewItem<T>(toFunctionN(f), false, var);
         }
 
         public <A> SetViewItem<T> invoking(Variable<A> var1, Function1<A, T> f) {
-            return new SetViewItem<T>(toFunctionN(f), var, var1);
+            return new SetViewItem<T>(toFunctionN(f), false, var, var1);
         }
 
         public <A, B> SetViewItem<T> invoking(Variable<A> var1, Variable<B> var2, Function2<A, B, T> f) {
-            return new SetViewItem<T>(toFunctionN(f), var, var1, var2);
+            return new SetViewItem<T>(toFunctionN(f), false, var, var1, var2);
+        }
+
+        public SetViewItem<T> in(Function0<Iterable<? extends T>> f) {
+            return new SetViewItem<T>(toFunctionN(f), true, var);
+        }
+
+        public <A> SetViewItem<T> in(Variable<A> var1, Function1<A, Iterable<? extends T>> f) {
+            return new SetViewItem<T>(toFunctionN(f), true, var, var1);
+        }
+
+        public <A, B> SetViewItem<T> in(Variable<A> var1, Variable<B> var2, Function2<A, B, Iterable<? extends T>> f) {
+            return new SetViewItem<T>(toFunctionN(f), true, var, var1, var2);
         }
     }
 }

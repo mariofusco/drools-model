@@ -49,44 +49,68 @@ public class PatternBuilder {
         Pattern<T> get();
     }
 
-    public static class InvokerPatternBuilder<T> implements ValidBuilder<T> {
-        private final Variable<T> variable;
-        private final DataSource dataSource;
-        private Variable[] inputVariables;
-        private FunctionN<T> function;
+    public static class InvokerPatternBuilder<T> {
+        protected final Variable<T> variable;
+        protected final DataSource dataSource;
+        protected Variable[] inputVariables;
 
         private InvokerPatternBuilder(Variable<T> variable, DataSource dataSource) {
             this.variable = variable;
             this.dataSource = dataSource;
         }
 
-        public InvokerPatternBuilder(Variable<T> variable, DataSource dataSource, Variable[] inputVariables, FunctionN<T> function) {
-            this(variable, dataSource);
+        public <A> InvokerSingleValuePatternBuilder<T> invoking(Function0<T> f) {
+            return new InvokerSingleValuePatternBuilder(variable, dataSource, new Variable[0], toFunctionN(f));
+        }
+
+        public <A> InvokerSingleValuePatternBuilder<T> invoking(Variable<A> var, Function1<A, T> f) {
+            return new InvokerSingleValuePatternBuilder(variable, dataSource, new Variable[] { var }, toFunctionN(f));
+        }
+
+        public <A, B> InvokerSingleValuePatternBuilder<T> invoking(Variable<A> var1, Variable<B> var2, Function2<A, B, T> f) {
+            return new InvokerSingleValuePatternBuilder(variable, dataSource, new Variable[] { var1, var2 }, toFunctionN(f));
+        }
+
+        public <A> InvokerMultiValuePatternBuilder<T> in(Function0<Iterable<? extends T>> f) {
+            return new InvokerMultiValuePatternBuilder(variable, dataSource, new Variable[0], toFunctionN(f));
+        }
+
+        public <A> InvokerMultiValuePatternBuilder<T> in(Variable<A> var, Function1<A, Iterable<? extends T>> f) {
+            return new InvokerMultiValuePatternBuilder(variable, dataSource, new Variable[] { var }, toFunctionN(f));
+        }
+
+        public <A, B> InvokerMultiValuePatternBuilder<T> in(Variable<A> var1, Variable<B> var2, Function2<A, B, Iterable<? extends T>> f) {
+            return new InvokerMultiValuePatternBuilder(variable, dataSource, new Variable[] { var1, var2 }, toFunctionN(f));
+        }
+    }
+
+    public static class InvokerSingleValuePatternBuilder<T> extends InvokerPatternBuilder<T> implements ValidBuilder<T> {
+        private FunctionN<T> function;
+
+        public InvokerSingleValuePatternBuilder(Variable<T> variable, DataSource dataSource, Variable[] inputVariables, FunctionN<T> function) {
+            super(variable, dataSource);
             this.inputVariables = inputVariables;
             this.function = function;
         }
 
-        public <A> InvokerPatternBuilder<T> invoking(Function0<T> f) {
-            inputVariables = new Variable[0];
-            function = toFunctionN(f);
-            return this;
+        @Override
+        public Pattern<T> get() {
+            return new InvokerSingleValuePatternImpl<T>(dataSource, function, variable, inputVariables);
         }
+    }
 
-        public <A> InvokerPatternBuilder<T> invoking(Variable<A> var, Function1<A, T> f) {
-            inputVariables = new Variable[] { var };
-            function = toFunctionN(f);
-            return this;
-        }
+    public static class InvokerMultiValuePatternBuilder<T> extends InvokerPatternBuilder<T> implements ValidBuilder<T> {
+        private FunctionN<Iterable<? extends T>> function;
 
-        public <A, B> InvokerPatternBuilder<T> invoking(Variable<A> var1, Variable<B> var2, Function2<A, B, T> f) {
-            inputVariables = new Variable[] { var1, var2 };
-            function = toFunctionN(f);
-            return this;
+        public InvokerMultiValuePatternBuilder(Variable<T> variable, DataSource dataSource, Variable[] inputVariables, FunctionN<Iterable<? extends T>> function) {
+            super(variable, dataSource);
+            this.inputVariables = inputVariables;
+            this.function = function;
         }
 
         @Override
         public Pattern<T> get() {
-            return new InvokerPatternImpl(dataSource, function, variable, inputVariables);
+            return new InvokerMultiValuePatternImpl<T>(dataSource, function, variable, inputVariables);
         }
     }
 

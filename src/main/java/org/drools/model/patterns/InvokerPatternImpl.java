@@ -4,18 +4,15 @@ import org.drools.model.Constraint;
 import org.drools.model.DataSource;
 import org.drools.model.InvokerPattern;
 import org.drools.model.Variable;
-import org.drools.model.functions.FunctionN;
 
-public class InvokerPatternImpl<T> extends AbstractSinglePattern implements InvokerPattern<T> {
+public abstract class InvokerPatternImpl<T> extends AbstractSinglePattern implements InvokerPattern<T> {
 
     private final DataSource dataSource;
-    private final FunctionN<T> invokedFunction;
     private final Variable<T> variable;
     private final Variable[] inputVariables;
 
-    InvokerPatternImpl(DataSource dataSource, FunctionN<T> function, Variable<T> boundVariable, Variable... inputVariables) {
+    InvokerPatternImpl(DataSource dataSource, Variable<T> boundVariable, Variable... inputVariables) {
         this.dataSource = dataSource;
-        this.invokedFunction = function;
         this.variable = boundVariable;
         this.inputVariables = inputVariables;
     }
@@ -43,10 +40,5 @@ public class InvokerPatternImpl<T> extends AbstractSinglePattern implements Invo
     @Override
     public Constraint getConstraint() {
         throw new UnsupportedOperationException("An InvokerPattern doesn't have a Constraint");
-    }
-
-    @Override
-    public FunctionN<T> getInvokedFunction() {
-        return invokedFunction;
     }
 }

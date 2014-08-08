@@ -5,12 +5,14 @@ import org.drools.model.functions.FunctionN;
 
 public class SetViewItem<T> implements ViewItem<T> {
 
-    private final FunctionN<T> invokedFunction;
+    private final FunctionN invokedFunction;
+    private final boolean multivalue;
     private final Variable<T> variable;
     private final Variable[] inputVariables;
 
-    SetViewItem(FunctionN<T> function, Variable<T> boundVariable, Variable... inputVariables) {
+    SetViewItem(FunctionN function, boolean multivalue, Variable<T> boundVariable, Variable... inputVariables) {
         this.invokedFunction = function;
+        this.multivalue = multivalue;
         this.variable = boundVariable;
         this.inputVariables = inputVariables;
     }
@@ -20,11 +22,15 @@ public class SetViewItem<T> implements ViewItem<T> {
         return variable;
     }
 
-    public FunctionN<T> getInvokedFunction() {
+    public FunctionN getInvokedFunction() {
         return invokedFunction;
     }
 
     public Variable[] getInputVariables() {
         return inputVariables;
+    }
+
+    public boolean isMultivalue() {
+        return multivalue;
     }
 }

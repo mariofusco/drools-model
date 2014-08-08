@@ -50,10 +50,15 @@ public class ViewBuilder {
 
             if (viewItem instanceof SetViewItem) {
                 SetViewItem setViewItem = (SetViewItem)viewItem;
-                PatternBuilder.ValidBuilder patternBuilder = new PatternBuilder.InvokerPatternBuilder(var,
-                                                                                                      null,
-                                                                                                      setViewItem.getInputVariables(),
-                                                                                                      setViewItem.getInvokedFunction());
+                PatternBuilder.ValidBuilder patternBuilder = setViewItem.isMultivalue() ?
+                        new PatternBuilder.InvokerMultiValuePatternBuilder( var,
+                                                                             null,
+                                                                             setViewItem.getInputVariables(),
+                                                                             setViewItem.getInvokedFunction() ) :
+                        new PatternBuilder.InvokerSingleValuePatternBuilder( var,
+                                                                             null,
+                                                                             setViewItem.getInputVariables(),
+                                                                             setViewItem.getInvokedFunction() );
                 builderMap.put(var, patternBuilder);
                 continue;
             }

@@ -4,6 +4,7 @@ import org.drools.model.AccumulateFunction;
 import org.drools.model.Condition;
 import org.drools.model.DSL;
 import org.drools.model.DataSource;
+import org.drools.model.DataStore;
 import org.drools.model.ExistentialPattern;
 import org.drools.model.Variable;
 import org.drools.model.View;
@@ -29,7 +30,7 @@ public class FlowDSL {
         return input(var, new Function0<DataSource<T>>() {
             @Override
             public DataSource<T> apply() {
-                return DataSource.EMPTY;
+                return DataStore.EMPTY;
             }
         });
     }

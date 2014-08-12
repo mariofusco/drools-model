@@ -6,11 +6,11 @@ import org.drools.model.functions.Function0;
 
 public class InputViewItem<T> implements ViewItem {
     private final Variable<T> var;
-    private final Function0<DataSource<T>> provider;
+    private final Function0<DataSource<T>> dataSourceSupplier;
 
-    public InputViewItem(Variable<T> var, Function0<DataSource<T>> provider) {
+    public InputViewItem(Variable<T> var, Function0<DataSource<T>> dataSourceSupplier) {
         this.var = var;
-        this.provider = provider;
+        this.dataSourceSupplier = dataSourceSupplier;
     }
 
     @Override
@@ -18,7 +18,7 @@ public class InputViewItem<T> implements ViewItem {
         return var;
     }
 
-    public DataSource<T> getDataSource() {
-        return provider.apply();
+    public Function0<DataSource<T>> getDataSourceSupplier() {
+        return dataSourceSupplier;
     }
 }

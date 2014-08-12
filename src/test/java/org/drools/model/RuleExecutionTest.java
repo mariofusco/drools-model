@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.drools.model.DSL.*;
-import static org.drools.model.impl.DataSourceImpl.sourceOf;
-import static org.drools.model.impl.DataStoreImpl.storeOf;
 import static org.junit.Assert.assertEquals;
 
 public class RuleExecutionTest {
@@ -20,7 +18,7 @@ public class RuleExecutionTest {
     @Test
     public void testSimpleRule() {
 
-        DataSource persons = sourceOf(new Person("Mark", 37),
+        DataSource persons = storeOf( new Person("Mark", 37),
                                       new Person("Edson", 35),
                                       new Person("Mario", 40),
                                       new Person("Sofia", 3));
@@ -33,7 +31,7 @@ public class RuleExecutionTest {
                 .attribute(Rule.Attribute.AGENDA_GROUP, "myGroup")
                 .when(p -> p.filter(mark)
                             .with(person -> person.getName().equals("Mark"))
-                            .from(persons))
+                            .from(() -> persons))
                 .then(c -> c.on(mark)
                             .execute(p -> list.add(p.getName())));
 
@@ -50,7 +48,7 @@ public class RuleExecutionTest {
     @Test
     public void testJoin() {
 
-        DataSource persons = sourceOf(new Person("Mark", 37),
+        DataSource persons = storeOf( new Person("Mark", 37),
                                       new Person("Edson", 35),
                                       new Person("Mario", 40),
                                       new Person("Sofia", 3));
@@ -63,11 +61,11 @@ public class RuleExecutionTest {
                 .when(
                         p -> p.filter(mark)
                               .with(person -> person.getName().equals("Mark"))
-                              .from(persons),
+                              .from(() -> persons),
                         p -> p.filter(older)
                               .with(person -> !person.getName().equals("Mark"))
                               .and(older, mark, (p1, p2) -> p1.getAge() > p2.getAge())
-                              .from(persons)
+                              .from(() -> persons)
                      )
                 .then(c -> c.on(older, mark)
                             .execute((p1, p2) -> list.add(p1.getName() + " is older than " + p2.getName())));
@@ -91,11 +89,11 @@ public class RuleExecutionTest {
                 .when(
                         p -> p.filter(mark)
                               .with(person -> person.getName().equals("Mark"))
-                              .from(persons),
+                              .from(() -> persons),
                         p -> p.filter(younger)
                               .with(person -> !person.getName().equals("Mark"))
                               .and(younger, mark, (p1, p2) -> p1.getAge() < p2.getAge())
-                              .from(persons)
+                              .from(() -> persons)
                      )
                 .then(c -> c.on(younger)
                             .execute(y -> persons.delete(y))
@@ -121,11 +119,11 @@ public class RuleExecutionTest {
                 .when(
                         p -> p.filter(mark)
                               .with(person -> person.getName().equals("Mark"))
-                              .from(persons),
+                              .from(() -> persons),
                         p -> p.filter(other)
                               .with(person -> !person.getName().equals("Mark"))
                               .and(other, mark, (p1, p2) -> p1.getAge() > p2.getAge())
-                              .from(persons)
+                              .from(() -> persons)
                     )
                 .then(c -> c.on(other)
                            .execute(o -> persons.update(o, p -> p.setAge(p.getAge()-1)))

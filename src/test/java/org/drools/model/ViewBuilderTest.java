@@ -12,7 +12,6 @@ import static org.drools.model.DSL.view;
 import static org.drools.model.functions.accumulate.Average.avg;
 import static org.drools.model.functions.accumulate.Reduce.reduce;
 import static org.drools.model.functions.accumulate.Sum.sum;
-import static org.drools.model.impl.DataSourceImpl.sourceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -21,7 +20,7 @@ public class ViewBuilderTest {
     @Test
     public void testSimpleView() {
 
-        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+        DataSource<Person> persons = storeOf( new Person("Mark", 37),
                                               new Person("Edson", 35));
 
         persons.insert(new Person("Mario", 40));
@@ -33,7 +32,7 @@ public class ViewBuilderTest {
                 view(p -> p.filter(typeOf(Person.class))
                            .with(person -> person.getName().equals("Mark"))
                            .or(person -> person.getAge() > 18 && person.getAge() < 65)
-                           .from(persons));
+                           .from(() -> persons));
 
         List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
 
@@ -48,7 +47,7 @@ public class ViewBuilderTest {
     @Test
     public void testJoin() {
 
-        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+        DataSource<Person> persons = storeOf( new Person("Mark", 37),
                                               new Person("Edson", 35),
                                               new Person("Mario", 40),
                                               new Person("Sofia", 3));
@@ -58,7 +57,7 @@ public class ViewBuilderTest {
 
         Variable<Person> mark = bind(typeOf(Person.class));
         Variable<Person> older = bind(typeOf(Person.class));
-        View view = view(persons,
+        View view = view(() -> persons,
                          p -> p.filter(mark)
                                .with(person -> person.getName().equals("Mark"))
                                .indexedBy(Index.ConstraintType.EQUAL, Person::getName, "Mark"),
@@ -99,7 +98,7 @@ public class ViewBuilderTest {
 
     @Test
     public void testNot() {
-        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+        DataSource<Person> persons = storeOf( new Person("Mark", 37),
                                               new Person("Edson", 35),
                                               new Person("Mario", 40),
                                               new Person("Sofia", 3));
@@ -110,10 +109,10 @@ public class ViewBuilderTest {
         Variable<Person> oldest = bind(typeOf(Person.class));
 
         View view = view(
-                p -> p.filter(oldest).from(persons),
+                p -> p.filter(oldest).from(() -> persons),
                 not(p -> p.filter(typeOf(Person.class))
                           .with(oldest, (p1, p2) -> p1.getAge() > p2.getAge())
-                          .from(persons))
+                          .from(() -> persons))
         );
 
         List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
@@ -124,7 +123,7 @@ public class ViewBuilderTest {
 
     @Test
     public void testExists() {
-        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+        DataSource<Person> persons = storeOf( new Person("Mark", 37),
                                               new Person("Edson", 35),
                                               new Person("Mario", 40),
                                               new Person("Sofia", 3));
@@ -135,10 +134,10 @@ public class ViewBuilderTest {
         Variable<Person> person = bind(typeOf(Person.class));
 
         View view = view(
-                p -> p.filter(person).from(persons),
+                p -> p.filter(person).from(() -> persons),
                 exists( p -> p.filter(typeOf(Person.class))
                              .with(person, (p1, p2) -> p1.getName().length() > p2.getName().length())
-                             .from(persons) )
+                             .from(() -> persons) )
         );
 
         List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
@@ -149,7 +148,7 @@ public class ViewBuilderTest {
 
     @Test
     public void testAccumulate() {
-        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+        DataSource<Person> persons = storeOf( new Person("Mark", 37),
                                               new Person("Edson", 35),
                                               new Person("Mario", 40),
                                               new Person("Sofia", 3));
@@ -169,7 +168,7 @@ public class ViewBuilderTest {
         View view = view(
                 accumulate( p -> p.filter(typeOf(Person.class))
                                     .with(person -> person.getName().startsWith("M"))
-                                    .from(persons),
+                                    .from(() -> persons),
                             sum(Person::getAge).as(resultSum),
                             avg(Person::getAge).as(resultAvg),
                             reduce(0, (Integer max, Person p) -> p.getAge() > max ? p.getAge() : max).as(resultMax) )
@@ -185,7 +184,7 @@ public class ViewBuilderTest {
 
     @Test
     public void testOr() {
-        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+        DataSource<Person> persons = storeOf( new Person("Mark", 37),
                                               new Person("Edson", 35),
                                               new Person("Mario", 40),
                                               new Person("Sofia", 3));
@@ -196,14 +195,14 @@ public class ViewBuilderTest {
         View view = view(
                 pattern(p -> p.filter(mark)
                               .with(person -> person.getName().equals("Mark"))
-                              .from(persons)),
+                              .from(() -> persons)),
                 or(
                         pattern(p -> p.filter(other)
                                       .with(other, mark, (p1, p2) -> p1.getAge() > p2.getAge())
-                                      .from(persons)),
+                                      .from(() -> persons)),
                         pattern(p -> p.filter(other)
                                       .with(other, mark, (p1, p2) -> p1.getName().compareToIgnoreCase(p2.getName()) > 0)
-                                      .from(persons))
+                                      .from(() -> persons))
                 ));
 
 

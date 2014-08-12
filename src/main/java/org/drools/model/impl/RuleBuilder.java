@@ -7,6 +7,7 @@ import org.drools.model.Rule;
 import org.drools.model.View;
 import org.drools.model.consequences.ConsequenceBuilder;
 import org.drools.model.flow.ViewItem;
+import org.drools.model.functions.Function0;
 import org.drools.model.functions.Function1;
 import org.drools.model.patterns.AndPatterns;
 import org.drools.model.patterns.PatternBuilder;
@@ -32,10 +33,10 @@ public class RuleBuilder {
         return this;
     }
 
-    public RuleBuilderWithLHS when(DataSource dataSource, Function1<PatternBuilder, PatternBuilder.ValidBuilder>... builders) {
+    public RuleBuilderWithLHS when(Function0<DataSource> dataSourceSupplier, Function1<PatternBuilder, PatternBuilder.ValidBuilder>... builders) {
         Condition[] patterns = new Condition[builders.length];
         for (int i = 0; i < builders.length; i++) {
-            patterns[i] = builders[i].apply(new PatternBuilder().from(dataSource)).get();
+            patterns[i] = builders[i].apply(new PatternBuilder().from(dataSourceSupplier)).get();
         }
         return when(patterns);
     }

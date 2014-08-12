@@ -66,7 +66,7 @@ public class ViewBuilder {
             PatternBuilder.ValidBuilder patternBuilder = builderMap.get(var);
             if (patternBuilder == null) {
                 patternBuilder = new PatternBuilder().filter(var)
-                                                     .from(inputs.get(var).getDataSource());
+                                                     .from(inputs.get(var).getDataSourceSupplier());
                 builderMap.put(var, patternBuilder);
             }
 
@@ -78,7 +78,7 @@ public class ViewBuilder {
         for (Variable var : inputs.keySet()) {
             if (!builderMap.containsKey(var) && !variablesFromcombinedExpressions.contains(var)) {
                 builderMap.put(var, new PatternBuilder().filter(var)
-                                                        .from(inputs.get(var).getDataSource()));
+                                                        .from(inputs.get(var).getDataSourceSupplier()));
             }
         }
 
@@ -131,14 +131,14 @@ public class ViewBuilder {
             if (viewItem instanceof Expr1ViewItem) {
                 Expr1ViewItem expr = (Expr1ViewItem)viewItem;
                 Pattern pattern = new PatternBuilder().filter(var)
-                                                      .from(inputs.get(var).getDataSource())
+                                                      .from(inputs.get(var).getDataSourceSupplier())
                                                       .with(expr.getPredicate())
                                                       .get();
                 patterns.add(pattern);
             } else if (viewItem instanceof Expr2ViewItem) {
                 Expr2ViewItem expr = (Expr2ViewItem)viewItem;
                 Pattern pattern = new PatternBuilder().filter(var)
-                                                      .from(inputs.get(var).getDataSource())
+                                                      .from(inputs.get(var).getDataSourceSupplier())
                                                       .with(expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate())
                                                       .get();
                 patterns.add(pattern);

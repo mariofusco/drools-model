@@ -6,6 +6,7 @@ import org.drools.model.Constraint;
 import org.drools.model.DataSource;
 import org.drools.model.Pattern;
 import org.drools.model.Variable;
+import org.drools.model.functions.Function0;
 
 public class AccumulatePatternImpl<T> extends AbstractSinglePattern implements AccumulatePattern<T> {
 
@@ -33,8 +34,8 @@ public class AccumulatePatternImpl<T> extends AbstractSinglePattern implements A
     }
 
     @Override
-    public DataSource getDataSource() {
-        return pattern.getDataSource();
+    public Function0<DataSource> getDataSourceSupplier() {
+        return pattern.getDataSourceSupplier();
     }
 
     @Override

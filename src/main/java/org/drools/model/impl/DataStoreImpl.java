@@ -6,10 +6,12 @@ import org.drools.model.functions.Block1;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class DataStoreImpl<T> extends DataSourceImpl<T> implements DataStore<T> {
+public class DataStoreImpl<T> implements DataStore<T> {
 
-    protected DataStoreImpl(Collection source) {
-        super(source);
+    private final Collection<T> store;
+
+    private DataStoreImpl(Collection<T> store) {
+        this.store = store;
     }
 
     public static <T> DataStore<T> storeOf(T... items) {
@@ -21,14 +23,24 @@ public class DataStoreImpl<T> extends DataSourceImpl<T> implements DataStore<T> 
     }
 
     @Override
+    public Collection<T> getObjects() {
+        return store;
+    }
+
+    @Override
+    public void insert(T item) {
+        store.add(item);
+    }
+
+    @Override
     public <U extends T> void update(U item, Block1<U> f) {
-        source.remove(item);
+        store.remove(item);
         f.execute(item);
-        source.add(item);
+        store.add(item);
     }
 
     @Override
     public void delete(T item) {
-        source.remove(item);
+        store.remove(item);
     }
 }

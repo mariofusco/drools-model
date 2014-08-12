@@ -5,6 +5,7 @@ import org.drools.model.DataSource;
 import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
 import org.drools.model.Variable;
+import org.drools.model.functions.Function0;
 
 public class ExistentialPatternImpl<T> extends AbstractSinglePattern implements ExistentialPattern<T> {
 
@@ -22,8 +23,8 @@ public class ExistentialPatternImpl<T> extends AbstractSinglePattern implements 
     }
 
     @Override
-    public DataSource getDataSource() {
-        return pattern.getDataSource();
+    public Function0<DataSource> getDataSourceSupplier() {
+        return pattern.getDataSourceSupplier();
     }
 
     @Override

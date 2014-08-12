@@ -5,6 +5,7 @@ import org.drools.model.AccumulatePattern;
 import org.drools.model.Condition;
 import org.drools.model.Constraint;
 import org.drools.model.DataSource;
+import org.drools.model.DataStore;
 import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
 import org.drools.model.Rule;
@@ -85,7 +86,7 @@ public class BruteForceEngine {
         if (pattern instanceof AccumulatePattern) {
             return evaluateAccumulate((AccumulatePattern) pattern, bindings);
         }
-        Stream<Object> objects = getObjectsOfType(pattern.getDataSource(), pattern.getPatternVariable().getType());
+        Stream<Object> objects = getObjectsOfType((DataStore) pattern.getDataSourceSupplier().apply(), pattern.getPatternVariable().getType());
         List<BoundTuple> tuples =
                 objects.flatMap(obj -> generateMatches(pattern, bindings, obj))
                        .collect(toList());
@@ -93,7 +94,7 @@ public class BruteForceEngine {
     }
 
     private Bindings evaluateExistential(ExistentialPattern pattern, Bindings bindings) {
-        List<Object> objects = getObjectsOfType(pattern.getDataSource(), pattern.getPatternVariable().getType()).collect(toList());
+        List<Object> objects = getObjectsOfType((DataStore) pattern.getDataSourceSupplier().apply(), pattern.getPatternVariable().getType()).collect(toList());
         Predicate<BoundTuple> existentialPredicate =
                 tuple -> objects.stream()
                                  .map(obj -> tuple.bind(pattern.getPatternVariable(), obj))
@@ -109,7 +110,7 @@ public class BruteForceEngine {
     }
 
     private Bindings evaluateAccumulate(AccumulatePattern pattern, Bindings bindings) {
-        List<Object> objects = getObjectsOfType(pattern.getDataSource(), pattern.getPatternVariable().getType()).collect(toList());
+        List<Object> objects = getObjectsOfType((DataStore) pattern.getDataSourceSupplier().apply(), pattern.getPatternVariable().getType()).collect(toList());
         List<BoundTuple> tuples =
                 bindings.tuples.parallelStream()
                         .map(tuple -> objects.stream()
@@ -144,8 +145,8 @@ public class BruteForceEngine {
         }
     }
 
-    private Stream<Object> getObjectsOfType(DataSource dataSource, Type type) {
-        return dataSource.getObjects().parallelStream()
+    private Stream<Object> getObjectsOfType(DataStore dataStore, Type type) {
+        return dataStore.getObjects().parallelStream()
                 .filter(type::isInstance);
     }
 

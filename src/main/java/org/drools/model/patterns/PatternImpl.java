@@ -5,6 +5,7 @@ import org.drools.model.DataSource;
 import org.drools.model.Pattern;
 import org.drools.model.SingleConstraint;
 import org.drools.model.Variable;
+import org.drools.model.functions.Function0;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,18 +15,18 @@ public class PatternImpl<T> extends AbstractSinglePattern implements Pattern<T> 
     private final Variable<T> variable;
     private final Variable[] inputVariables;
     private final Constraint constraint;
-    private final DataSource dataSource;
+    private final Function0<DataSource> dataSourceSupplier;
 
-    PatternImpl(Variable<T> variable, Constraint constraint, DataSource dataSource) {
+    PatternImpl(Variable<T> variable, Constraint constraint, Function0<DataSource> dataSourceSupplier) {
         this.variable = variable;
         this.constraint = constraint;
-        this.dataSource = dataSource;
+        this.dataSourceSupplier = dataSourceSupplier != null ? dataSourceSupplier : Function0.Null.INSTANCE;
         this.inputVariables = collectInputVariables();
     }
 
     @Override
-    public DataSource getDataSource() {
-        return dataSource;
+    public Function0<DataSource> getDataSourceSupplier() {
+        return dataSourceSupplier;
     }
 
     @Override

@@ -4,8 +4,11 @@ import org.drools.model.consequences.ConsequenceBuilder;
 import org.drools.model.constraints.AbstractConstraint;
 import org.drools.model.constraints.SingleConstraint1;
 import org.drools.model.functions.Block0;
+import org.drools.model.functions.Function0;
 import org.drools.model.functions.Function1;
 import org.drools.model.functions.Predicate1;
+import org.drools.model.impl.DataStoreImpl;
+import org.drools.model.impl.DataStreamImpl;
 import org.drools.model.impl.JavaClassType;
 import org.drools.model.impl.RuleBuilder;
 import org.drools.model.impl.VariableImpl;
@@ -16,6 +19,22 @@ import org.drools.model.patterns.OrPatterns;
 import org.drools.model.patterns.PatternBuilder;
 
 public class DSL {
+
+    // -- DataSource --
+
+    public static <T> DataStore<T> storeOf(T... items) {
+        return DataStoreImpl.storeOf(items);
+    }
+
+    public static DataStore newDataStore() {
+        return storeOf();
+    }
+
+    public static DataStream newDataStream() {
+        return new DataStreamImpl();
+    }
+
+    // -- Variable --
 
     public static <T> Variable<T> any(Class<T> type) {
         return bind(typeOf(type));
@@ -28,6 +47,8 @@ public class DSL {
     public static <T> Type<T> typeOf(Class<T> type) {
         return new JavaClassType<T>(type);
     }
+
+    // -- LHS --
 
     public static <T> Pattern<T> pattern(Function1<PatternBuilder, PatternBuilder.ValidBuilder> builder) {
         return builder.apply(new PatternBuilder()).get();
@@ -53,10 +74,10 @@ public class DSL {
         return new OrPatterns(patterns);
     }
 
-    public static View view(DataSource dataSource, Function1<PatternBuilder, PatternBuilder.ValidBuilder>... builders) {
+    public static View view(Function0<DataSource> dataSourceSupplier, Function1<PatternBuilder, PatternBuilder.ValidBuilder>... builders) {
         Condition[] patterns = new Condition[builders.length];
         for (int i = 0; i < builders.length; i++) {
-            patterns[i] = builders[i].apply(new PatternBuilder().from(dataSource)).get();
+            patterns[i] = builders[i].apply(new PatternBuilder().from(dataSourceSupplier)).get();
         }
         return view(patterns);
     }
@@ -127,9 +148,7 @@ public class DSL {
         };
     }
 
-    public static RuleBuilder rule(String name) {
-        return new RuleBuilder(name);
-    }
+    // -- RHS --
 
     public static ConsequenceBuilder._0 execute(Block0 block) {
         return new ConsequenceBuilder._0(block);
@@ -141,5 +160,9 @@ public class DSL {
 
     public static <A, B> ConsequenceBuilder._2<A, B> on(Variable<A> decl1, Variable<B> decl2) {
         return new ConsequenceBuilder._2(decl1, decl2);
+    }
+
+    public static RuleBuilder rule(String name) {
+        return new RuleBuilder(name);
     }
 }

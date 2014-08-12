@@ -8,8 +8,8 @@ import java.util.List;
 
 import static org.drools.model.DSL.any;
 import static org.drools.model.DSL.rule;
+import static org.drools.model.DSL.storeOf;
 import static org.drools.model.flow.FlowDSL.*;
-import static org.drools.model.impl.DataSourceImpl.sourceOf;
 import static org.junit.Assert.assertEquals;
 
 public class FlowDSLTest {
@@ -17,10 +17,10 @@ public class FlowDSLTest {
     @Test
     public void testJoin() {
 
-        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
-                                              new Person("Edson", 35),
-                                              new Person("Mario", 40),
-                                              new Person("Sofia", 3));
+        DataSource<Person> persons = storeOf(new Person("Mark", 37),
+                                             new Person("Edson", 35),
+                                             new Person("Mario", 40),
+                                             new Person("Sofia", 3));
 
         // $mark: Person(name == "Mark") from entry-point "persons"
         // $older: Person(name != "Mark" && age > $mark.age) from entry-point "persons"
@@ -55,7 +55,7 @@ public class FlowDSLTest {
     @Test
     public void testJoinDifferentConstraintOrder() {
 
-        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+        DataSource<Person> persons = storeOf( new Person("Mark", 37),
                                               new Person("Edson", 35),
                                               new Person("Mario", 40),
                                               new Person("Sofia", 3));
@@ -83,7 +83,7 @@ public class FlowDSLTest {
 
     @Test
     public void testOr() {
-        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+        DataSource<Person> persons = storeOf( new Person("Mark", 37),
                                               new Person("Edson", 35),
                                               new Person("Mario", 40),
                                               new Person("Sofia", 3));
@@ -114,7 +114,7 @@ public class FlowDSLTest {
 
     @Test
     public void testNot() {
-        DataSource<Person> persons = sourceOf(new Person("Mark", 37),
+        DataSource<Person> persons = storeOf( new Person("Mark", 37),
                                               new Person("Edson", 35),
                                               new Person("Mario", 40),
                                               new Person("Sofia", 3));

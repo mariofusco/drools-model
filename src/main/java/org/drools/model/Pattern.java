@@ -1,8 +1,10 @@
 package org.drools.model;
 
+import org.drools.model.functions.Function0;
+
 public interface Pattern<T> extends Condition {
 
-    DataSource getDataSource();
+    Function0<DataSource> getDataSourceSupplier();
 
     Variable<T> getPatternVariable();
 

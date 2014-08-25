@@ -30,8 +30,12 @@ public class DSL {
         return storeOf();
     }
 
+    public static <T> DataStream<T> streamOf(T... items) {
+        return DataStreamImpl.streamOf(items);
+    }
+
     public static DataStream newDataStream() {
-        return new DataStreamImpl();
+        return streamOf();
     }
 
     // -- Variable --

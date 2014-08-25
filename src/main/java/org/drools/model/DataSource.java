@@ -1,7 +1,9 @@
 package org.drools.model;
 
-// DataSource is an EntryPoint only supporting inserts (Stream of events)
+import java.util.Observer;
+
 public interface DataSource<T> {
 
-    void insert(T item);
+    void addObserver(Observer o);
+    void deleteObserver(Observer o);
 }

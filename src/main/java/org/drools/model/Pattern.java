@@ -4,7 +4,7 @@ import org.drools.model.functions.Function0;
 
 public interface Pattern<T> extends Condition {
 
-    Function0<DataSource> getDataSourceSupplier();
+    Function0<? extends DataSource> getDataSourceSupplier();
 
     Variable<T> getPatternVariable();
 

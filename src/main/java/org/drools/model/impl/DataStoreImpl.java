@@ -5,8 +5,9 @@ import org.drools.model.functions.Block1;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Observable;
 
-public class DataStoreImpl<T> implements DataStore<T> {
+public class DataStoreImpl<T> extends Observable implements DataStore<T> {
 
     private final Collection<T> store;
 

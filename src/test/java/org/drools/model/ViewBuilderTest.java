@@ -20,7 +20,7 @@ public class ViewBuilderTest {
     @Test
     public void testSimpleView() {
 
-        DataSource<Person> persons = storeOf( new Person("Mark", 37),
+        DataStore<Person> persons = storeOf( new Person("Mark", 37),
                                               new Person("Edson", 35));
 
         persons.insert(new Person("Mario", 40));

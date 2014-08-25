@@ -12,6 +12,8 @@ public interface DataStore<T> extends DataSource<T> {
 
     Collection<T> getObjects();
 
+    void insert(T item);
+
     <U extends T> void update(U item, Block1<U> f);
 
     void delete(T item);

@@ -34,7 +34,7 @@ public class AccumulatePatternImpl<T> extends AbstractSinglePattern implements A
     }
 
     @Override
-    public Function0<DataSource> getDataSourceSupplier() {
+    public Function0<? extends DataSource> getDataSourceSupplier() {
         return pattern.getDataSourceSupplier();
     }
 

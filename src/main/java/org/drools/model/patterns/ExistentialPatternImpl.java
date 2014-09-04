@@ -1,11 +1,10 @@
 package org.drools.model.patterns;
 
 import org.drools.model.Constraint;
-import org.drools.model.DataSource;
+import org.drools.model.DataSourceDefinition;
 import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
 import org.drools.model.Variable;
-import org.drools.model.functions.Function0;
 
 public class ExistentialPatternImpl<T> extends AbstractSinglePattern implements ExistentialPattern<T> {
 
@@ -23,8 +22,8 @@ public class ExistentialPatternImpl<T> extends AbstractSinglePattern implements 
     }
 
     @Override
-    public Function0<DataSource> getDataSourceSupplier() {
-        return pattern.getDataSourceSupplier();
+    public DataSourceDefinition getDataSourceDefinition() {
+        return pattern.getDataSourceDefinition();
     }
 
     @Override

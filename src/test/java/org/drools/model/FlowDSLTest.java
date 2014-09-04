@@ -1,15 +1,13 @@
 package org.drools.model;
 
+import org.drools.datasource.DataSource;
 import org.drools.model.engine.BruteForceEngine;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.drools.model.DSL.any;
-import static org.drools.model.DSL.rule;
-import static org.drools.model.DSL.storeOf;
-import static org.drools.model.flow.FlowDSL.*;
+import static org.drools.model.DSL.*;
 import static org.junit.Assert.assertEquals;
 
 public class FlowDSLTest {
@@ -33,8 +31,8 @@ public class FlowDSLTest {
                 .attribute(Rule.Attribute.SALIENCE, 10)
                 .attribute(Rule.Attribute.AGENDA_GROUP, "myGroup")
                 .view(
-                        input(markV, () -> persons),
-                        input(olderV, () -> persons),
+                        input(markV, "persons"),
+                        input(olderV, "persons"),
                         expr(markV, mark -> mark.getName().equals("Mark")),
                         expr(olderV, older -> !older.getName().equals("Mark")),
                         expr(olderV, markV, (older, mark) -> older.getAge() > mark.getAge())
@@ -42,7 +40,7 @@ public class FlowDSLTest {
                 .then(c -> c.on(olderV, markV)
                             .execute((p1, p2) -> list.add(p1.getName() + " is older than " + p2.getName())));
 
-        BruteForceEngine.get().evaluate(rule);
+        new BruteForceEngine().bind("persons", persons).evaluate(rule);
         assertEquals(1, list.size());
         assertEquals("Mario is older than Mark", list.get(0));
 
@@ -67,14 +65,14 @@ public class FlowDSLTest {
         Variable<Person> olderV = any(Person.class);
 
         View view = view(
-            input(markV, () -> persons),
+            input(markV, "persons"),
             expr(markV, mark -> mark.getName().equals("Mark")),
-            input(olderV, () -> persons),
+            input(olderV, "persons"),
             expr(markV, olderV, (mark, older) -> mark.getAge() < older.getAge()),
             expr(olderV, older -> !older.getName().equals("Mark"))
         );
 
-        List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
+        List<TupleHandle> result = new BruteForceEngine().bind("persons", persons).evaluate(view);
         assertEquals(1, result.size());
         TupleHandle tuple = result.get(0);
         assertEquals("Mark", tuple.get(markV).getName());
@@ -92,15 +90,15 @@ public class FlowDSLTest {
         Variable<Person> otherV = any(Person.class);
 
         View view = view(
-                input(markV, () -> persons),
-                input(otherV, () -> persons),
+                input(markV, "persons"),
+                input(otherV, "persons"),
                 expr(markV, mark -> mark.getName().equals("Mark")),
                 or( expr(otherV, markV, (other, mark) -> other.getAge() > mark.getAge()),
                     expr(otherV, markV, (other, mark) -> other.getName().compareToIgnoreCase(mark.getName()) > 0)
                 )
         );
 
-        List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
+        List<TupleHandle> result = new BruteForceEngine().bind("persons", persons).evaluate(view);
         assertEquals(2, result.size());
 
         TupleHandle tuple = result.get(0);
@@ -126,12 +124,12 @@ public class FlowDSLTest {
         Variable<Person> otherV = any(Person.class);
 
         View view = view(
-                input(oldestV, () -> persons),
-                input(otherV, () -> persons),
+                input(oldestV, "persons"),
+                input(otherV, "persons"),
                 not(otherV, oldestV, (p1, p2) -> p1.getAge() > p2.getAge())
         );
 
-        List<TupleHandle> result = BruteForceEngine.get().evaluate(view);
+        List<TupleHandle> result = new BruteForceEngine().bind("persons", persons).evaluate(view);
         assertEquals(1, result.size());
         TupleHandle tuple = result.get(0);
         assertEquals("Mario", tuple.get(oldestV).getName());

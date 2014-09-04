@@ -1,11 +1,11 @@
 package org.drools.model.engine;
 
+import org.drools.datasource.DataSource;
+import org.drools.datasource.DataStore;
 import org.drools.model.AccumulateFunction;
 import org.drools.model.AccumulatePattern;
 import org.drools.model.Condition;
 import org.drools.model.Constraint;
-import org.drools.model.DataSource;
-import org.drools.model.DataStore;
 import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
 import org.drools.model.Rule;
@@ -20,7 +20,9 @@ import org.drools.model.impl.TupleHandleImpl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -29,10 +31,11 @@ import static java.util.stream.Collectors.toList;
 
 public class BruteForceEngine {
 
-    private static final BruteForceEngine INSTANCE = new BruteForceEngine();
+    private final Map<String, DataSource> dataSources = new HashMap<String, DataSource>();
 
-    public static BruteForceEngine get() {
-        return INSTANCE;
+    public BruteForceEngine bind(String name, DataSource dataSource) {
+        dataSources.put(name, dataSource);
+        return this;
     }
 
     public void evaluate(Rule... rules) {
@@ -62,6 +65,14 @@ public class BruteForceEngine {
         return evaluateCondition(condition, initialBindings()).toTupleHandles();
     }
 
+    private DataStore getPatternDataStore(Pattern pattern) {
+        DataStore dataStore = (DataStore) dataSources.get(pattern.getDataSourceDefinition().getName());
+        if (dataStore == null) {
+            throw new RuntimeException("Unknonw DataSource: " + pattern.getDataSourceDefinition().getName());
+        }
+        return dataStore;
+    }
+
     private Bindings evaluateCondition(Condition condition, Bindings bindings) {
         if (condition.getType() instanceof Condition.SingleType) {
             return evaluateSinglePattern((Pattern)condition, bindings);
@@ -86,7 +97,7 @@ public class BruteForceEngine {
         if (pattern instanceof AccumulatePattern) {
             return evaluateAccumulate((AccumulatePattern) pattern, bindings);
         }
-        Stream<Object> objects = getObjectsOfType((DataStore) pattern.getDataSourceSupplier().apply(), pattern.getPatternVariable().getType());
+        Stream<Object> objects = getObjectsOfType(getPatternDataStore(pattern), pattern.getPatternVariable().getType());
         List<BoundTuple> tuples =
                 objects.flatMap(obj -> generateMatches(pattern, bindings, obj))
                        .collect(toList());
@@ -94,7 +105,7 @@ public class BruteForceEngine {
     }
 
     private Bindings evaluateExistential(ExistentialPattern pattern, Bindings bindings) {
-        List<Object> objects = getObjectsOfType((DataStore) pattern.getDataSourceSupplier().apply(), pattern.getPatternVariable().getType()).collect(toList());
+        List<Object> objects = getObjectsOfType(getPatternDataStore(pattern), pattern.getPatternVariable().getType()).collect(toList());
         Predicate<BoundTuple> existentialPredicate =
                 tuple -> objects.stream()
                                  .map(obj -> tuple.bind(pattern.getPatternVariable(), obj))
@@ -110,7 +121,7 @@ public class BruteForceEngine {
     }
 
     private Bindings evaluateAccumulate(AccumulatePattern pattern, Bindings bindings) {
-        List<Object> objects = getObjectsOfType((DataStore) pattern.getDataSourceSupplier().apply(), pattern.getPatternVariable().getType()).collect(toList());
+        List<Object> objects = getObjectsOfType(getPatternDataStore(pattern), pattern.getPatternVariable().getType()).collect(toList());
         List<BoundTuple> tuples =
                 bindings.tuples.parallelStream()
                         .map(tuple -> objects.stream()

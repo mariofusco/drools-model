@@ -1,7 +1,8 @@
 package org.drools.model.patterns;
 
+import org.drools.datasource.DataSource;
 import org.drools.model.Constraint;
-import org.drools.model.DataSource;
+import org.drools.model.DataSourceDefinition;
 import org.drools.model.Index;
 import org.drools.model.Pattern;
 import org.drools.model.SingleConstraint;
@@ -17,6 +18,7 @@ import org.drools.model.functions.Function2;
 import org.drools.model.functions.FunctionN;
 import org.drools.model.functions.Predicate1;
 import org.drools.model.functions.Predicate2;
+import org.drools.model.impl.DataSourceDefinitionImpl;
 import org.drools.model.index.AlphaIndexImpl;
 import org.drools.model.index.BetaIndexImpl;
 
@@ -26,10 +28,10 @@ import static org.drools.model.functions.FunctionUtils.toFunctionN;
 public class PatternBuilder {
 
     private Variable[] joinVars;
-    private Function0<DataSource> dataSourceSupplier;
+    private DataSourceDefinition dataSourceDefinition = DataSourceDefinitionImpl.DEFAULT;
 
-    public PatternBuilder from(Function0<DataSource> dataSourceSupplier) {
-        this.dataSourceSupplier = dataSourceSupplier;
+    public PatternBuilder from(DataSourceDefinition dataSourceDefinition) {
+        this.dataSourceDefinition = dataSourceDefinition;
         return this;
     }
 
@@ -38,11 +40,11 @@ public class PatternBuilder {
     }
 
     public <T> BoundPatternBuilder<T> filter(Variable<T> var) {
-        return new BoundPatternBuilder<T>(var, dataSourceSupplier);
+        return new BoundPatternBuilder<T>(var, dataSourceDefinition);
     }
 
     public <T> InvokerPatternBuilder<T> set(Variable<T> var) {
-        return new InvokerPatternBuilder<T>(var, dataSourceSupplier);
+        return new InvokerPatternBuilder<T>(var, dataSourceDefinition);
     }
 
     public interface ValidBuilder<T> {
@@ -51,85 +53,85 @@ public class PatternBuilder {
 
     public static class InvokerPatternBuilder<T> {
         protected final Variable<T> variable;
-        protected Function0<DataSource> dataSourceSupplier;
+        protected DataSourceDefinition dataSourceDefinition;
         protected Variable[] inputVariables;
 
-        private InvokerPatternBuilder(Variable<T> variable, Function0<DataSource> dataSourceSupplier) {
+        private InvokerPatternBuilder(Variable<T> variable, DataSourceDefinition dataSourceDefinition) {
             this.variable = variable;
-            this.dataSourceSupplier = dataSourceSupplier;
+            this.dataSourceDefinition = dataSourceDefinition;
         }
 
         public <A> InvokerSingleValuePatternBuilder<T> invoking(Function0<T> f) {
-            return new InvokerSingleValuePatternBuilder(variable, dataSourceSupplier, new Variable[0], toFunctionN(f));
+            return new InvokerSingleValuePatternBuilder(variable, dataSourceDefinition, new Variable[0], toFunctionN(f));
         }
 
         public <A> InvokerSingleValuePatternBuilder<T> invoking(Variable<A> var, Function1<A, T> f) {
-            return new InvokerSingleValuePatternBuilder(variable, dataSourceSupplier, new Variable[] { var }, toFunctionN(f));
+            return new InvokerSingleValuePatternBuilder(variable, dataSourceDefinition, new Variable[] { var }, toFunctionN(f));
         }
 
         public <A, B> InvokerSingleValuePatternBuilder<T> invoking(Variable<A> var1, Variable<B> var2, Function2<A, B, T> f) {
-            return new InvokerSingleValuePatternBuilder(variable, dataSourceSupplier, new Variable[] { var1, var2 }, toFunctionN(f));
+            return new InvokerSingleValuePatternBuilder(variable, dataSourceDefinition, new Variable[] { var1, var2 }, toFunctionN(f));
         }
 
         public <A> InvokerMultiValuePatternBuilder<T> in(Function0<Iterable<? extends T>> f) {
-            return new InvokerMultiValuePatternBuilder(variable, dataSourceSupplier, new Variable[0], toFunctionN(f));
+            return new InvokerMultiValuePatternBuilder(variable, dataSourceDefinition, new Variable[0], toFunctionN(f));
         }
 
         public <A> InvokerMultiValuePatternBuilder<T> in(Variable<A> var, Function1<A, Iterable<? extends T>> f) {
-            return new InvokerMultiValuePatternBuilder(variable, dataSourceSupplier, new Variable[] { var }, toFunctionN(f));
+            return new InvokerMultiValuePatternBuilder(variable, dataSourceDefinition, new Variable[] { var }, toFunctionN(f));
         }
 
         public <A, B> InvokerMultiValuePatternBuilder<T> in(Variable<A> var1, Variable<B> var2, Function2<A, B, Iterable<? extends T>> f) {
-            return new InvokerMultiValuePatternBuilder(variable, dataSourceSupplier, new Variable[] { var1, var2 }, toFunctionN(f));
+            return new InvokerMultiValuePatternBuilder(variable, dataSourceDefinition, new Variable[] { var1, var2 }, toFunctionN(f));
         }
     }
 
     public static class InvokerSingleValuePatternBuilder<T> extends InvokerPatternBuilder<T> implements ValidBuilder<T> {
         private FunctionN<T> function;
 
-        public InvokerSingleValuePatternBuilder(Variable<T> variable, Function0<DataSource> dataSourceSupplier, Variable[] inputVariables, FunctionN<T> function) {
-            super(variable, dataSourceSupplier);
+        public InvokerSingleValuePatternBuilder(Variable<T> variable, DataSourceDefinition dataSourceDefinition, Variable[] inputVariables, FunctionN<T> function) {
+            super(variable, dataSourceDefinition);
             this.inputVariables = inputVariables;
             this.function = function;
         }
 
         @Override
         public Pattern<T> get() {
-            return new InvokerSingleValuePatternImpl<T>(dataSourceSupplier, function, variable, inputVariables);
+            return new InvokerSingleValuePatternImpl<T>(dataSourceDefinition, function, variable, inputVariables);
         }
     }
 
     public static class InvokerMultiValuePatternBuilder<T> extends InvokerPatternBuilder<T> implements ValidBuilder<T> {
         private FunctionN<Iterable<? extends T>> function;
 
-        public InvokerMultiValuePatternBuilder(Variable<T> variable, Function0<DataSource> dataSourceSupplier, Variable[] inputVariables, FunctionN<Iterable<? extends T>> function) {
-            super(variable, dataSourceSupplier);
+        public InvokerMultiValuePatternBuilder(Variable<T> variable, DataSourceDefinition dataSourceDefinition, Variable[] inputVariables, FunctionN<Iterable<? extends T>> function) {
+            super(variable, dataSourceDefinition);
             this.inputVariables = inputVariables;
             this.function = function;
         }
 
         @Override
         public Pattern<T> get() {
-            return new InvokerMultiValuePatternImpl<T>(dataSourceSupplier, function, variable, inputVariables);
+            return new InvokerMultiValuePatternImpl<T>(dataSourceDefinition, function, variable, inputVariables);
         }
     }
 
     public static class BoundPatternBuilder<T> implements ValidBuilder<T> {
         private final Variable<T> variable;
-        private Function0<DataSource> dataSourceSupplier;
+        private DataSourceDefinition dataSourceDefinition;
 
-        private BoundPatternBuilder(Variable<T> variable, Function0<DataSource> dataSourceSupplier) {
+        private BoundPatternBuilder(Variable<T> variable, DataSourceDefinition dataSourceDefinition) {
             this.variable = variable;
-            this.dataSourceSupplier = dataSourceSupplier;
+            this.dataSourceDefinition = dataSourceDefinition;
         }
 
-        public BoundPatternBuilder<T> from(Function0<DataSource> dataSourceSupplier) {
-            this.dataSourceSupplier = dataSourceSupplier;
+        public BoundPatternBuilder<T> from(DataSourceDefinition dataSourceDefinition) {
+            this.dataSourceDefinition = dataSourceDefinition;
             return this;
         }
 
         public ConstrainedPatternBuilder<T> with(SingleConstraint constraint) {
-            return new ConstrainedPatternBuilder(variable, (AbstractSingleConstraint)constraint, dataSourceSupplier);
+            return new ConstrainedPatternBuilder(variable, (AbstractSingleConstraint)constraint, dataSourceDefinition);
         }
 
         public ConstrainedPatternBuilder<T> with(Predicate1<T> predicate) {
@@ -158,25 +160,25 @@ public class PatternBuilder {
 
         @Override
         public Pattern<T> get() {
-            return new PatternImpl(variable, AbstractSingleConstraint.EMPTY, dataSourceSupplier);
+            return new PatternImpl(variable, AbstractSingleConstraint.EMPTY, dataSourceDefinition);
         }
     }
 
     public static class ConstrainedPatternBuilder<T> implements ValidBuilder<T> {
         private final Variable<T> variable;
         private Constraint constraint;
-        private Function0<DataSource> dataSourceSupplier;
+        private DataSourceDefinition dataSourceDefinition;
         private AbstractSingleConstraint lastConstraint;
 
-        private ConstrainedPatternBuilder(Variable<T> variable, AbstractSingleConstraint constraint, Function0<DataSource> dataSourceSupplier) {
+        private ConstrainedPatternBuilder(Variable<T> variable, AbstractSingleConstraint constraint, DataSourceDefinition dataSourceDefinition) {
             this.variable = variable;
             this.constraint = constraint;
             this.lastConstraint = constraint;
-            this.dataSourceSupplier = dataSourceSupplier;
+            this.dataSourceDefinition = dataSourceDefinition;
         }
 
-        public ConstrainedPatternBuilder<T> from(Function0<DataSource> dataSourceSupplier) {
-            this.dataSourceSupplier = dataSourceSupplier;
+        public ConstrainedPatternBuilder<T> from(DataSourceDefinition dataSourceDefinition) {
+            this.dataSourceDefinition = dataSourceDefinition;
             return this;
         }
 
@@ -260,7 +262,7 @@ public class PatternBuilder {
 
         @Override
         public Pattern<T> get() {
-            return new PatternImpl(variable, constraint, dataSourceSupplier);
+            return new PatternImpl(variable, constraint, dataSourceDefinition);
         }
     }
 }

@@ -2,7 +2,6 @@ package org.drools.model.impl;
 
 import org.drools.model.AccumulateFunction;
 import org.drools.model.Condition;
-import org.drools.model.DSL;
 import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
 import org.drools.model.Variable;
@@ -14,7 +13,9 @@ import org.drools.model.flow.ExprViewItem;
 import org.drools.model.flow.InputViewItem;
 import org.drools.model.flow.SetViewItem;
 import org.drools.model.flow.ViewItem;
+import org.drools.model.patterns.AccumulatePatternImpl;
 import org.drools.model.patterns.AndPatterns;
+import org.drools.model.patterns.ExistentialPatternImpl;
 import org.drools.model.patterns.OrPatterns;
 import org.drools.model.patterns.PatternBuilder;
 
@@ -28,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class ViewBuilder {
+
+    private ViewBuilder() { }
 
     public static List<Condition> viewItems2Conditions(ViewItem[] viewItems) {
         Map<Variable, InputViewItem> inputs = new HashMap<Variable, InputViewItem>();
@@ -52,11 +55,11 @@ public class ViewBuilder {
                 SetViewItem setViewItem = (SetViewItem)viewItem;
                 PatternBuilder.ValidBuilder patternBuilder = setViewItem.isMultivalue() ?
                         new PatternBuilder.InvokerMultiValuePatternBuilder( var,
-                                                                             null,
-                                                                             setViewItem.getInputVariables(),
-                                                                             setViewItem.getInvokedFunction() ) :
+                                                                            DataSourceDefinitionImpl.DEFAULT,
+                                                                            setViewItem.getInputVariables(),
+                                                                            setViewItem.getInvokedFunction() ) :
                         new PatternBuilder.InvokerSingleValuePatternBuilder( var,
-                                                                             null,
+                                                                             DataSourceDefinitionImpl.DEFAULT,
                                                                              setViewItem.getInputVariables(),
                                                                              setViewItem.getInvokedFunction() );
                 builderMap.put(var, patternBuilder);
@@ -66,7 +69,7 @@ public class ViewBuilder {
             PatternBuilder.ValidBuilder patternBuilder = builderMap.get(var);
             if (patternBuilder == null) {
                 patternBuilder = new PatternBuilder().filter(var)
-                                                     .from(inputs.get(var).getDataSourceSupplier());
+                                                     .from(inputs.get(var).getDataSourceDefinition());
                 builderMap.put(var, patternBuilder);
             }
 
@@ -78,7 +81,7 @@ public class ViewBuilder {
         for (Variable var : inputs.keySet()) {
             if (!builderMap.containsKey(var) && !variablesFromcombinedExpressions.contains(var)) {
                 builderMap.put(var, new PatternBuilder().filter(var)
-                                                        .from(inputs.get(var).getDataSourceSupplier()));
+                                                        .from(inputs.get(var).getDataSourceDefinition()));
             }
         }
 
@@ -131,14 +134,14 @@ public class ViewBuilder {
             if (viewItem instanceof Expr1ViewItem) {
                 Expr1ViewItem expr = (Expr1ViewItem)viewItem;
                 Pattern pattern = new PatternBuilder().filter(var)
-                                                      .from(inputs.get(var).getDataSourceSupplier())
+                                                      .from(inputs.get(var).getDataSourceDefinition())
                                                       .with(expr.getPredicate())
                                                       .get();
                 patterns.add(pattern);
             } else if (viewItem instanceof Expr2ViewItem) {
                 Expr2ViewItem expr = (Expr2ViewItem)viewItem;
                 Pattern pattern = new PatternBuilder().filter(var)
-                                                      .from(inputs.get(var).getDataSourceSupplier())
+                                                      .from(inputs.get(var).getDataSourceDefinition())
                                                       .with(expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate())
                                                       .get();
                 patterns.add(pattern);
@@ -191,7 +194,7 @@ public class ViewBuilder {
 
         @Override
         public Pattern get() {
-            return DSL.not(builder.get());
+            return new ExistentialPatternImpl(ExistentialPattern.ExistentialType.NOT, builder.get());
         }
     }
 
@@ -204,7 +207,7 @@ public class ViewBuilder {
 
         @Override
         public Pattern get() {
-            return DSL.exists(builder.get());
+            return new ExistentialPatternImpl(ExistentialPattern.ExistentialType.EXISTS, builder.get());
         }
     }
 
@@ -219,7 +222,7 @@ public class ViewBuilder {
 
         @Override
         public Pattern get() {
-            return DSL.accumulate(builder.get(), functions);
+            return new AccumulatePatternImpl(builder.get(), functions);
         }
     }
 }

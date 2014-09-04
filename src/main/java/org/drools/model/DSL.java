@@ -1,41 +1,49 @@
 package org.drools.model;
 
+import org.drools.datasource.DataStore;
+import org.drools.datasource.DataStream;
+import org.drools.datasource.impl.DataStreamImpl;
+import org.drools.datasource.impl.SetDataStore;
 import org.drools.model.consequences.ConsequenceBuilder;
-import org.drools.model.constraints.AbstractConstraint;
-import org.drools.model.constraints.SingleConstraint1;
+import org.drools.model.flow.AccumulateExprViewItem;
+import org.drools.model.flow.CombinedExprViewItem;
+import org.drools.model.flow.Expr1ViewItem;
+import org.drools.model.flow.Expr2ViewItem;
+import org.drools.model.flow.ExprViewItem;
+import org.drools.model.flow.InputViewItem;
+import org.drools.model.flow.SetViewItem;
+import org.drools.model.flow.ViewItem;
 import org.drools.model.functions.Block0;
 import org.drools.model.functions.Function0;
 import org.drools.model.functions.Function1;
+import org.drools.model.functions.Function2;
 import org.drools.model.functions.Predicate1;
-import org.drools.model.impl.DataStoreImpl;
-import org.drools.model.impl.DataStreamImpl;
+import org.drools.model.functions.Predicate2;
+import org.drools.model.impl.DataSourceDefinitionImpl;
 import org.drools.model.impl.JavaClassType;
 import org.drools.model.impl.RuleBuilder;
 import org.drools.model.impl.VariableImpl;
-import org.drools.model.patterns.AccumulatePatternImpl;
 import org.drools.model.patterns.AndPatterns;
-import org.drools.model.patterns.ExistentialPatternImpl;
-import org.drools.model.patterns.OrPatterns;
-import org.drools.model.patterns.PatternBuilder;
+
+import java.util.List;
+
+import static org.drools.model.functions.FunctionUtils.toFunctionN;
+import static org.drools.model.impl.ViewBuilder.viewItems2Conditions;
 
 public class DSL {
 
     // -- DataSource --
 
     public static <T> DataStore<T> storeOf(T... items) {
-        return DataStoreImpl.storeOf(items);
+        return SetDataStore.storeOf(items);
     }
 
     public static DataStore newDataStore() {
         return storeOf();
     }
 
-    public static <T> DataStream<T> streamOf(T... items) {
-        return DataStreamImpl.streamOf(items);
-    }
-
     public static DataStream newDataStream() {
-        return streamOf();
+        return new DataStreamImpl();
     }
 
     // -- Variable --
@@ -54,102 +62,117 @@ public class DSL {
 
     // -- LHS --
 
-    public static <T> Pattern<T> pattern(Function1<PatternBuilder, PatternBuilder.ValidBuilder> builder) {
-        return builder.apply(new PatternBuilder()).get();
+    public static View view(ViewItem... viewItems) {
+        List<Condition> conditions = viewItems2Conditions(viewItems);
+        return new AndPatterns(conditions.toArray(new Condition[conditions.size()]));
     }
 
-    public static <A> AbstractConstraint constraint(Variable<A> variable, Predicate1<A> predicate) {
-        return new SingleConstraint1<A>(variable, predicate);
+    public static <T> ViewItem<T> input(Variable<T> var) {
+        return new InputViewItem(var, DataSourceDefinitionImpl.DEFAULT);
     }
 
-    public static AbstractConstraint and(Constraint... constraints) {
-        return AbstractConstraint.and(constraints);
+    public static <T> ViewItem<T> input(Variable<T> var, String dataSourceName) {
+        return new InputViewItem(var, new DataSourceDefinitionImpl(dataSourceName, false));
     }
 
-    public static AbstractConstraint or(Constraint... constraints) {
-        return AbstractConstraint.or(constraints);
+    public static <T> ViewItem<T> subscribe(Variable<T> var, String dataSourceName) {
+        return new InputViewItem(var, new DataSourceDefinitionImpl(dataSourceName, true));
     }
 
-    public static Condition and(Condition... patterns) {
-        return new AndPatterns(patterns);
+    public static <T> ExprViewItem<T> expr(Variable<T> var, Predicate1<T> predicate) {
+        return new Expr1ViewItem<T>(var, predicate);
     }
 
-    public static Condition or(Condition... patterns) {
-        return new OrPatterns(patterns);
+    public static <T, U> ExprViewItem<T> expr(Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
+        return new Expr2ViewItem<T, U>(var1, var2, predicate);
     }
 
-    public static View view(Function0<DataSource> dataSourceSupplier, Function1<PatternBuilder, PatternBuilder.ValidBuilder>... builders) {
-        Condition[] patterns = new Condition[builders.length];
-        for (int i = 0; i < builders.length; i++) {
-            patterns[i] = builders[i].apply(new PatternBuilder().from(dataSourceSupplier)).get();
+    public static <T> ExprViewItem<T> expr(String exprId, Variable<T> var, Predicate1<T> predicate) {
+        return new Expr1ViewItem<T>(exprId, var, predicate);
+    }
+
+    public static <T, U> ExprViewItem<T> expr(String exprId, Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
+        return new Expr2ViewItem<T, U>(exprId, var1, var2, predicate);
+    }
+
+    public static <T> ExprViewItem<T> not(ExprViewItem expr) {
+        return expr.setExistentialType(ExistentialPattern.ExistentialType.NOT);
+    }
+
+    public static <T> ExprViewItem<T> not(Variable<T> var) {
+        return not(var, Predicate1.TRUE);
+    }
+
+    public static <T> ExprViewItem<T> not(Variable<T> var, Predicate1<T> predicate) {
+        return not(new Expr1ViewItem<T>(var, predicate));
+    }
+
+    public static <T, U> ExprViewItem<T> not(Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
+        return not(new Expr2ViewItem<T, U>(var1, var2, predicate));
+    }
+
+    public static <T> ExprViewItem<T> exists(Variable<T> var) {
+        return exists(var, Predicate1.TRUE);
+    }
+
+    public static <T> ExprViewItem<T> exists(ExprViewItem<T> expr) {
+        return expr.setExistentialType(ExistentialPattern.ExistentialType.EXISTS);
+    }
+
+    public static <T> ExprViewItem<T> exists(Variable<T> var, Predicate1<T> predicate) {
+        return exists(new Expr1ViewItem<T>(var, predicate));
+    }
+
+    public static <T, U> ExprViewItem<T> exists(Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
+        return exists(new Expr2ViewItem<T, U>(var1, var2, predicate));
+    }
+
+    public static <T> ExprViewItem<T> accumulate(ExprViewItem<T> expr, AccumulateFunction<T, ?, ?>... functions) {
+        return new AccumulateExprViewItem(expr, functions);
+    }
+
+    public static ExprViewItem or(ExprViewItem... expressions) {
+        return new CombinedExprViewItem(Condition.OrType.INSTANCE, expressions);
+    }
+
+    public static ExprViewItem and(ExprViewItem... expressions) {
+        return new CombinedExprViewItem(Condition.AndType.INSTANCE, expressions);
+    }
+
+    public static <T> SetViewItemBuilder<T> set(Variable<T> var) {
+        return new SetViewItemBuilder<T>(var);
+    }
+
+    public static class SetViewItemBuilder<T> {
+        private final Variable<T> var;
+
+        private SetViewItemBuilder(Variable<T> var) {
+            this.var = var;
         }
-        return view(patterns);
-    }
 
-    public static View view(Function1<PatternBuilder, PatternBuilder.ValidBuilder>... builders) {
-        Condition[] patterns = new Condition[builders.length];
-        for (int i = 0; i < builders.length; i++) {
-            patterns[i] = builders[i].apply(new PatternBuilder()).get();
+        public SetViewItem<T> invoking(Function0<T> f) {
+            return new SetViewItem<T>(toFunctionN(f), false, var);
         }
-        return view(patterns);
-    }
 
-    public static View view(Condition... patterns) {
-        return new AndPatterns(patterns);
-    }
+        public <A> SetViewItem<T> invoking(Variable<A> var1, Function1<A, T> f) {
+            return new SetViewItem<T>(toFunctionN(f), false, var, var1);
+        }
 
-    public static <T> ExistentialPattern not(Pattern<T> pattern) {
-        return new ExistentialPatternImpl<T>(ExistentialPattern.ExistentialType.NOT, pattern);
-    }
+        public <A, B> SetViewItem<T> invoking(Variable<A> var1, Variable<B> var2, Function2<A, B, T> f) {
+            return new SetViewItem<T>(toFunctionN(f), false, var, var1, var2);
+        }
 
-    public static <T> Function1<PatternBuilder, PatternBuilder.ValidBuilder> not(final Function1<PatternBuilder, PatternBuilder.ValidBuilder<T>> builder) {
-        return new Function1<PatternBuilder, PatternBuilder.ValidBuilder>() {
-            @Override
-            public PatternBuilder.ValidBuilder apply(PatternBuilder patternBuilder) {
-                return new PatternBuilder.ValidBuilder() {
-                    @Override
-                    public Pattern<T> get() {
-                        return not(builder.apply(new PatternBuilder()).get());
-                    }
-                };
-            }
-        };
-    }
+        public SetViewItem<T> in(Function0<Iterable<? extends T>> f) {
+            return new SetViewItem<T>(toFunctionN(f), true, var);
+        }
 
-    public static <T> ExistentialPattern<T> exists(Pattern<T> pattern) {
-        return new ExistentialPatternImpl<T>(ExistentialPattern.ExistentialType.EXISTS, pattern);
-    }
+        public <A> SetViewItem<T> in(Variable<A> var1, Function1<A, Iterable<? extends T>> f) {
+            return new SetViewItem<T>(toFunctionN(f), true, var, var1);
+        }
 
-    public static <T> Function1<PatternBuilder, PatternBuilder.ValidBuilder> exists(final Function1<PatternBuilder, PatternBuilder.ValidBuilder<T>> builder) {
-        return new Function1<PatternBuilder, PatternBuilder.ValidBuilder>() {
-            @Override
-            public PatternBuilder.ValidBuilder apply(PatternBuilder patternBuilder) {
-                return new PatternBuilder.ValidBuilder() {
-                    @Override
-                    public Pattern<T> get() {
-                        return exists(builder.apply(new PatternBuilder()).get());
-                    }
-                };
-            }
-        };
-    }
-
-    public static <T> AccumulatePattern<T> accumulate(Pattern<T> pattern, AccumulateFunction<T, ?, ?>... functions) {
-        return new AccumulatePatternImpl<T>(pattern, functions);
-    }
-
-    public static <T> Function1<PatternBuilder, PatternBuilder.ValidBuilder> accumulate(final Function1<PatternBuilder, PatternBuilder.ValidBuilder<T>> builder, final AccumulateFunction<T, ?, ?>... functions) {
-        return new Function1<PatternBuilder, PatternBuilder.ValidBuilder>() {
-            @Override
-            public PatternBuilder.ValidBuilder apply(PatternBuilder patternBuilder) {
-                return new PatternBuilder.ValidBuilder() {
-                    @Override
-                    public Pattern<T> get() {
-                        return accumulate(builder.apply(new PatternBuilder()).get(), functions);
-                    }
-                };
-            }
-        };
+        public <A, B> SetViewItem<T> in(Variable<A> var1, Variable<B> var2, Function2<A, B, Iterable<? extends T>> f) {
+            return new SetViewItem<T>(toFunctionN(f), true, var, var1, var2);
+        }
     }
 
     // -- RHS --

@@ -1,12 +1,11 @@
 package org.drools.model.patterns;
 
-import org.drools.model.AccumulatePattern;
 import org.drools.model.AccumulateFunction;
+import org.drools.model.AccumulatePattern;
 import org.drools.model.Constraint;
-import org.drools.model.DataSource;
+import org.drools.model.DataSourceDefinition;
 import org.drools.model.Pattern;
 import org.drools.model.Variable;
-import org.drools.model.functions.Function0;
 
 public class AccumulatePatternImpl<T> extends AbstractSinglePattern implements AccumulatePattern<T> {
 
@@ -34,8 +33,8 @@ public class AccumulatePatternImpl<T> extends AbstractSinglePattern implements A
     }
 
     @Override
-    public Function0<? extends DataSource> getDataSourceSupplier() {
-        return pattern.getDataSourceSupplier();
+    public DataSourceDefinition getDataSourceDefinition() {
+        return pattern.getDataSourceDefinition();
     }
 
     @Override

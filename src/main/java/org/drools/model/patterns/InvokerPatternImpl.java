@@ -1,19 +1,18 @@
 package org.drools.model.patterns;
 
 import org.drools.model.Constraint;
-import org.drools.model.DataSource;
+import org.drools.model.DataSourceDefinition;
 import org.drools.model.InvokerPattern;
 import org.drools.model.Variable;
-import org.drools.model.functions.Function0;
 
 public abstract class InvokerPatternImpl<T> extends AbstractSinglePattern implements InvokerPattern<T> {
 
-    private final Function0<DataSource> dataSourceSupplier;
+    private final DataSourceDefinition dataSourceDefinition;
     private final Variable<T> variable;
     private final Variable[] inputVariables;
 
-    InvokerPatternImpl(Function0<DataSource> dataSourceSupplier, Variable<T> boundVariable, Variable... inputVariables) {
-        this.dataSourceSupplier = dataSourceSupplier != null ? dataSourceSupplier : Function0.Null.INSTANCE;
+    InvokerPatternImpl(DataSourceDefinition dataSourceDefinition, Variable<T> boundVariable, Variable... inputVariables) {
+        this.dataSourceDefinition = dataSourceDefinition;
         this.variable = boundVariable;
         this.inputVariables = inputVariables;
     }
@@ -34,8 +33,8 @@ public abstract class InvokerPatternImpl<T> extends AbstractSinglePattern implem
     }
 
     @Override
-    public Function0<DataSource> getDataSourceSupplier() {
-        return dataSourceSupplier;
+    public DataSourceDefinition getDataSourceDefinition() {
+        return dataSourceDefinition;
     }
 
     @Override

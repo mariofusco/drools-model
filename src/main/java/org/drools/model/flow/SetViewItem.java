@@ -10,7 +10,7 @@ public class SetViewItem<T> implements ViewItem<T> {
     private final Variable<T> variable;
     private final Variable[] inputVariables;
 
-    SetViewItem(FunctionN function, boolean multivalue, Variable<T> boundVariable, Variable... inputVariables) {
+    public SetViewItem(FunctionN function, boolean multivalue, Variable<T> boundVariable, Variable... inputVariables) {
         this.invokedFunction = function;
         this.multivalue = multivalue;
         this.variable = boundVariable;

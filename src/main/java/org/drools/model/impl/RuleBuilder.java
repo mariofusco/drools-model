@@ -48,8 +48,12 @@ public class RuleBuilder {
         return when(patterns);
     }
 
+    public RuleBuilderWithLHS when(View view) {
+        return new RuleBuilderWithLHS(name, attributes, view);
+    }
+
     public RuleBuilderWithLHS when(Condition... patterns) {
-        return new RuleBuilderWithLHS(name, attributes, new AndPatterns(patterns));
+        return when(new AndPatterns(patterns));
     }
 
     public RuleBuilderWithLHS view(ViewItem... viewItems) {

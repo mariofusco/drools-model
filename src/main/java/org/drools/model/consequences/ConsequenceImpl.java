@@ -13,16 +13,15 @@ public class ConsequenceImpl implements Consequence {
     private final Update[] updates;
     private final Variable[] deletes;
 
-    ConsequenceImpl(BlockN block) {
-        this(block, null, null, null, null);
-    }
+    private final boolean usingDrools;
 
-    ConsequenceImpl(BlockN block, Variable[] declarations, FunctionN[] inserts, Update[] updates, Variable[] deletes) {
+    ConsequenceImpl(BlockN block, Variable[] declarations, FunctionN[] inserts, Update[] updates, Variable[] deletes, boolean usingDrools) {
         this.declarations = declarations;
         this.block = block;
         this.inserts = inserts == null ? new FunctionN[0] : inserts;
         this.updates = updates == null ? new Update[0] : updates;
         this.deletes = deletes == null ? new Variable[0] : deletes;
+        this.usingDrools = usingDrools;
     }
 
     @Override
@@ -48,6 +47,11 @@ public class ConsequenceImpl implements Consequence {
     @Override
     public Variable[] getDeletes() {
         return deletes;
+    }
+
+    @Override
+    public boolean isUsingDrools() {
+        return usingDrools;
     }
 
     @Override

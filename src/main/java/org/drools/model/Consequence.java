@@ -17,6 +17,8 @@ public interface Consequence {
 
     boolean isChangingWorkingMemory();
 
+    boolean isUsingDrools();
+
     public interface Update<T> {
         Variable<T> getUpdatedVariable();
 

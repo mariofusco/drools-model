@@ -14,6 +14,7 @@ import org.drools.model.flow.InputViewItem;
 import org.drools.model.flow.SetViewItem;
 import org.drools.model.flow.ViewItem;
 import org.drools.model.functions.Block0;
+import org.drools.model.functions.Block1;
 import org.drools.model.functions.Function0;
 import org.drools.model.functions.Function1;
 import org.drools.model.functions.Function2;
@@ -61,6 +62,10 @@ public class DSL {
     }
 
     // -- LHS --
+
+    public static View when(ViewItem... viewItems) {
+        return view(viewItems);
+    }
 
     public static View view(ViewItem... viewItems) {
         List<Condition> conditions = viewItems2Conditions(viewItems);
@@ -178,6 +183,10 @@ public class DSL {
     // -- RHS --
 
     public static ConsequenceBuilder._0 execute(Block0 block) {
+        return new ConsequenceBuilder._0(block);
+    }
+
+    public static ConsequenceBuilder._0 execute(Block1<Drools> block) {
         return new ConsequenceBuilder._0(block);
     }
 

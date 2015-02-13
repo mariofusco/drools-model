@@ -4,7 +4,7 @@ import org.drools.model.DataSourceDefinition;
 
 public class DataSourceDefinitionImpl implements DataSourceDefinition {
 
-    public static final DataSourceDefinition DEFAULT = new DataSourceDefinitionImpl("default", false);
+    public static final DataSourceDefinition DEFAULT = new DataSourceDefinitionImpl("DEFAULT", false);
 
     private final String name;
     private final boolean observable;

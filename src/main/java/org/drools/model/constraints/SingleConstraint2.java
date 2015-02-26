@@ -1,8 +1,10 @@
 package org.drools.model.constraints;
 
 import org.drools.model.Variable;
-import org.drools.model.functions.PredicateN;
 import org.drools.model.functions.Predicate2;
+import org.drools.model.functions.PredicateN;
+
+import static org.drools.model.functions.LambdaIntrospector.getLambdaFingerprint;
 
 public class SingleConstraint2<A, B> extends AbstractSingleConstraint {
 
@@ -11,6 +13,7 @@ public class SingleConstraint2<A, B> extends AbstractSingleConstraint {
     private final Predicate2<A, B> predicate;
 
     public SingleConstraint2(Variable<A> var1, Variable<B> var2, Predicate2<A, B> predicate) {
+        super(getLambdaFingerprint(predicate.getClass(), var1, var2));
         this.var1 = var1;
         this.var2 = var2;
         this.predicate = predicate;

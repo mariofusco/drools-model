@@ -4,11 +4,13 @@ import org.drools.model.Condition;
 import org.drools.model.Variable;
 import org.drools.model.functions.Predicate1;
 
+import static org.drools.model.functions.LambdaIntrospector.getLambdaFingerprint;
+
 public class Expr1ViewItem<T> extends AbstractExprViewItem<T> {
     private final Predicate1<T> predicate;
 
     public Expr1ViewItem(Variable<T> var, Predicate1<T> predicate) {
-        super(var);
+        super(getLambdaFingerprint(predicate.getClass(), var), var);
         this.predicate = predicate;
     }
 
@@ -25,4 +27,5 @@ public class Expr1ViewItem<T> extends AbstractExprViewItem<T> {
     public Condition.Type getType() {
         return Condition.SingleType.INSTANCE;
     }
+
 }

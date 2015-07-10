@@ -10,7 +10,7 @@ public class Expr1ViewItem<T> extends AbstractExprViewItem<T> {
     private final Predicate1<T> predicate;
 
     public Expr1ViewItem(Variable<T> var, Predicate1<T> predicate) {
-        super(getLambdaFingerprint(predicate.getClass(), var), var);
+        super(getLambdaFingerprint(predicate, var), var);
         this.predicate = predicate;
     }
 

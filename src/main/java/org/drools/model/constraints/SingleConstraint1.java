@@ -12,7 +12,7 @@ public class SingleConstraint1<A> extends AbstractSingleConstraint {
     private final Predicate1<A> predicate;
 
     public SingleConstraint1(Variable<A> variable, Predicate1<A> predicate) {
-        super(getLambdaFingerprint(predicate.getClass(), variable));
+        super(getLambdaFingerprint(predicate, variable));
         this.variable = variable;
         this.predicate = predicate;
     }

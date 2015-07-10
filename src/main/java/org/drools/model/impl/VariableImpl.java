@@ -2,13 +2,8 @@ package org.drools.model.impl;
 
 import org.drools.model.Type;
 import org.drools.model.Variable;
-import org.drools.model.functions.LambdaIntrospector;
 
 public class VariableImpl<T> implements Variable<T> {
-    static {
-        LambdaIntrospector.init();
-    }
-
     private final Type<T> type;
 
     public VariableImpl(Type<T> type) {

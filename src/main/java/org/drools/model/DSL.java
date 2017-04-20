@@ -1,5 +1,7 @@
 package org.drools.model;
 
+import java.util.List;
+
 import org.drools.datasource.DataStore;
 import org.drools.datasource.DataStream;
 import org.drools.datasource.impl.DataStreamImpl;
@@ -25,8 +27,6 @@ import org.drools.model.impl.JavaClassType;
 import org.drools.model.impl.RuleBuilder;
 import org.drools.model.impl.VariableImpl;
 import org.drools.model.patterns.AndPatterns;
-
-import java.util.List;
 
 import static org.drools.model.functions.FunctionUtils.toFunctionN;
 import static org.drools.model.impl.ViewBuilder.viewItems2Conditions;
@@ -73,15 +73,15 @@ public class DSL {
     }
 
     public static <T> ViewItem<T> input(Variable<T> var) {
-        return new InputViewItem(var, DataSourceDefinitionImpl.DEFAULT);
+        return new InputViewItem<T>(var, DataSourceDefinitionImpl.DEFAULT);
     }
 
     public static <T> ViewItem<T> input(Variable<T> var, String dataSourceName) {
-        return new InputViewItem(var, new DataSourceDefinitionImpl(dataSourceName, false));
+        return new InputViewItem<T>(var, new DataSourceDefinitionImpl(dataSourceName, false));
     }
 
     public static <T> ViewItem<T> subscribe(Variable<T> var, String dataSourceName) {
-        return new InputViewItem(var, new DataSourceDefinitionImpl(dataSourceName, true));
+        return new InputViewItem<T>(var, new DataSourceDefinitionImpl(dataSourceName, true));
     }
 
     public static <T> ExprViewItem<T> expr(Variable<T> var, Predicate1<T> predicate) {

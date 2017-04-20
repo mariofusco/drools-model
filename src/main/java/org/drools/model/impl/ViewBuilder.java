@@ -1,7 +1,17 @@
 package org.drools.model.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.drools.model.AccumulateFunction;
 import org.drools.model.Condition;
+import org.drools.model.DataSourceDefinition;
 import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
 import org.drools.model.Variable;
@@ -19,29 +29,22 @@ import org.drools.model.patterns.ExistentialPatternImpl;
 import org.drools.model.patterns.OrPatterns;
 import org.drools.model.patterns.PatternBuilder;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static org.drools.model.DSL.input;
 
 public class ViewBuilder {
 
     private ViewBuilder() { }
 
     public static List<Condition> viewItems2Conditions(ViewItem[] viewItems) {
-        Map<Variable, InputViewItem> inputs = new HashMap<Variable, InputViewItem>();
-        Map<Variable, PatternBuilder.ValidBuilder> builderMap = new HashMap<Variable, PatternBuilder.ValidBuilder>();
-        List<CombinedExprViewItem> combinedExpressions = new ArrayList<CombinedExprViewItem>();
-        Set<Variable> variablesFromcombinedExpressions = new HashSet<Variable>();
+        Map<Variable<?>, InputViewItem<?>> inputs = new HashMap<>();
+        Map<Variable<?>, PatternBuilder.ValidBuilder> builderMap = new HashMap<>();
+        List<CombinedExprViewItem> combinedExpressions = new ArrayList<>();
+        Set<Variable> variablesFromCombinedExpressions = new HashSet<>();
 
         for (ViewItem viewItem : viewItems) {
             if (viewItem instanceof CombinedExprViewItem) {
                 combinedExpressions.add((CombinedExprViewItem)viewItem);
-                variablesFromcombinedExpressions.add(viewItem.getFirstVariable());
+                variablesFromCombinedExpressions.add(viewItem.getFirstVariable());
                 continue;
             }
 
@@ -69,19 +72,23 @@ public class ViewBuilder {
             PatternBuilder.ValidBuilder patternBuilder = builderMap.get(var);
             if (patternBuilder == null) {
                 patternBuilder = new PatternBuilder().filter(var)
-                                                     .from(inputs.get(var).getDataSourceDefinition());
+                                                     .from( getDataSourceDefinition( inputs, var ) );
                 builderMap.put(var, patternBuilder);
             }
 
             if (viewItem instanceof ExprViewItem) {
+                inputs.computeIfAbsent( viewItem.getFirstVariable(), v -> (InputViewItem) input(v) );
+                if ( viewItem instanceof Expr2ViewItem ) {
+                    inputs.computeIfAbsent( ( (Expr2ViewItem) viewItem ).getSecondVariable(), v -> (InputViewItem) input(v) );
+                }
                 builderMap.put(var, expr2PatternBuilder((ExprViewItem)viewItem, patternBuilder));
             }
         }
 
         for (Variable var : inputs.keySet()) {
-            if (!builderMap.containsKey(var) && !variablesFromcombinedExpressions.contains(var)) {
+            if (!builderMap.containsKey(var) && !variablesFromCombinedExpressions.contains(var)) {
                 builderMap.put(var, new PatternBuilder().filter(var)
-                                                        .from(inputs.get(var).getDataSourceDefinition()));
+                                                        .from( getDataSourceDefinition( inputs, var ) ) );
             }
         }
 
@@ -91,6 +98,11 @@ public class ViewBuilder {
         }
 
         return aggregateConditions(inputs, combinedExpressions, patterns);
+    }
+
+    private static DataSourceDefinition getDataSourceDefinition( Map<Variable<?>, InputViewItem<?>> inputs, Variable var ) {
+        InputViewItem input = inputs.get(var);
+        return input != null ? input.getDataSourceDefinition() : DataSourceDefinitionImpl.DEFAULT;
     }
 
     private static PatternBuilder.ValidBuilder expr2PatternBuilder(ExprViewItem viewItem, PatternBuilder.ValidBuilder patternBuilder) {
@@ -121,9 +133,9 @@ public class ViewBuilder {
         return patternBuilder;
     }
 
-    private static Condition createPatternForCombinedExpression(Map<Variable, InputViewItem> inputs, CombinedExprViewItem combinedExpression) {
-        List<CombinedExprViewItem> combinedExpressions = new ArrayList<CombinedExprViewItem>();
-        List<Pattern> patterns = new ArrayList<Pattern>();
+    private static Condition createPatternForCombinedExpression(Map<Variable<?>, InputViewItem<?>> inputs, CombinedExprViewItem combinedExpression) {
+        List<CombinedExprViewItem> combinedExpressions = new ArrayList<>();
+        List<Pattern> patterns = new ArrayList<>();
 
         for (ExprViewItem viewItem : combinedExpression.getExpressions()) {
             if (viewItem instanceof CombinedExprViewItem) {
@@ -134,14 +146,14 @@ public class ViewBuilder {
             if (viewItem instanceof Expr1ViewItem) {
                 Expr1ViewItem expr = (Expr1ViewItem)viewItem;
                 Pattern pattern = new PatternBuilder().filter(var)
-                                                      .from(inputs.get(var).getDataSourceDefinition())
+                                                      .from( getDataSourceDefinition( inputs, var ) )
                                                       .with(expr.getPredicate())
                                                       .get();
                 patterns.add(pattern);
             } else if (viewItem instanceof Expr2ViewItem) {
                 Expr2ViewItem expr = (Expr2ViewItem)viewItem;
                 Pattern pattern = new PatternBuilder().filter(var)
-                                                      .from(inputs.get(var).getDataSourceDefinition())
+                                                      .from( getDataSourceDefinition( inputs, var ) )
                                                       .with(expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate())
                                                       .get();
                 patterns.add(pattern);
@@ -157,7 +169,7 @@ public class ViewBuilder {
         throw new RuntimeException("Unknown expression type: " + combinedExpression.getType());
     }
 
-    private static List<Condition> aggregateConditions(Map<Variable, InputViewItem> inputs, List<CombinedExprViewItem> combinedExpressions, List<Pattern> patterns) {
+    private static List<Condition> aggregateConditions(Map<Variable<?>, InputViewItem<?>> inputs, List<CombinedExprViewItem> combinedExpressions, List<Pattern> patterns) {
         Collections.sort(patterns, PATTERN_DEPS_COMPARATOR);
         List<Condition> conditions = new ArrayList<Condition>();
         conditions.addAll(patterns);

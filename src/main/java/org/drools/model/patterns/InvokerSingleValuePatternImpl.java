@@ -1,10 +1,8 @@
 package org.drools.model.patterns;
 
-import org.drools.datasource.DataSource;
 import org.drools.model.DataSourceDefinition;
 import org.drools.model.InvokerSingleValuePattern;
 import org.drools.model.Variable;
-import org.drools.model.functions.Function0;
 import org.drools.model.functions.FunctionN;
 
 public class InvokerSingleValuePatternImpl<T> extends InvokerPatternImpl<T> implements InvokerSingleValuePattern<T> {

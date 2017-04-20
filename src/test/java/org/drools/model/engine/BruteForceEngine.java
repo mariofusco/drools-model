@@ -1,7 +1,13 @@
 package org.drools.model.engine;
 
-import org.drools.datasource.DataSource;
-import org.drools.datasource.DataStore;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
 import org.drools.model.AccumulateFunction;
 import org.drools.model.AccumulatePattern;
 import org.drools.model.Condition;
@@ -16,15 +22,9 @@ import org.drools.model.Variable;
 import org.drools.model.View;
 import org.drools.model.constraints.AndConstraints;
 import org.drools.model.constraints.OrConstraints;
+import org.drools.model.datasources.DataSource;
+import org.drools.model.datasources.DataStore;
 import org.drools.model.impl.TupleHandleImpl;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
@@ -65,7 +65,7 @@ public class BruteForceEngine {
         return evaluateCondition(condition, initialBindings()).toTupleHandles();
     }
 
-    private DataStore getPatternDataStore(Pattern pattern) {
+    private DataStore getPatternDataStore( Pattern pattern ) {
         DataStore dataStore = (DataStore) dataSources.get(pattern.getDataSourceDefinition().getName());
         if (dataStore == null) {
             throw new RuntimeException("Unknonw DataSource: " + pattern.getDataSourceDefinition().getName());

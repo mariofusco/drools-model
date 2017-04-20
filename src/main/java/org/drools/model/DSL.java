@@ -2,11 +2,11 @@ package org.drools.model;
 
 import java.util.List;
 
-import org.drools.datasource.DataStore;
-import org.drools.datasource.DataStream;
-import org.drools.datasource.impl.DataStreamImpl;
-import org.drools.datasource.impl.SetDataStore;
 import org.drools.model.consequences.ConsequenceBuilder;
+import org.drools.model.datasources.DataStore;
+import org.drools.model.datasources.DataStream;
+import org.drools.model.datasources.impl.DataStreamImpl;
+import org.drools.model.datasources.impl.SetDataStore;
 import org.drools.model.flow.AccumulateExprViewItem;
 import org.drools.model.flow.CombinedExprViewItem;
 import org.drools.model.flow.Expr1ViewItem;
@@ -35,8 +35,8 @@ public class DSL {
 
     // -- DataSource --
 
-    public static <T> DataStore<T> storeOf(T... items) {
-        return SetDataStore.storeOf(items);
+    public static <T> DataStore<T> storeOf( T... items ) {
+        return SetDataStore.storeOf( items );
     }
 
     public static DataStore newDataStore() {

@@ -1,11 +1,11 @@
 package org.drools.model;
 
-import org.drools.datasource.DataSource;
-import org.drools.model.engine.BruteForceEngine;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.drools.model.datasources.DataSource;
+import org.drools.model.engine.BruteForceEngine;
+import org.junit.Test;
 
 import static org.drools.model.DSL.*;
 import static org.junit.Assert.assertEquals;
@@ -15,10 +15,10 @@ public class FlowDSLTest {
     @Test
     public void testJoin() {
 
-        DataSource<Person> persons = storeOf(new Person("Mark", 37),
-                                             new Person("Edson", 35),
-                                             new Person("Mario", 40),
-                                             new Person("Sofia", 3));
+        DataSource<Person> persons = storeOf( new Person( "Mark", 37),
+                                              new Person("Edson", 35),
+                                              new Person("Mario", 40),
+                                              new Person("Sofia", 3) );
 
         // $mark: Person(name == "Mark") from entry-point "persons"
         // $older: Person(name != "Mark" && age > $mark.age) from entry-point "persons"

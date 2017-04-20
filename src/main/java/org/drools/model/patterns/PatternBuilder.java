@@ -1,6 +1,5 @@
 package org.drools.model.patterns;
 
-import org.drools.datasource.DataSource;
 import org.drools.model.Constraint;
 import org.drools.model.DataSourceDefinition;
 import org.drools.model.Index;

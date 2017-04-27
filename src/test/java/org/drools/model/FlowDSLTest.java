@@ -20,8 +20,8 @@ public class FlowDSLTest {
                                               new Person("Mario", 40),
                                               new Person("Sofia", 3) );
 
-        // $mark: Person(name == "Mark") from entry-point "persons"
-        // $older: Person(name != "Mark" && age > $mark.age) from entry-point "persons"
+        // $mark: Person(name == "Mark") in entry-point "persons"
+        // $older: Person(name != "Mark" && age > $mark.age) in entry-point "persons"
 
         List<String> list = new ArrayList<>();
         Variable<Person> markV = any(Person.class);
@@ -58,8 +58,8 @@ public class FlowDSLTest {
                                               new Person("Mario", 40),
                                               new Person("Sofia", 3));
 
-        // $mark: Person(name == "Mark") from entry-point "persons"
-        // $older: Person(name != "Mark" && age > $mark.age) from entry-point "persons"
+        // $mark: Person(name == "Mark") in entry-point "persons"
+        // $older: Person(name != "Mark" && age > $mark.age) in entry-point "persons"
 
         Variable<Person> markV = any(Person.class);
         Variable<Person> olderV = any(Person.class);

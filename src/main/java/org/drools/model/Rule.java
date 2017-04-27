@@ -25,4 +25,6 @@ public interface Rule {
     Object getAttribute(Attribute attribute);
 
     String getName();
+    String getPackge();
+    String getUnit();
 }

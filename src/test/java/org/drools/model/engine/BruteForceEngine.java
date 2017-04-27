@@ -74,18 +74,19 @@ public class BruteForceEngine {
     }
 
     private Bindings evaluateCondition(Condition condition, Bindings bindings) {
-        if (condition.getType() instanceof Condition.SingleType) {
-            return evaluateSinglePattern((Pattern)condition, bindings);
-        } else if (condition.getType() instanceof Condition.AndType) {
-            return condition.getSubConditions().stream()
-                            .reduce(bindings,
-                                    (b, p) -> evaluateCondition(p, b),
-                                    (b1, b2) -> null);
-        } else if (condition.getType() instanceof Condition.OrType) {
-            return condition.getSubConditions().stream()
-                            .reduce(new Bindings(),
-                                    (b, p) -> b.append(evaluateCondition(p, bindings)),
-                                    (b1, b2) -> null);
+        switch (condition.getType()) {
+            case PATTERN:
+                return evaluateSinglePattern((Pattern)condition, bindings);
+            case AND:
+                return condition.getSubConditions().stream()
+                                .reduce(bindings,
+                                        (b, p) -> evaluateCondition(p, b),
+                                        (b1, b2) -> null);
+            case OR:
+                return condition.getSubConditions().stream()
+                                .reduce(new Bindings(),
+                                        (b, p) -> b.append(evaluateCondition(p, bindings)),
+                                        (b1, b2) -> null);
         }
         return null;
     }

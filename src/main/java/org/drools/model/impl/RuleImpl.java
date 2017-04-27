@@ -1,27 +1,27 @@
 package org.drools.model.impl;
 
+import java.util.Map;
+
 import org.drools.model.Consequence;
 import org.drools.model.Rule;
 import org.drools.model.View;
 
-import java.util.Map;
-
 public class RuleImpl implements Rule {
 
+    private final String pkg;
     private final String name;
+    private final String unit;
     private final View view;
     private final Consequence consequence;
 
     private Map<Attribute, Object> attributes;
 
-    public RuleImpl(String name, View view, Consequence consequence) {
+    public RuleImpl(String pkg, String name, String unit, View view, Consequence consequence, Map<Attribute, Object> attributes) {
+        this.pkg = pkg;
         this.name = name;
+        this.unit = unit;
         this.view = view;
         this.consequence = consequence;
-    }
-
-    public RuleImpl(String name, View view, Consequence consequence, Map<Attribute, Object> attributes) {
-        this(name, view, consequence);
         this.attributes = attributes;
     }
 
@@ -44,5 +44,15 @@ public class RuleImpl implements Rule {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getPackge() {
+        return pkg;
+    }
+
+    @Override
+    public String getUnit() {
+        return unit;
     }
 }

@@ -8,34 +8,44 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.drools.model.AccumulateFunction;
 import org.drools.model.Condition;
+import org.drools.model.Condition.Type;
 import org.drools.model.DataSourceDefinition;
 import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
 import org.drools.model.Variable;
-import org.drools.model.flow.AccumulateExprViewItem;
-import org.drools.model.flow.CombinedExprViewItem;
-import org.drools.model.flow.Expr1ViewItem;
-import org.drools.model.flow.Expr2ViewItem;
-import org.drools.model.flow.ExprViewItem;
-import org.drools.model.flow.InputViewItem;
-import org.drools.model.flow.SetViewItem;
-import org.drools.model.flow.ViewItem;
 import org.drools.model.patterns.AccumulatePatternImpl;
 import org.drools.model.patterns.AndPatterns;
 import org.drools.model.patterns.ExistentialPatternImpl;
 import org.drools.model.patterns.OrPatterns;
 import org.drools.model.patterns.PatternBuilder;
+import org.drools.model.view.AccumulateExprViewItem;
+import org.drools.model.view.CombinedExprViewItem;
+import org.drools.model.view.Expr1ViewItem;
+import org.drools.model.view.Expr2ViewItem;
+import org.drools.model.view.ExprViewItem;
+import org.drools.model.view.InputViewItem;
+import org.drools.model.view.SetViewItem;
+import org.drools.model.view.ViewItem;
+import org.drools.model.view.ViewItemBuilder;
 
+import static java.util.stream.Collectors.toList;
 import static org.drools.model.DSL.input;
 
 public class ViewBuilder {
 
     private ViewBuilder() { }
 
-    public static List<Condition> viewItems2Conditions(ViewItem[] viewItems) {
+    public static AndPatterns viewItems2Patterns( ViewItemBuilder[] viewItemBuilders ) {
+        List<ViewItem> viewItems = Stream.of( viewItemBuilders ).map( ViewItemBuilder::get ).collect( toList() );
+        List<Condition> conditions = viewItems2Conditions( viewItems );
+        return new AndPatterns(conditions);
+    }
+
+    public static List<Condition> viewItems2Conditions(List<ViewItem> viewItems) {
         Map<Variable<?>, InputViewItem<?>> inputs = new HashMap<>();
         Map<Variable<?>, PatternBuilder.ValidBuilder> builderMap = new HashMap<>();
         List<CombinedExprViewItem> combinedExpressions = new ArrayList<>();
@@ -161,10 +171,10 @@ public class ViewBuilder {
         }
 
         List<Condition> conditions = aggregateConditions(inputs, combinedExpressions, patterns);
-        if (combinedExpression.getType() instanceof Condition.AndType) {
-            return new AndPatterns(conditions.toArray(new Condition[conditions.size()]));
-        } else if (combinedExpression.getType() instanceof Condition.OrType) {
-            return new OrPatterns(conditions.toArray(new Condition[conditions.size()]));
+        if ( combinedExpression.getType() == Type.AND ) {
+            return new AndPatterns( conditions );
+        } else if ( combinedExpression.getType() == Type.OR ) {
+            return new OrPatterns( conditions );
         }
         throw new RuntimeException("Unknown expression type: " + combinedExpression.getType());
     }

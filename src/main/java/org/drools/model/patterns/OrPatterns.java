@@ -1,16 +1,20 @@
 package org.drools.model.patterns;
 
-import org.drools.model.Condition;
-
 import java.util.Arrays;
 import java.util.List;
+
+import org.drools.model.Condition;
 
 public class OrPatterns implements Condition {
 
     private final List<Condition> patterns;
 
     public OrPatterns(Condition... patterns) {
-        this.patterns = Arrays.asList(patterns);
+        this( Arrays.asList(patterns) );
+    }
+
+    public OrPatterns(List<Condition> patterns) {
+        this.patterns = patterns;
     }
 
     @Override
@@ -20,6 +24,6 @@ public class OrPatterns implements Condition {
 
     @Override
     public Type getType() {
-        return OrType.INSTANCE;
+        return Type.OR;
     }
 }

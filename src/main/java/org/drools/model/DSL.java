@@ -1,20 +1,10 @@
 package org.drools.model;
 
-import java.util.List;
-
 import org.drools.model.consequences.ConsequenceBuilder;
 import org.drools.model.datasources.DataStore;
 import org.drools.model.datasources.DataStream;
 import org.drools.model.datasources.impl.DataStreamImpl;
 import org.drools.model.datasources.impl.SetDataStore;
-import org.drools.model.flow.AccumulateExprViewItem;
-import org.drools.model.flow.CombinedExprViewItem;
-import org.drools.model.flow.Expr1ViewItem;
-import org.drools.model.flow.Expr2ViewItem;
-import org.drools.model.flow.ExprViewItem;
-import org.drools.model.flow.InputViewItem;
-import org.drools.model.flow.SetViewItem;
-import org.drools.model.flow.ViewItem;
 import org.drools.model.functions.Block0;
 import org.drools.model.functions.Block1;
 import org.drools.model.functions.Function0;
@@ -25,11 +15,21 @@ import org.drools.model.functions.Predicate2;
 import org.drools.model.impl.DataSourceDefinitionImpl;
 import org.drools.model.impl.JavaClassType;
 import org.drools.model.impl.RuleBuilder;
+import org.drools.model.impl.SourceImpl;
 import org.drools.model.impl.VariableImpl;
-import org.drools.model.patterns.AndPatterns;
+import org.drools.model.view.AccumulateExprViewItem;
+import org.drools.model.view.CombinedExprViewItem;
+import org.drools.model.view.Expr1ViewItem;
+import org.drools.model.view.Expr2ViewItem;
+import org.drools.model.view.ExprViewItem;
+import org.drools.model.view.InputViewItem;
+import org.drools.model.view.OOPathBuilder;
+import org.drools.model.view.SetViewItem;
+import org.drools.model.view.ViewItem;
+import org.drools.model.view.ViewItemBuilder;
 
 import static org.drools.model.functions.FunctionUtils.toFunctionN;
-import static org.drools.model.impl.ViewBuilder.viewItems2Conditions;
+import static org.drools.model.impl.ViewBuilder.viewItems2Patterns;
 
 public class DSL {
 
@@ -50,14 +50,18 @@ public class DSL {
     // -- Variable --
 
     public static <T> Variable<T> any(Class<T> type) {
-        return bind(typeOf(type));
+        return variableOf( type( type ) );
     }
 
-    public static <T> Variable<T> bind(Type<T> type) {
+    public static <T> Variable<T> variableOf( Type<T> type ) {
         return new VariableImpl<T>(type);
     }
 
-    public static <T> Type<T> typeOf(Class<T> type) {
+    public static <T> Source<T> sourceOf( Type<T> type ) {
+        return new SourceImpl<T>(type);
+    }
+
+    public static <T> Type<T> type( Class<T> type ) {
         return new JavaClassType<T>(type);
     }
 
@@ -67,9 +71,8 @@ public class DSL {
         return view(viewItems);
     }
 
-    public static View view(ViewItem... viewItems) {
-        List<Condition> conditions = viewItems2Conditions(viewItems);
-        return new AndPatterns(conditions.toArray(new Condition[conditions.size()]));
+    public static View view(ViewItemBuilder... viewItemBuilders ) {
+        return viewItems2Patterns( viewItemBuilders );
     }
 
     public static <T> ViewItem<T> input(Variable<T> var) {
@@ -98,6 +101,10 @@ public class DSL {
 
     public static <T, U> ExprViewItem<T> expr(String exprId, Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
         return new Expr2ViewItem<T, U>(exprId, var1, var2, predicate);
+    }
+
+    public static <T> OOPathBuilder<T> var( Variable<T> var ) {
+        return new OOPathBuilder<T>(var);
     }
 
     public static <T> ExprViewItem<T> not(ExprViewItem expr) {
@@ -137,11 +144,11 @@ public class DSL {
     }
 
     public static ExprViewItem or(ExprViewItem... expressions) {
-        return new CombinedExprViewItem(Condition.OrType.INSTANCE, expressions);
+        return new CombinedExprViewItem(Condition.Type.OR, expressions);
     }
 
     public static ExprViewItem and(ExprViewItem... expressions) {
-        return new CombinedExprViewItem(Condition.AndType.INSTANCE, expressions);
+        return new CombinedExprViewItem(Condition.Type.AND, expressions);
     }
 
     public static <T> SetViewItemBuilder<T> set(Variable<T> var) {
@@ -200,5 +207,9 @@ public class DSL {
 
     public static RuleBuilder rule(String name) {
         return new RuleBuilder(name);
+    }
+
+    public static RuleBuilder rule(String pkg, String name) {
+        return new RuleBuilder(pkg, name);
     }
 }

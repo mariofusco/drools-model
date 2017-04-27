@@ -1,9 +1,10 @@
 package org.drools.model.patterns;
 
-import org.drools.model.Condition;
-
 import java.util.Collections;
 import java.util.List;
+
+import org.drools.model.Condition;
+import org.drools.model.Condition.Type;
 
 public abstract class AbstractSinglePattern {
 
@@ -12,6 +13,6 @@ public abstract class AbstractSinglePattern {
     }
 
     public Condition.Type getType() {
-        return Condition.SingleType.INSTANCE;
+        return Type.PATTERN;
     }
 }

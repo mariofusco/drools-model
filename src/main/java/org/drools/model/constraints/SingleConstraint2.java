@@ -33,11 +33,6 @@ public class SingleConstraint2<A, B> extends AbstractSingleConstraint {
 
     @Override
     public PredicateN getPredicate() {
-        return new PredicateN() {
-            @Override
-            public boolean test(Object... objs) {
-                return predicate.test((A)objs[0], (B)objs[1]);
-            }
-        };
+        return objs -> predicate.test( (A)objs[0], (B)objs[1] );
     }
 }

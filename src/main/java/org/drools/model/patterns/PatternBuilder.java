@@ -21,7 +21,7 @@ import org.drools.model.impl.DataSourceDefinitionImpl;
 import org.drools.model.index.AlphaIndexImpl;
 import org.drools.model.index.BetaIndexImpl;
 
-import static org.drools.model.DSL.bind;
+import static org.drools.model.DSL.variableOf;
 import static org.drools.model.functions.FunctionUtils.toFunctionN;
 
 public class PatternBuilder {
@@ -35,7 +35,7 @@ public class PatternBuilder {
     }
 
     public <T> BoundPatternBuilder<T> filter(Type<T> type) {
-        return filter((Variable<T>) bind(type));
+        return filter((Variable<T>) variableOf( type ) );
     }
 
     public <T> BoundPatternBuilder<T> filter(Variable<T> var) {

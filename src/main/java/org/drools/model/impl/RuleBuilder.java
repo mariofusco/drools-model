@@ -1,30 +1,54 @@
 package org.drools.model.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.drools.model.Condition;
 import org.drools.model.Consequence;
 import org.drools.model.DataSourceDefinition;
 import org.drools.model.Rule;
 import org.drools.model.View;
 import org.drools.model.consequences.ConsequenceBuilder;
-import org.drools.model.flow.ViewItem;
 import org.drools.model.functions.Function1;
 import org.drools.model.patterns.AndPatterns;
 import org.drools.model.patterns.PatternBuilder;
+import org.drools.model.view.ViewItemBuilder;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.drools.model.impl.ViewBuilder.viewItems2Conditions;
+import static org.drools.model.impl.ViewBuilder.viewItems2Patterns;
 
 public class RuleBuilder {
 
+    private final String pkg;
     private final String name;
+
+    private String unit;
 
     private final Map<Rule.Attribute, Object> attributes = new HashMap<Rule.Attribute, Object>();
 
     public RuleBuilder(String name) {
+        this("defaultpkg", name);
+    }
+
+    public RuleBuilder(String pkg, String name) {
+        this.pkg = pkg;
         this.name = name;
+    }
+
+    public RuleBuilder unit(String unit) {
+        this.unit = unit;
+        return this;
+    }
+
+    public RuleBuilder unit(Class<?> unitClass) {
+        this.unit = getCanonicalSimpleName(unitClass);
+        return this;
+    }
+
+    public static String getCanonicalSimpleName(Class<?> c) {
+        Class<?> enclosingClass = c.getEnclosingClass();
+        return enclosingClass != null ?
+               getCanonicalSimpleName(enclosingClass) + "." + c.getSimpleName() :
+               c.getSimpleName();
     }
 
     public RuleBuilder attribute(Rule.Attribute attribute, Object value) {
@@ -49,36 +73,31 @@ public class RuleBuilder {
     }
 
     public RuleBuilderWithLHS when(View view) {
-        return new RuleBuilderWithLHS(name, attributes, view);
+        return new RuleBuilderWithLHS(view);
     }
 
     public RuleBuilderWithLHS when(Condition... patterns) {
         return when(new AndPatterns(patterns));
     }
 
-    public RuleBuilderWithLHS view(ViewItem... viewItems) {
-        List<Condition> conditions = viewItems2Conditions(viewItems);
-        return when(conditions.toArray(new Condition[conditions.size()]));
+    public RuleBuilderWithLHS view( ViewItemBuilder... viewItemBuilders ) {
+        return when(viewItems2Patterns( viewItemBuilders ));
     }
 
     public class RuleBuilderWithLHS {
-        private final String name;
-        private final Map<Rule.Attribute, Object> attributes;
         private final View view;
 
-        public RuleBuilderWithLHS(String name, Map<Rule.Attribute, Object> attributes, View view) {
-            this.name = name;
-            this.attributes = attributes;
+        public RuleBuilderWithLHS(View view) {
             this.view = view;
         }
 
         public Rule then(Function1<ConsequenceBuilder, ConsequenceBuilder.ValidBuilder> builder) {
             Consequence consequence = builder.apply(new ConsequenceBuilder()).get();
-            return new RuleImpl(name, view, consequence, attributes);
+            return new RuleImpl(pkg, name, unit, view, consequence, attributes);
         }
 
         public Rule then(ConsequenceBuilder.ValidBuilder builder) {
-            return new RuleImpl(name, view, builder.get(), attributes);
+            return new RuleImpl(pkg, name, unit, view, builder.get(), attributes);
         }
     }
 }

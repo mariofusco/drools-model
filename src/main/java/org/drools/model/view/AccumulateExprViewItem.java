@@ -1,7 +1,8 @@
-package org.drools.model.flow;
+package org.drools.model.view;
 
 import org.drools.model.AccumulateFunction;
 import org.drools.model.Condition;
+import org.drools.model.Condition.Type;
 
 public class AccumulateExprViewItem<T> extends AbstractExprViewItem<T> {
 
@@ -16,7 +17,7 @@ public class AccumulateExprViewItem<T> extends AbstractExprViewItem<T> {
 
     @Override
     public Condition.Type getType() {
-        return Condition.SingleType.INSTANCE;
+        return Type.PATTERN;
     }
 
     public ExprViewItem<T> getExpr() {

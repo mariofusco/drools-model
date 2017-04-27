@@ -1,4 +1,4 @@
-package org.drools.model.flow;
+package org.drools.model.view;
 
 import org.drools.model.Condition;
 import org.drools.model.Variable;

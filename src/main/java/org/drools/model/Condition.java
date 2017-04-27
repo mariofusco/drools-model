@@ -7,15 +7,7 @@ public interface Condition {
 
     Type getType();
 
-    public interface Type { }
-
-    public static class SingleType implements Type {
-        public static final SingleType INSTANCE = new SingleType();
-    }
-    public static class OrType implements Type {
-        public static final OrType INSTANCE = new OrType();
-    }
-    public static class AndType implements Type {
-        public static final AndType INSTANCE = new AndType();
+    enum Type {
+        PATTERN, OOPATH, OR, AND
     }
 }

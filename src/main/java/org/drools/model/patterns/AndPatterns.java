@@ -1,17 +1,21 @@
 package org.drools.model.patterns;
 
-import org.drools.model.Condition;
-import org.drools.model.View;
-
 import java.util.Arrays;
 import java.util.List;
+
+import org.drools.model.Condition;
+import org.drools.model.View;
 
 public class AndPatterns implements Condition, View {
 
     private final List<Condition> patterns;
 
     public AndPatterns(Condition... patterns) {
-        this.patterns = Arrays.asList(patterns);
+        this( Arrays.asList(patterns) );
+    }
+
+    public AndPatterns(List<Condition> patterns) {
+        this.patterns = patterns;
     }
 
     @Override
@@ -21,6 +25,6 @@ public class AndPatterns implements Condition, View {
 
     @Override
     public Type getType() {
-        return AndType.INSTANCE;
+        return Type.AND;
     }
 }

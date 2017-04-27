@@ -1,6 +1,7 @@
-package org.drools.model.flow;
+package org.drools.model.view;
 
 import org.drools.model.Condition;
+import org.drools.model.Condition.Type;
 import org.drools.model.Variable;
 import org.drools.model.functions.Predicate2;
 
@@ -33,6 +34,6 @@ public class Expr2ViewItem<T, U> extends AbstractExprViewItem<T> {
 
     @Override
     public Condition.Type getType() {
-        return Condition.SingleType.INSTANCE;
+        return Type.PATTERN;
     }
 }

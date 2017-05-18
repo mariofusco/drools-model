@@ -8,7 +8,7 @@ import org.drools.model.functions.FunctionN;
 public class InvokerSingleValuePatternImpl<T> extends InvokerPatternImpl<T> implements InvokerSingleValuePattern<T> {
     private final FunctionN<T> invokedFunction;
 
-    InvokerSingleValuePatternImpl(DataSourceDefinition dataSourceDefinition, FunctionN<T> function, Variable<T> boundVariable, Variable... inputVariables) {
+    public InvokerSingleValuePatternImpl(DataSourceDefinition dataSourceDefinition, FunctionN<T> function, Variable<T> boundVariable, Variable... inputVariables) {
         super(dataSourceDefinition, boundVariable, inputVariables);
         this.invokedFunction = function;
     }

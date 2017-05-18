@@ -8,7 +8,7 @@ import org.drools.model.functions.FunctionN;
 public class InvokerMultiValuePatternImpl<T> extends InvokerPatternImpl<T> implements InvokerMultiValuePattern<T> {
     private final FunctionN<Iterable<? extends T>> invokedFunction;
 
-    InvokerMultiValuePatternImpl(DataSourceDefinition dataSourceDefinition, FunctionN<Iterable<? extends T>> function, Variable<T> boundVariable, Variable... inputVariables) {
+    public InvokerMultiValuePatternImpl(DataSourceDefinition dataSourceDefinition, FunctionN<Iterable<? extends T>> function, Variable<T> boundVariable, Variable... inputVariables) {
         super(dataSourceDefinition, boundVariable, inputVariables);
         this.invokedFunction = function;
     }

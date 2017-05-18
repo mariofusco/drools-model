@@ -1,15 +1,15 @@
 package org.drools.model.constraints;
 
-import org.drools.model.Constraint;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.drools.model.Constraint;
 
 public class AndConstraints extends AbstractConstraint {
 
     private final List<Constraint> constraints = new ArrayList<Constraint>();
 
-    AndConstraints(Constraint... constraints) {
+    public AndConstraints(Constraint... constraints) {
         for (Constraint constraint : constraints) {
             and(constraint);
         }

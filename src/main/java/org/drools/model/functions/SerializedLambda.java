@@ -57,10 +57,14 @@ public final class SerializedLambda implements Serializable {
                     protected Class<?> resolveClass(ObjectStreamClass desc)
                             throws IOException, ClassNotFoundException {
 
-                        Class<?> resolvedClass = super.resolveClass(desc);
-                        if (resolvedClass == java.lang.invoke.SerializedLambda.class)
-                            return SerializedLambda.class;
-                        return resolvedClass;
+                        try {
+                            Class<?> resolvedClass = super.resolveClass( desc );
+                            if ( resolvedClass == java.lang.invoke.SerializedLambda.class ) {
+                                return SerializedLambda.class;
+                            }
+                        } catch (ClassNotFoundException cnfe) { }
+
+                        return Class.forName(desc.getName(), true, lambda.getClass().getClassLoader());
                     }
 
                 };

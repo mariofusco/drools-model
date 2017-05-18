@@ -1,26 +1,26 @@
 package org.drools.model.patterns;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.drools.model.Constraint;
 import org.drools.model.DataSourceDefinition;
 import org.drools.model.Pattern;
 import org.drools.model.SingleConstraint;
 import org.drools.model.Variable;
-
-import java.util.HashSet;
-import java.util.Set;
+import org.drools.model.constraints.AbstractConstraint;
 
 public class PatternImpl<T> extends AbstractSinglePattern implements Pattern<T> {
 
     private final Variable<T> variable;
-    private final Variable[] inputVariables;
-    private final Constraint constraint;
+    private Variable[] inputVariables;
     private final DataSourceDefinition dataSourceDefinition;
+    private Constraint constraint;
 
-    PatternImpl(Variable<T> variable, Constraint constraint, DataSourceDefinition dataSourceDefinition) {
+    public PatternImpl(Variable<T> variable, Constraint constraint, DataSourceDefinition dataSourceDefinition) {
         this.variable = variable;
         this.constraint = constraint;
         this.dataSourceDefinition = dataSourceDefinition;
-        this.inputVariables = collectInputVariables();
     }
 
     @Override
@@ -40,12 +40,19 @@ public class PatternImpl<T> extends AbstractSinglePattern implements Pattern<T> 
 
     @Override
     public Variable[] getInputVariables() {
+        if (inputVariables == null) {
+            this.inputVariables = collectInputVariables();
+        }
         return inputVariables;
     }
 
     @Override
     public Constraint getConstraint() {
         return constraint;
+    }
+
+    public void addConstraint( Constraint constraint ) {
+        this.constraint = ( (AbstractConstraint) this.constraint ).and( constraint );
     }
 
     private Variable[] collectInputVariables() {

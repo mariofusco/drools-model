@@ -3,17 +3,17 @@ package org.drools.model.index;
 import org.drools.model.AlphaIndex;
 import org.drools.model.functions.Function1;
 
-public class AlphaIndexImpl<A> extends AbstractIndex<A> implements AlphaIndex<A> {
+public class AlphaIndexImpl<A, V> extends AbstractIndex<A, V> implements AlphaIndex<A, V> {
 
-    private final Object rightValue;
+    private final V rightValue;
 
-    public AlphaIndexImpl(ConstraintType constraintType, Function1<A, ?> leftOperandExtractor, Object rightValue) {
+    public AlphaIndexImpl(ConstraintType constraintType, Function1<A, V> leftOperandExtractor, V rightValue) {
         super(constraintType, leftOperandExtractor);
         this.rightValue = rightValue;
     }
 
     @Override
-    public Object getRightValue() {
+    public V getRightValue() {
         return rightValue;
     }
 

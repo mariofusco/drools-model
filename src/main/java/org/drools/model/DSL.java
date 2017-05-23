@@ -20,7 +20,8 @@ import org.drools.model.impl.VariableImpl;
 import org.drools.model.view.AccumulateExprViewItem;
 import org.drools.model.view.CombinedExprViewItem;
 import org.drools.model.view.Expr1ViewItem;
-import org.drools.model.view.Expr2ViewItem;
+import org.drools.model.view.Expr1ViewItemImpl;
+import org.drools.model.view.Expr2ViewItemImpl;
 import org.drools.model.view.ExprViewItem;
 import org.drools.model.view.InputViewItem;
 import org.drools.model.view.OOPathBuilder;
@@ -87,20 +88,20 @@ public class DSL {
         return new InputViewItem<T>(var, new DataSourceDefinitionImpl(dataSourceName, true));
     }
 
-    public static <T> ExprViewItem<T> expr(Variable<T> var, Predicate1<T> predicate) {
-        return new Expr1ViewItem<T>(var, predicate);
+    public static <T> Expr1ViewItem<T> expr( Variable<T> var, Predicate1<T> predicate ) {
+        return new Expr1ViewItemImpl<T>( var, predicate );
     }
 
     public static <T, U> ExprViewItem<T> expr(Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
-        return new Expr2ViewItem<T, U>(var1, var2, predicate);
+        return new Expr2ViewItemImpl<T, U>( var1, var2, predicate );
     }
 
     public static <T> ExprViewItem<T> expr(String exprId, Variable<T> var, Predicate1<T> predicate) {
-        return new Expr1ViewItem<T>(exprId, var, predicate);
+        return new Expr1ViewItemImpl<T>( exprId, var, predicate);
     }
 
     public static <T, U> ExprViewItem<T> expr(String exprId, Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
-        return new Expr2ViewItem<T, U>(exprId, var1, var2, predicate);
+        return new Expr2ViewItemImpl<T, U>( exprId, var1, var2, predicate);
     }
 
     public static <T> OOPathBuilder<T> var( Variable<T> var ) {
@@ -112,19 +113,19 @@ public class DSL {
     }
 
     public static <T> ExprViewItem<T> not(Variable<T> var) {
-        return not(new Expr1ViewItem<T>("true", var, Predicate1.TRUE));
+        return not(new Expr1ViewItemImpl<T>( "true", var, Predicate1.TRUE) );
     }
 
     public static <T> ExprViewItem<T> not(Variable<T> var, Predicate1<T> predicate) {
-        return not(new Expr1ViewItem<T>(var, predicate));
+        return not(new Expr1ViewItemImpl<T>( var, predicate) );
     }
 
     public static <T, U> ExprViewItem<T> not(Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
-        return not(new Expr2ViewItem<T, U>(var1, var2, predicate));
+        return not(new Expr2ViewItemImpl<T, U>( var1, var2, predicate) );
     }
 
     public static <T> ExprViewItem<T> exists(Variable<T> var) {
-        return exists(new Expr1ViewItem<T>("true", var, Predicate1.TRUE));
+        return exists(new Expr1ViewItemImpl<T>( "true", var, Predicate1.TRUE) );
     }
 
     public static <T> ExprViewItem<T> exists(ExprViewItem<T> expr) {
@@ -132,11 +133,11 @@ public class DSL {
     }
 
     public static <T> ExprViewItem<T> exists(Variable<T> var, Predicate1<T> predicate) {
-        return exists(new Expr1ViewItem<T>(var, predicate));
+        return exists(new Expr1ViewItemImpl<T>( var, predicate) );
     }
 
     public static <T, U> ExprViewItem<T> exists(Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
-        return exists(new Expr2ViewItem<T, U>(var1, var2, predicate));
+        return exists(new Expr2ViewItemImpl<T, U>( var1, var2, predicate) );
     }
 
     public static <T> ExprViewItem<T> accumulate(ExprViewItem<T> expr, AccumulateFunction<T, ?, ?>... functions) {

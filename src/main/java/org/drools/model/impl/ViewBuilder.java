@@ -30,8 +30,8 @@ import org.drools.model.patterns.PatternBuilder;
 import org.drools.model.patterns.PatternImpl;
 import org.drools.model.view.AccumulateExprViewItem;
 import org.drools.model.view.CombinedExprViewItem;
-import org.drools.model.view.Expr1ViewItem;
-import org.drools.model.view.Expr2ViewItem;
+import org.drools.model.view.Expr1ViewItemImpl;
+import org.drools.model.view.Expr2ViewItemImpl;
 import org.drools.model.view.ExprViewItem;
 import org.drools.model.view.InputViewItem;
 import org.drools.model.view.SetViewItem;
@@ -94,8 +94,8 @@ public class ViewBuilder {
 
             if (viewItem instanceof ExprViewItem) {
                 inputs.computeIfAbsent( viewItem.getFirstVariable(), v -> (InputViewItem) input(v) );
-                if ( viewItem instanceof Expr2ViewItem ) {
-                    inputs.computeIfAbsent( ( (Expr2ViewItem) viewItem ).getSecondVariable(), v -> (InputViewItem) input(v) );
+                if ( viewItem instanceof Expr2ViewItemImpl ) {
+                    inputs.computeIfAbsent( ( (Expr2ViewItemImpl) viewItem ).getSecondVariable(), v -> (InputViewItem) input(v) );
                 }
                 builderMap.put(var, expr2PatternBuilder((ExprViewItem)viewItem, patternBuilder));
             }
@@ -114,15 +114,15 @@ public class ViewBuilder {
     }
 
     private static PatternBuilder.ValidBuilder expr2PatternBuilder(ExprViewItem viewItem, PatternBuilder.ValidBuilder patternBuilder) {
-        if (viewItem instanceof Expr1ViewItem) {
-            Expr1ViewItem expr = (Expr1ViewItem)viewItem;
+        if (viewItem instanceof Expr1ViewItemImpl) {
+            Expr1ViewItemImpl expr = (Expr1ViewItemImpl)viewItem;
             if (patternBuilder instanceof PatternBuilder.BoundPatternBuilder) {
                 patternBuilder = ((PatternBuilder.BoundPatternBuilder) patternBuilder).with(expr.getExprId(), expr.getPredicate());
             } else if (patternBuilder instanceof PatternBuilder.ConstrainedPatternBuilder) {
                 patternBuilder = ((PatternBuilder.ConstrainedPatternBuilder) patternBuilder).and(expr.getExprId(), expr.getPredicate());
             }
-        } else if (viewItem instanceof Expr2ViewItem) {
-            Expr2ViewItem expr = (Expr2ViewItem)viewItem;
+        } else if (viewItem instanceof Expr2ViewItemImpl) {
+            Expr2ViewItemImpl expr = (Expr2ViewItemImpl)viewItem;
             if (patternBuilder instanceof PatternBuilder.BoundPatternBuilder) {
                 patternBuilder = ((PatternBuilder.BoundPatternBuilder)patternBuilder).with(expr.getExprId(), expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate());
             } else if (patternBuilder instanceof PatternBuilder.ConstrainedPatternBuilder) {
@@ -188,8 +188,8 @@ public class ViewBuilder {
 
             if (viewItem instanceof ExprViewItem) {
                 inputs.computeIfAbsent( viewItem.getFirstVariable(), v -> (InputViewItem) input(v) );
-                if ( viewItem instanceof Expr2ViewItem ) {
-                    inputs.computeIfAbsent( ( (Expr2ViewItem) viewItem ).getSecondVariable(), v -> (InputViewItem) input(v) );
+                if ( viewItem instanceof Expr2ViewItemImpl ) {
+                    inputs.computeIfAbsent( ( (Expr2ViewItemImpl) viewItem ).getSecondVariable(), v -> (InputViewItem) input( v ) );
                 }
                 patternsMap.put(var, expr2Pattern((ExprViewItem)viewItem, pattern));
             }
@@ -205,12 +205,12 @@ public class ViewBuilder {
     }
 
     private static Pattern expr2Pattern(ExprViewItem viewItem, Pattern pattern) {
-        if (viewItem instanceof Expr1ViewItem) {
-            Expr1ViewItem expr = (Expr1ViewItem)viewItem;
-            ( (PatternImpl) pattern ).addConstraint( new SingleConstraint1( expr.getExprId(), expr.getFirstVariable(), expr.getPredicate() ) );
-        } else if (viewItem instanceof Expr2ViewItem) {
-            Expr2ViewItem expr = (Expr2ViewItem)viewItem;
-            ( (PatternImpl) pattern ).addConstraint( new SingleConstraint2( expr.getExprId(), expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate() ) );
+        if (viewItem instanceof Expr1ViewItemImpl ) {
+            Expr1ViewItemImpl expr = (Expr1ViewItemImpl)viewItem;
+            ( (PatternImpl) pattern ).addConstraint( new SingleConstraint1( expr ) );
+        } else if (viewItem instanceof Expr2ViewItemImpl ) {
+            Expr2ViewItemImpl expr = (Expr2ViewItemImpl)viewItem;
+            ( (PatternImpl) pattern ).addConstraint( new SingleConstraint2( expr ) );
         } else if (viewItem instanceof AccumulateExprViewItem) {
             AccumulateExprViewItem acc = (AccumulateExprViewItem)viewItem;
             pattern = new AccumulatePatternImpl(expr2Pattern(acc.getExpr(), pattern), acc.getFunctions());
@@ -234,15 +234,15 @@ public class ViewBuilder {
                 continue;
             }
             Variable var = viewItem.getFirstVariable();
-            if (viewItem instanceof Expr1ViewItem) {
-                Expr1ViewItem expr = (Expr1ViewItem)viewItem;
+            if (viewItem instanceof Expr1ViewItemImpl ) {
+                Expr1ViewItemImpl expr = (Expr1ViewItemImpl)viewItem;
                 Pattern pattern = new PatternBuilder().filter(var)
                                                       .from( getDataSourceDefinition( inputs, var ) )
                                                       .with(expr.getPredicate())
                                                       .get();
                 patterns.add(pattern);
-            } else if (viewItem instanceof Expr2ViewItem) {
-                Expr2ViewItem expr = (Expr2ViewItem)viewItem;
+            } else if (viewItem instanceof Expr2ViewItemImpl ) {
+                Expr2ViewItemImpl expr = (Expr2ViewItemImpl)viewItem;
                 Pattern pattern = new PatternBuilder().filter(var)
                                                       .from( getDataSourceDefinition( inputs, var ) )
                                                       .with(expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate())

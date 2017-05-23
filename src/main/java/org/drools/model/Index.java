@@ -2,12 +2,12 @@ package org.drools.model;
 
 import org.drools.model.functions.Function1;
 
-public interface Index<A> {
-    public enum IndexType {
+public interface Index<A, V> {
+    enum IndexType {
         ALPHA, BETA;
     }
 
-    public enum ConstraintType {
+    enum ConstraintType {
         EQUAL,
         NOT_EQUAL,
         GREATER_THAN,
@@ -21,5 +21,5 @@ public interface Index<A> {
 
     ConstraintType getConstraintType();
 
-    Function1<A, ?> getLeftOperandExtractor();
+    Function1<A, V> getLeftOperandExtractor();
 }

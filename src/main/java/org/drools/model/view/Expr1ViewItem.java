@@ -1,32 +1,24 @@
+/*
+ * Copyright 2005 JBoss Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.drools.model.view;
 
-import org.drools.model.Condition;
-import org.drools.model.Condition.Type;
-import org.drools.model.Variable;
-import org.drools.model.functions.Predicate1;
+import org.drools.model.Index;
+import org.drools.model.functions.Function1;
 
-import static org.drools.model.functions.LambdaIntrospector.getLambdaFingerprint;
-
-public class Expr1ViewItem<T> extends AbstractExprViewItem<T> {
-    private final Predicate1<T> predicate;
-
-    public Expr1ViewItem(Variable<T> var, Predicate1<T> predicate) {
-        super(getLambdaFingerprint(predicate, var), var);
-        this.predicate = predicate;
-    }
-
-    public Expr1ViewItem(String exprId, Variable<T> var, Predicate1<T> predicate) {
-        super(exprId, var);
-        this.predicate = predicate;
-    }
-
-    public Predicate1<T> getPredicate() {
-        return predicate;
-    }
-
-    @Override
-    public Condition.Type getType() {
-        return Type.PATTERN;
-    }
-
+public interface Expr1ViewItem<T> extends ExprViewItem<T> {
+    <U> Expr1ViewItem<T> indexedBy( Index.ConstraintType constraintType, Function1<T, U> leftOperandExtractor, U rightValue );
 }

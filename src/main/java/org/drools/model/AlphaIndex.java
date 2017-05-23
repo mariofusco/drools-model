@@ -1,6 +1,6 @@
 package org.drools.model;
 
-public interface AlphaIndex<A> extends Index<A> {
+public interface AlphaIndex<A, V> extends Index<A, V> {
 
-    Object getRightValue();
+    V getRightValue();
 }

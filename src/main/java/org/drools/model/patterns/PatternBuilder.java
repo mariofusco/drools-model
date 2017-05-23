@@ -249,13 +249,13 @@ public class PatternBuilder {
             return this;
         }
 
-        public ConstrainedPatternBuilder<T> indexedBy(Index.ConstraintType constraintType, Function1<T, ?> leftOperandExtractor, Object rightValue) {
-            lastConstraint.setIndex(new AlphaIndexImpl<T>(constraintType, leftOperandExtractor, rightValue));
+        public <U> ConstrainedPatternBuilder<T> indexedBy(Index.ConstraintType constraintType, Function1<T, U> leftOperandExtractor, U rightValue) {
+            lastConstraint.setIndex(new AlphaIndexImpl<T, U>(constraintType, leftOperandExtractor, rightValue));
             return this;
         }
 
-        public <A> ConstrainedPatternBuilder<T> indexedBy(Index.ConstraintType constraintType, Function1<T, ?> leftOperandExtractor, Function1<A, ?> rightOperandExtractor) {
-            lastConstraint.setIndex(new BetaIndexImpl<T>(constraintType, leftOperandExtractor, rightOperandExtractor));
+        public <U, V> ConstrainedPatternBuilder<T> indexedBy(Index.ConstraintType constraintType, Function1<T, V> leftOperandExtractor, Function1<U, V> rightOperandExtractor) {
+            lastConstraint.setIndex(new BetaIndexImpl<T, U, V>(constraintType, leftOperandExtractor, rightOperandExtractor));
             return this;
         }
 

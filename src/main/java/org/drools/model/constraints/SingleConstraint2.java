@@ -1,6 +1,5 @@
 package org.drools.model.constraints;
 
-import org.drools.model.BetaIndex;
 import org.drools.model.Variable;
 import org.drools.model.functions.Predicate2;
 import org.drools.model.functions.PredicateN;
@@ -13,8 +12,6 @@ public class SingleConstraint2<A, B> extends AbstractSingleConstraint {
     private final Variable<A> var1;
     private final Variable<B> var2;
     private final Predicate2<A, B> predicate;
-
-    private BetaIndex<A, B, ?> index;
 
     public SingleConstraint2(Variable<A> var1, Variable<B> var2, Predicate2<A, B> predicate) {
         super(getLambdaFingerprint(predicate, var1, var2));
@@ -32,7 +29,7 @@ public class SingleConstraint2<A, B> extends AbstractSingleConstraint {
 
     public SingleConstraint2(Expr2ViewItemImpl<A, B> expr) {
         this( expr.getExprId(), expr.getFirstVariable(), expr.getSecondVariable(), expr.getPredicate() );
-        this.index = expr.getIndex();
+        setIndex( expr.getIndex() );
     }
 
     @Override

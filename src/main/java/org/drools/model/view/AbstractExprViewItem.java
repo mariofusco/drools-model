@@ -12,6 +12,8 @@ public abstract class AbstractExprViewItem<T> implements ExprViewItem<T>  {
 
     private ExistentialPattern.ExistentialType existentialType;
 
+    private String[] reactiveProps;
+
     public AbstractExprViewItem(Variable<T> var) {
         this(randomUUID().toString(), var);
     }
@@ -37,8 +39,17 @@ public abstract class AbstractExprViewItem<T> implements ExprViewItem<T>  {
         return this;
     }
 
+    public AbstractExprViewItem<T> reactOn(String... props) {
+        this.reactiveProps = props;
+        return this;
+    }
+
     @Override
     public String getExprId() {
         return exprId;
+    }
+
+    public String[] getReactiveProps() {
+        return reactiveProps;
     }
 }

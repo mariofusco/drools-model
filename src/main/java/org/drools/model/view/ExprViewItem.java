@@ -11,4 +11,6 @@ public interface ExprViewItem<T> extends ViewItem<T> {
     ExprViewItem setExistentialType(ExistentialPattern.ExistentialType existentialType);
 
     String getExprId();
+
+    ExprViewItem reactOn(String... props);
 }

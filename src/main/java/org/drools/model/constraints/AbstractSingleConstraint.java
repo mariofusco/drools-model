@@ -15,6 +15,8 @@ public abstract class AbstractSingleConstraint extends AbstractConstraint implem
 
     private Index index;
 
+    private String[] reactiveProps;
+
     protected AbstractSingleConstraint() {
         this(randomUUID().toString());
     }
@@ -40,6 +42,15 @@ public abstract class AbstractSingleConstraint extends AbstractConstraint implem
 
     public void setIndex(Index index) {
         this.index = index;
+    }
+
+    @Override
+    public String[] getReactiveProps() {
+        return reactiveProps;
+    }
+
+    public void setReactiveProps( String[] reactiveProps ) {
+        this.reactiveProps = reactiveProps;
     }
 
     @Override

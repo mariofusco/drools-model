@@ -10,4 +10,6 @@ public interface SingleConstraint extends Constraint {
     Index getIndex();
 
     String getExprId();
+
+    String[] getReactiveProps();
 }

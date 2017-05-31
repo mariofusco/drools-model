@@ -7,8 +7,6 @@ import org.drools.model.Constraint;
 import org.drools.model.Index;
 import org.drools.model.SingleConstraint;
 
-import static java.util.UUID.randomUUID;
-
 public abstract class AbstractSingleConstraint extends AbstractConstraint implements SingleConstraint {
 
     private final String exprId;
@@ -16,10 +14,6 @@ public abstract class AbstractSingleConstraint extends AbstractConstraint implem
     private Index index;
 
     private String[] reactiveProps;
-
-    protected AbstractSingleConstraint() {
-        this(randomUUID().toString());
-    }
 
     protected AbstractSingleConstraint(String exprId) {
         this.exprId = exprId;

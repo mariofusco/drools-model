@@ -13,7 +13,7 @@ public interface Constraint {
 
     Type getType();
 
-    Constraint EMPTY = new AbstractSingleConstraint() {
+    Constraint EMPTY = new AbstractSingleConstraint("EMPTY") {
         @Override
         public Variable[] getVariables() {
             return new Variable[0];

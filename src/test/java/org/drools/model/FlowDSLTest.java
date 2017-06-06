@@ -65,11 +65,11 @@ public class FlowDSLTest {
         Variable<Person> olderV = any(Person.class);
 
         View view = view(
+            input(olderV, "persons"),
+            expr(olderV, older -> !older.getName().equals("Mark")),
             input(markV, "persons"),
             expr(markV, mark -> mark.getName().equals("Mark")),
-            input(olderV, "persons"),
-            expr(markV, olderV, (mark, older) -> mark.getAge() < older.getAge()),
-            expr(olderV, older -> !older.getName().equals("Mark"))
+            expr(markV, olderV, (mark, older) -> mark.getAge() < older.getAge())
         );
 
         List<TupleHandle> result = new BruteForceEngine().bind("persons", persons).evaluate(view);

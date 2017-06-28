@@ -8,7 +8,7 @@ public interface Condition {
     Type getType();
 
     enum Type {
-        PATTERN( false ), OOPATH( false ), OR( true ), AND( true ), NOT( true ), EXISTS( true );
+        PATTERN( false ), ACCUMULATE( false ), OOPATH( false ), OR( true ), AND( true ), NOT( true ), EXISTS( true );
 
         private final boolean composite;
 

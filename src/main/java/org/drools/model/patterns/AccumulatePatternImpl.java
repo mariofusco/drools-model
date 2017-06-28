@@ -51,4 +51,9 @@ public class AccumulatePatternImpl<T> extends AbstractSinglePattern implements A
     public Constraint getConstraint() {
         return pattern.getConstraint();
     }
+
+    @Override
+    public Type getType() {
+        return Type.ACCUMULATE;
+    }
 }

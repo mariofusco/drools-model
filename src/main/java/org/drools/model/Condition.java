@@ -8,6 +8,16 @@ public interface Condition {
     Type getType();
 
     enum Type {
-        PATTERN, OOPATH, OR, AND
+        PATTERN( false ), OOPATH( false ), OR( true ), AND( true ), NOT( true ), EXISTS( true );
+
+        private final boolean composite;
+
+        Type( boolean composite ) {
+            this.composite = composite;
+        }
+
+        public boolean isComposite() {
+            return composite;
+        }
     }
 }

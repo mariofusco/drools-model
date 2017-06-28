@@ -6,15 +6,17 @@ import java.util.List;
 import org.drools.model.Condition;
 import org.drools.model.View;
 
-public class AndPatterns implements Condition, View {
+public class CompositePatterns implements Condition, View {
 
+    private final Type type;
     private final List<Condition> patterns;
 
-    public AndPatterns(Condition... patterns) {
-        this( Arrays.asList(patterns) );
+    public CompositePatterns( Type type, Condition... patterns ) {
+        this( type, Arrays.asList(patterns) );
     }
 
-    public AndPatterns(List<Condition> patterns) {
+    public CompositePatterns( Type type, List<Condition> patterns ) {
+        this.type = type;
         this.patterns = patterns;
     }
 
@@ -25,6 +27,6 @@ public class AndPatterns implements Condition, View {
 
     @Override
     public Type getType() {
-        return Type.AND;
+        return type;
     }
 }

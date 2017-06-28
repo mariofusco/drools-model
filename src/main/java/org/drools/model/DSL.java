@@ -109,8 +109,8 @@ public class DSL {
         return new OOPathBuilder<T>(var);
     }
 
-    public static <T> ExprViewItem<T> not(ExprViewItem expr) {
-        return expr.setExistentialType(ExistentialPattern.ExistentialType.NOT);
+    public static ExprViewItem not(ExprViewItem... expressions) {
+        return new CombinedExprViewItem(Condition.Type.NOT, expressions);
     }
 
     public static <T> ExprViewItem<T> not(Variable<T> var) {
@@ -125,12 +125,12 @@ public class DSL {
         return not(new Expr2ViewItemImpl<T, U>( var1, var2, predicate) );
     }
 
-    public static <T> ExprViewItem<T> exists(Variable<T> var) {
-        return exists(new Expr1ViewItemImpl<T>( "true", var, Predicate1.TRUE) );
+    public static ExprViewItem exists(ExprViewItem... expressions) {
+        return new CombinedExprViewItem(Condition.Type.EXISTS, expressions);
     }
 
-    public static <T> ExprViewItem<T> exists(ExprViewItem<T> expr) {
-        return expr.setExistentialType(ExistentialPattern.ExistentialType.EXISTS);
+    public static <T> ExprViewItem<T> exists(Variable<T> var) {
+        return exists(new Expr1ViewItemImpl<T>( "true", var, Predicate1.TRUE) );
     }
 
     public static <T> ExprViewItem<T> exists(Variable<T> var, Predicate1<T> predicate) {

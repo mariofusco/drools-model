@@ -12,7 +12,6 @@ import org.drools.model.AccumulateFunction;
 import org.drools.model.AccumulatePattern;
 import org.drools.model.Condition;
 import org.drools.model.Constraint;
-import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
 import org.drools.model.Rule;
 import org.drools.model.SingleConstraint;
@@ -77,6 +76,9 @@ public class BruteForceEngine {
         switch (condition.getType()) {
             case PATTERN:
                 return evaluateSinglePattern((Pattern)condition, bindings);
+            case NOT:
+            case EXISTS:
+                return evaluateExistential(condition.getType(), (Pattern)condition.getSubConditions().get(0), bindings);
             case AND:
                 return condition.getSubConditions().stream()
                                 .reduce(bindings,
@@ -92,9 +94,6 @@ public class BruteForceEngine {
     }
 
     private Bindings evaluateSinglePattern(Pattern pattern, Bindings bindings) {
-        if (pattern instanceof ExistentialPattern) {
-            return evaluateExistential((ExistentialPattern) pattern, bindings);
-        }
         if (pattern instanceof AccumulatePattern) {
             return evaluateAccumulate((AccumulatePattern) pattern, bindings);
         }
@@ -105,13 +104,13 @@ public class BruteForceEngine {
         return new Bindings(tuples);
     }
 
-    private Bindings evaluateExistential(ExistentialPattern pattern, Bindings bindings) {
+    private Bindings evaluateExistential(Condition.Type existentialType, Pattern pattern, Bindings bindings) {
         List<Object> objects = getObjectsOfType(getPatternDataStore(pattern), pattern.getPatternVariable().getType()).collect(toList());
         Predicate<BoundTuple> existentialPredicate =
                 tuple -> objects.stream()
                                  .map(obj -> tuple.bind(pattern.getPatternVariable(), obj))
                                  .anyMatch(t -> match(pattern.getConstraint(), t));
-        if (pattern.getExistentialType() == ExistentialPattern.ExistentialType.NOT) {
+        if (existentialType == Condition.Type.NOT) {
             existentialPredicate = existentialPredicate.negate();
         }
         List<BoundTuple> tuples =

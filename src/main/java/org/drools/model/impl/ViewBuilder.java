@@ -13,18 +13,15 @@ import org.drools.model.Condition;
 import org.drools.model.Condition.Type;
 import org.drools.model.Constraint;
 import org.drools.model.DataSourceDefinition;
-import org.drools.model.ExistentialPattern;
 import org.drools.model.Pattern;
 import org.drools.model.Variable;
 import org.drools.model.View;
 import org.drools.model.constraints.SingleConstraint1;
 import org.drools.model.constraints.SingleConstraint2;
 import org.drools.model.patterns.AccumulatePatternImpl;
-import org.drools.model.patterns.AndPatterns;
-import org.drools.model.patterns.ExistentialPatternImpl;
+import org.drools.model.patterns.CompositePatterns;
 import org.drools.model.patterns.InvokerMultiValuePatternImpl;
 import org.drools.model.patterns.InvokerSingleValuePatternImpl;
-import org.drools.model.patterns.OrPatterns;
 import org.drools.model.patterns.PatternImpl;
 import org.drools.model.view.AccumulateExprViewItem;
 import org.drools.model.view.CombinedExprViewItem;
@@ -110,18 +107,16 @@ public class ViewBuilder {
             }
         }
 
+        Condition condition = new CompositePatterns( type, conditions );
         if ( type == Type.AND ) {
-            if (topLevel && inputs.size() > usedVars.size()) {
+            if ( topLevel && inputs.size() > usedVars.size() ) {
                 inputs.keySet().removeAll( usedVars );
-                for (Map.Entry<Variable<?>, InputViewItem<?>> entry : inputs.entrySet()) {
+                for ( Map.Entry<Variable<?>, InputViewItem<?>> entry : inputs.entrySet() ) {
                     conditions.add( 0, new PatternImpl( entry.getKey(), Constraint.EMPTY, entry.getValue().getDataSourceDefinition() ) );
                 }
             }
-            return new AndPatterns( conditions );
-        } else if ( type == Type.OR ) {
-            return new OrPatterns( conditions );
         }
-        throw new RuntimeException("Unknown expression type: " + type);
+        return condition;
     }
 
     private static DataSourceDefinition getDataSourceDefinition( Map<Variable<?>, InputViewItem<?>> inputs, Variable var ) {
@@ -141,11 +136,6 @@ public class ViewBuilder {
             pattern = new AccumulatePatternImpl(expr2Pattern(acc.getExpr(), pattern), acc.getFunctions());
         }
 
-        if (viewItem.getExistentialType() == ExistentialPattern.ExistentialType.NOT) {
-            pattern = new ExistentialPatternImpl(ExistentialPattern.ExistentialType.NOT, pattern);
-        } else if (viewItem.getExistentialType() == ExistentialPattern.ExistentialType.EXISTS) {
-            pattern = new ExistentialPatternImpl(ExistentialPattern.ExistentialType.EXISTS, pattern);
-        }
         return pattern;
     }
 }

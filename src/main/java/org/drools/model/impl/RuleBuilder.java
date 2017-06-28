@@ -4,13 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.drools.model.Condition;
+import org.drools.model.Condition.Type;
 import org.drools.model.Consequence;
 import org.drools.model.DataSourceDefinition;
 import org.drools.model.Rule;
 import org.drools.model.View;
 import org.drools.model.consequences.ConsequenceBuilder;
 import org.drools.model.functions.Function1;
-import org.drools.model.patterns.AndPatterns;
+import org.drools.model.patterns.CompositePatterns;
 import org.drools.model.patterns.PatternBuilder;
 import org.drools.model.view.ViewItemBuilder;
 
@@ -77,7 +78,7 @@ public class RuleBuilder {
     }
 
     public RuleBuilderWithLHS when(Condition... patterns) {
-        return when(new AndPatterns(patterns));
+        return when(new CompositePatterns( Type.AND, patterns ) );
     }
 
     public RuleBuilderWithLHS view( ViewItemBuilder... viewItemBuilders ) {

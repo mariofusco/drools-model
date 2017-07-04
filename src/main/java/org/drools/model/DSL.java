@@ -93,7 +93,7 @@ public class DSL {
         return new Expr1ViewItemImpl<T>( var, predicate );
     }
 
-    public static <T, U> ExprViewItem<T> expr(Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
+    public static <T, U> Expr2ViewItem<T, U> expr(Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate) {
         return new Expr2ViewItemImpl<T, U>( var1, var2, predicate );
     }
 

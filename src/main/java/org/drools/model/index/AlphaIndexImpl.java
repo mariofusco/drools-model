@@ -7,8 +7,8 @@ public class AlphaIndexImpl<A, V> extends AbstractIndex<A, V> implements AlphaIn
 
     private final V rightValue;
 
-    public AlphaIndexImpl(ConstraintType constraintType, Function1<A, V> leftOperandExtractor, V rightValue) {
-        super(constraintType, leftOperandExtractor);
+    public AlphaIndexImpl(Class<?> indexedClass, ConstraintType constraintType, Function1<A, V> leftOperandExtractor, V rightValue) {
+        super( indexedClass, constraintType, leftOperandExtractor );
         this.rightValue = rightValue;
     }
 

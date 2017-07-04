@@ -19,6 +19,8 @@ public interface Index<A, V> {
 
     IndexType getIndexType();
 
+    Class<?> getIndexedClass();
+
     ConstraintType getConstraintType();
 
     Function1<A, V> getLeftOperandExtractor();

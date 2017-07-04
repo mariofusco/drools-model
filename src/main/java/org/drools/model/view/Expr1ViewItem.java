@@ -20,5 +20,5 @@ import org.drools.model.Index;
 import org.drools.model.functions.Function1;
 
 public interface Expr1ViewItem<T> extends ExprViewItem<T> {
-    <U> Expr1ViewItem<T> indexedBy( Index.ConstraintType constraintType, Function1<T, U> leftOperandExtractor, U rightValue );
+    <U> Expr1ViewItem<T> indexedBy( Class<?> indexedClass, Index.ConstraintType constraintType, Function1<T, U> leftOperandExtractor, U rightValue );
 }

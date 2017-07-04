@@ -5,12 +5,19 @@ import org.drools.model.functions.Function1;
 
 public abstract class AbstractIndex<A, V> implements Index<A, V> {
 
+    private final Class<?> indexedClass;
     private final ConstraintType constraintType;
     private final Function1<A, V> leftOperandExtractor;
 
-    protected AbstractIndex(ConstraintType constraintType, Function1<A, V> leftOperandExtractor) {
+    protected AbstractIndex( Class<?> indexedClass, ConstraintType constraintType, Function1<A, V> leftOperandExtractor ) {
+        this.indexedClass = indexedClass;
         this.constraintType = constraintType;
         this.leftOperandExtractor = leftOperandExtractor;
+    }
+
+    @Override
+    public Class<?> getIndexedClass() {
+        return indexedClass;
     }
 
     @Override

@@ -1,17 +1,17 @@
 package org.drools.model.functions;
 
-import org.drools.model.Variable;
-import org.mvel2.asm.ClassReader;
-import org.mvel2.asm.ClassVisitor;
-import org.mvel2.asm.Label;
-import org.mvel2.asm.MethodVisitor;
-import org.mvel2.asm.Opcodes;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.drools.model.Variable;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 public class LambdaIntrospector {
 
@@ -48,7 +48,7 @@ public class LambdaIntrospector {
             try {
                 classStream = lambda.getClass().getClassLoader()
                                     .getResourceAsStream( extracted.implClass.replace( '.', '/' ) + ".class" );
-                ClassReader reader = new ClassReader(classStream);
+                ClassReader reader = new ClassReader( classStream);
                 reader.accept(visitor, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
             } catch (Exception e) {
                 throw new RuntimeException( e );
@@ -77,7 +77,7 @@ public class LambdaIntrospector {
         }
 
         @Override
-        public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+        public MethodVisitor visitMethod( int access, String name, String desc, String signature, String[] exceptions ) {
             return name.startsWith( "lambda$" ) ? new LambdaMethodVisitor(this, name) : super.visitMethod(access, name, desc, signature, exceptions);
         }
 

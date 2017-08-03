@@ -22,6 +22,7 @@ import org.drools.model.patterns.AccumulatePatternImpl;
 import org.drools.model.patterns.CompositePatterns;
 import org.drools.model.patterns.InvokerMultiValuePatternImpl;
 import org.drools.model.patterns.InvokerSingleValuePatternImpl;
+import org.drools.model.patterns.OOPathImpl;
 import org.drools.model.patterns.PatternImpl;
 import org.drools.model.view.AccumulateExprViewItem;
 import org.drools.model.view.CombinedExprViewItem;
@@ -29,6 +30,8 @@ import org.drools.model.view.Expr1ViewItemImpl;
 import org.drools.model.view.Expr2ViewItemImpl;
 import org.drools.model.view.ExprViewItem;
 import org.drools.model.view.InputViewItem;
+import org.drools.model.view.OOPathViewItem;
+import org.drools.model.view.OOPathViewItem.OOPathChunk;
 import org.drools.model.view.SetViewItem;
 import org.drools.model.view.ViewItem;
 import org.drools.model.view.ViewItemBuilder;
@@ -48,7 +51,7 @@ public class ViewBuilder {
     public static Condition viewItems2Condition(List<ViewItem> viewItems, Map<Variable<?>, InputViewItem<?>> inputs,
                                                 Set<Variable<?>> usedVars, Condition.Type type, boolean topLevel) {
         List<Condition> conditions = new ArrayList<>();
-        Map<Variable<?>, Pattern> patternsMap = new HashMap<>();
+        Map<Variable<?>, Condition> conditionMap = new HashMap<>();
         for (ViewItem viewItem : viewItems) {
             if ( viewItem instanceof CombinedExprViewItem ) {
                 CombinedExprViewItem combined = (CombinedExprViewItem) viewItem;
@@ -73,23 +76,23 @@ public class ViewBuilder {
                                                                      setViewItem.getInvokedFunction(),
                                                                      var,
                                                                      setViewItem.getInputVariables() );
-                patternsMap.put( var, pattern );
+                conditionMap.put( var, pattern );
                 conditions.add( pattern );
                 continue;
             }
 
             usedVars.add(var);
-            Pattern pattern;
+            Condition condition;
             if ( type == Type.AND ) {
-                pattern = patternsMap.get( var );
-                if ( pattern == null ) {
-                    pattern = new PatternImpl( var, Constraint.EMPTY, getDataSourceDefinition( inputs, var ) );
-                    patternsMap.put( var, pattern );
-                    conditions.add( pattern );
+                condition = conditionMap.get( var );
+                if ( condition == null ) {
+                    condition = new PatternImpl( var, Constraint.EMPTY, getDataSourceDefinition( inputs, var ) );
+                    conditions.add( condition );
+                    conditionMap.put( var, condition );
                 }
             } else {
-                pattern = new PatternImpl( var, Constraint.EMPTY, getDataSourceDefinition( inputs, var ) );
-                conditions.add( pattern );
+                condition = new PatternImpl( var, Constraint.EMPTY, getDataSourceDefinition( inputs, var ) );
+                conditions.add( condition );
             }
 
             if (viewItem instanceof ExprViewItem ) {
@@ -98,12 +101,12 @@ public class ViewBuilder {
                     Variable<?> var2 = ( (Expr2ViewItemImpl) viewItem ).getSecondVariable();
                     inputs.putIfAbsent(var2, (InputViewItem) input( var2 ));
                 }
+            }
 
-                Pattern modifiedPattern = expr2Pattern( (ExprViewItem) viewItem, pattern );
-                conditions.set( conditions.indexOf( pattern ), modifiedPattern );
-                if (type == Type.AND) {
-                    patternsMap.put( var, modifiedPattern );
-                }
+            Condition modifiedPattern = viewItem2Condition( viewItem, condition );
+            conditions.set( conditions.indexOf( condition ), modifiedPattern );
+            if (type == Type.AND) {
+                conditionMap.put( var, modifiedPattern );
             }
         }
 
@@ -124,18 +127,36 @@ public class ViewBuilder {
         return input != null ? input.getDataSourceDefinition() : DataSourceDefinitionImpl.DEFAULT;
     }
 
-    private static Pattern expr2Pattern(ExprViewItem viewItem, Pattern pattern) {
+    private static Condition viewItem2Condition( ViewItem viewItem, Condition condition ) {
         if (viewItem instanceof Expr1ViewItemImpl ) {
             Expr1ViewItemImpl expr = (Expr1ViewItemImpl)viewItem;
-            ( (PatternImpl) pattern ).addConstraint( new SingleConstraint1( expr ) );
-        } else if (viewItem instanceof Expr2ViewItemImpl ) {
-            Expr2ViewItemImpl expr = (Expr2ViewItemImpl)viewItem;
-            ( (PatternImpl) pattern ).addConstraint( new SingleConstraint2( expr ) );
-        } else if (viewItem instanceof AccumulateExprViewItem) {
-            AccumulateExprViewItem acc = (AccumulateExprViewItem)viewItem;
-            pattern = new AccumulatePatternImpl(expr2Pattern(acc.getExpr(), pattern), acc.getFunctions());
+            ( (PatternImpl) condition ).addConstraint( new SingleConstraint1( expr ) );
+            return condition;
         }
 
-        return pattern;
+        if (viewItem instanceof Expr2ViewItemImpl ) {
+            Expr2ViewItemImpl expr = (Expr2ViewItemImpl)viewItem;
+            ( (PatternImpl) condition ).addConstraint( new SingleConstraint2( expr ) );
+            return condition;
+        }
+
+        if (viewItem instanceof AccumulateExprViewItem) {
+            AccumulateExprViewItem acc = (AccumulateExprViewItem)viewItem;
+            return new AccumulatePatternImpl( (Pattern) viewItem2Condition( acc.getExpr(), condition ), acc.getFunctions() );
+        }
+
+        if (viewItem instanceof OOPathViewItem) {
+            OOPathViewItem<?,?> oopath = ( (OOPathViewItem) viewItem );
+            if (oopath.getChunks().size() > 1) {
+                throw new UnsupportedOperationException();
+            }
+            OOPathChunk chunk = oopath.getChunks().get( 0 );
+            ( (PatternImpl) condition ).addConstraint( new SingleConstraint1( (Expr1ViewItemImpl)chunk.getExpr() ) );
+            OOPathImpl oopathPattern = new OOPathImpl( oopath.getSource(), oopath.getChunks() );
+            oopathPattern.setFirstCondition( condition );
+            return oopathPattern;
+        }
+
+        throw new UnsupportedOperationException( "Unknown ViewItem: " + viewItem );
     }
 }

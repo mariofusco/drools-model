@@ -1,9 +1,13 @@
 package org.drools.model;
 
+import java.util.Collections;
 import java.util.List;
 
 public interface Condition {
-    List<Condition> getSubConditions();
+
+    default List<Condition> getSubConditions() {
+        return Collections.emptyList();
+    }
 
     Type getType();
 

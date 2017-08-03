@@ -16,65 +16,51 @@
 
 package org.drools.model.view;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.drools.model.Source;
 import org.drools.model.Variable;
 import org.drools.model.functions.Function1;
-import org.drools.model.functions.Predicate1;
 
-public class OOPathViewItem<T> implements ViewItem<T> {
-    private final Variable<T> variable;
-    private final List<OOPathChunk<?>> chunks;
+public class OOPathViewItem<S, T> implements ViewItem<T> {
+    private final Source<S> source;
+    private final LinkedList<OOPathChunk<?>> chunks;
 
-    public OOPathViewItem( Variable<T> variable, List<OOPathChunk<?>> chunks ) {
-        this.variable = variable;
+    public OOPathViewItem( Source<S> source, LinkedList<OOPathChunk<?>> chunks ) {
+        this.source = source;
         this.chunks = chunks;
     }
 
     @Override
     public Variable<T> getFirstVariable() {
-        return variable;
+        return (Variable<T>) chunks.getLast().getExpr().getFirstVariable();
     }
 
     public List<OOPathChunk<?>> getChunks() {
         return chunks;
     }
 
-    public abstract static class OOPathChunk<S> {
-        private Predicate1<S> filter;
-
-        public Predicate1<S> getFilter() {
-            return filter;
-        }
-
-        public void setFilter( Predicate1<S> filter ) {
-            this.filter = filter;
-        }
+    public Source<S> getSource() {
+        return source;
     }
 
-    public static class OOPathHeadChunk<S> extends OOPathChunk<S> {
-        private final Source<S> source;
+    public static class OOPathChunk<T> {
+        private ExprViewItem<T> expr;
+        private Function1<?, Iterable<T>> map;
 
-        public OOPathHeadChunk( Source<S> source ) {
-            this.source = source;
-        }
+        public OOPathChunk() { }
 
-        public Source<S> getSource() {
-            return source;
-        }
-    }
-
-    public static class OOPathTailChunk<R, S> extends OOPathChunk<S> {
-        private final Function1<R, S> map;
-
-        public OOPathTailChunk( Function1<R, S> map ) {
+        public OOPathChunk( Function1<?, Iterable<T>> map ) {
             this.map = map;
         }
 
-        public Function1<R, S> getMap() {
-            return map;
+        public void setExpr( ExprViewItem<T> expr ) {
+            this.expr = expr;
+        }
+
+        public ExprViewItem<T> getExpr() {
+            return expr;
         }
     }
-
 }

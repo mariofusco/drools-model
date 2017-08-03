@@ -26,6 +26,7 @@ import org.drools.model.view.Expr2ViewItemImpl;
 import org.drools.model.view.ExprViewItem;
 import org.drools.model.view.InputViewItem;
 import org.drools.model.view.OOPathBuilder;
+import org.drools.model.view.OOPathBuilder.OOPathChunkBuilder;
 import org.drools.model.view.SetViewItem;
 import org.drools.model.view.ViewItem;
 import org.drools.model.view.ViewItemBuilder;
@@ -59,8 +60,8 @@ public class DSL {
         return new VariableImpl<T>(type);
     }
 
-    public static <T> Source<T> sourceOf( Type<T> type ) {
-        return new SourceImpl<T>(type);
+    public static <T> Source<T> sourceOf( String name, Type<T> type ) {
+        return new SourceImpl<T>( name, type);
     }
 
     public static <T> Type<T> type( Class<T> type ) {
@@ -105,8 +106,8 @@ public class DSL {
         return new Expr2ViewItemImpl<T, U>( exprId, var1, var2, predicate);
     }
 
-    public static <T> OOPathBuilder<T> var( Variable<T> var ) {
-        return new OOPathBuilder<T>(var);
+    public static <T> OOPathChunkBuilder<T, T> from( Source<T> source ) {
+        return new OOPathBuilder<T>(source).firstChunk();
     }
 
     public static ExprViewItem not(ExprViewItem... expressions) {

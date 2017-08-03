@@ -23,39 +23,51 @@ import org.drools.model.Variable;
 import org.drools.model.functions.Function1;
 import org.drools.model.functions.Predicate1;
 import org.drools.model.view.OOPathViewItem.OOPathChunk;
-import org.drools.model.view.OOPathViewItem.OOPathHeadChunk;
-import org.drools.model.view.OOPathViewItem.OOPathTailChunk;
 
 public class OOPathBuilder<T> {
 
-    private final Variable<T> variable;
+    private final Source<T> source;
+
     private final LinkedList<OOPathChunk<?>> chunks = new LinkedList<>();
 
-    public OOPathBuilder( Variable<T> variable ) {
-        this.variable = variable;
+    public OOPathBuilder( Source<T> source ) {
+        this.source = source;
     }
 
-    public <S> OOPathChunkBuilder<S> in( Source<S> source ) {
-        chunks.add(new OOPathHeadChunk<S>( source ) );
-        return new OOPathChunkBuilder<S>();
+    public OOPathChunkBuilder<T, T> firstChunk() {
+        OOPathChunk<T> chunk = new OOPathChunk<T>();
+        chunks.add( chunk );
+        return new OOPathChunkBuilder<T, T>( this, chunk );
     }
 
-    public class OOPathChunkEndBuilder<S> implements ViewItemBuilder<T> {
-        public <T> OOPathChunkEndBuilder<T> map( Function1<S, T> map ) {
-            chunks.add(new OOPathTailChunk<S, T>( map ) );
-            return new OOPathChunkBuilder<T>();
+    public static class OOPathChunkBuilder<S, T> implements ViewItemBuilder<T> {
+
+        private final OOPathBuilder<S> builder;
+        private final OOPathChunk<T> chunk;
+
+        public OOPathChunkBuilder( OOPathBuilder<S> builder, OOPathChunk<T> chunk ) {
+            this.builder = builder;
+            this.chunk = chunk;
+        }
+
+        public <V> OOPathChunkBuilder<S, V> map( Function1<T, Iterable<V>> map ) {
+            OOPathChunk<V> chunk = new OOPathChunk<V>( map );
+            builder.chunks.add(chunk);
+            return new OOPathChunkBuilder<S, V>( builder, chunk );
+        }
+
+        public OOPathChunkBuilder<S, T> filter( Variable<T> var, Predicate1<T> predicate ) {
+            return filter( new Expr1ViewItemImpl<T>( var, predicate ) );
+        }
+
+        public OOPathChunkBuilder<S, T> filter( ExprViewItem<T> expr ) {
+            chunk.setExpr( expr );
+            return this;
         }
 
         @Override
         public ViewItem<T> get() {
-            return new OOPathViewItem<>( variable, chunks );
-        }
-    }
-
-    public class OOPathChunkBuilder<S> extends OOPathChunkEndBuilder<S> {
-        public OOPathChunkEndBuilder<S> filter( Predicate1<S> filter ) {
-            ((OOPathChunk<S>) chunks.getLast()).setFilter( filter );
-            return this;
+            return new OOPathViewItem<S, T>( builder.source, builder.chunks );
         }
     }
 }

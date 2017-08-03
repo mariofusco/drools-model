@@ -41,7 +41,7 @@ public class RuleBuilder {
     }
 
     public RuleBuilder unit(Class<?> unitClass) {
-        this.unit = getCanonicalSimpleName(unitClass);
+        this.unit = unitClass.getName();
         return this;
     }
 

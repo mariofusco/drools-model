@@ -16,21 +16,42 @@
 
 package org.drools.model.patterns;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.drools.model.Condition;
 import org.drools.model.OOPath;
+import org.drools.model.Source;
+import org.drools.model.view.OOPathViewItem.OOPathChunk;
 
 public class OOPathImpl implements OOPath {
 
-    @Override
-    public List<Condition> getSubConditions() {
-        return Collections.emptyList();
+    private final Source<?> source;
+    private final List<OOPathChunk<?>> chunks;
+    private Condition firstCondition;
+
+    public OOPathImpl( Source<?> source, List<OOPathChunk<?>> chunks ) {
+        this.source = source;
+        this.chunks = chunks;
     }
 
     @Override
     public Type getType() {
         return Type.OOPATH;
+    }
+
+    public void setFirstCondition( Condition condition ) {
+        this.firstCondition = condition;
+    }
+
+    public Condition getFirstCondition() {
+        return firstCondition;
+    }
+
+    public Source<?> getSource() {
+        return source;
+    }
+
+    public List<OOPathChunk<?>> getChunks() {
+        return chunks;
     }
 }

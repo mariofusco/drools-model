@@ -16,5 +16,15 @@
 
 package org.drools.model;
 
+import java.util.List;
+
+import org.drools.model.view.OOPathViewItem.OOPathChunk;
+
 public interface OOPath extends Condition {
+
+    Source<?> getSource();
+    List<OOPathChunk<?>> getChunks();
+
+    // TODO: remove
+    Condition getFirstCondition();
 }

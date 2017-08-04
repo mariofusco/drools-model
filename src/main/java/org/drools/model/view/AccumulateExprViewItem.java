@@ -3,6 +3,7 @@ package org.drools.model.view;
 import org.drools.model.AccumulateFunction;
 import org.drools.model.Condition;
 import org.drools.model.Condition.Type;
+import org.drools.model.Variable;
 
 public class AccumulateExprViewItem<T> extends AbstractExprViewItem<T> {
 
@@ -18,6 +19,11 @@ public class AccumulateExprViewItem<T> extends AbstractExprViewItem<T> {
     @Override
     public Condition.Type getType() {
         return Type.PATTERN;
+    }
+
+    @Override
+    public Variable<?>[] getVariables() {
+        return expr.getVariables();
     }
 
     public ExprViewItem<T> getExpr() {

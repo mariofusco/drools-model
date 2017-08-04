@@ -21,7 +21,7 @@ public abstract class AbstractExprViewItem<T> implements ExprViewItem<T>  {
     }
 
     @Override
-    public Variable getFirstVariable() {
+    public Variable<T> getFirstVariable() {
         return var;
     }
 

@@ -27,6 +27,11 @@ public class Expr1ViewItemImpl<T> extends AbstractExprViewItem<T> implements Exp
         this.predicate = predicate;
     }
 
+    @Override
+    public Variable<?>[] getVariables() {
+        return new Variable[] { getFirstVariable() };
+    }
+
     public Predicate1<T> getPredicate() {
         return predicate;
     }

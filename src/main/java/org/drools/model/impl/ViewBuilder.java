@@ -38,6 +38,7 @@ import org.drools.model.view.ViewItemBuilder;
 
 import static java.util.stream.Collectors.toList;
 import static org.drools.model.DSL.input;
+import static org.drools.model.constraints.AbstractSingleConstraint.fromExpr;
 
 public class ViewBuilder {
 
@@ -151,7 +152,7 @@ public class ViewBuilder {
                 throw new UnsupportedOperationException();
             }
             OOPathChunk chunk = oopath.getChunks().get( 0 );
-            ( (PatternImpl) condition ).addConstraint( new SingleConstraint1( (Expr1ViewItemImpl)chunk.getExpr() ) );
+            ( (PatternImpl) condition ).addConstraint( fromExpr( chunk.getExpr() ) );
             OOPathImpl oopathPattern = new OOPathImpl( oopath.getSource(), oopath.getChunks() );
             oopathPattern.setFirstCondition( condition );
             return oopathPattern;

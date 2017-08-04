@@ -34,7 +34,7 @@ public class PatternImpl<T> extends AbstractSinglePattern implements Pattern<T> 
     }
 
     @Override
-    public Variable[] getBoundVariables() {
+    public Variable<?>[] getBoundVariables() {
         return new Variable[] { variable };
     }
 

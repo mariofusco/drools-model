@@ -22,6 +22,11 @@ public class SetViewItem<T> implements ViewItem<T> {
         return variable;
     }
 
+    @Override
+    public Variable<?>[] getVariables() {
+        return new Variable[] { variable };
+    }
+
     public FunctionN getInvokedFunction() {
         return invokedFunction;
     }

@@ -6,8 +6,6 @@ public interface Pattern<T> extends Condition {
 
     Variable<T> getPatternVariable();
 
-    Variable[] getBoundVariables();
-
     Variable[] getInputVariables();
 
     Constraint getConstraint();

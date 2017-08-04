@@ -17,10 +17,12 @@
 package org.drools.model.patterns;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.drools.model.Condition;
 import org.drools.model.OOPath;
 import org.drools.model.Source;
+import org.drools.model.Variable;
 import org.drools.model.view.OOPathViewItem.OOPathChunk;
 
 public class OOPathImpl implements OOPath {
@@ -39,18 +41,30 @@ public class OOPathImpl implements OOPath {
         return Type.OOPATH;
     }
 
+    @Override
+    public Variable<?>[] getBoundVariables() {
+        return chunks.stream()
+                     .map(OOPathChunk::getExpr)
+                     .flatMap( expr -> Stream.of( expr.getVariables() ) )
+                     .distinct()
+                     .toArray(Variable[]::new );
+    }
+
     public void setFirstCondition( Condition condition ) {
         this.firstCondition = condition;
     }
 
+    @Override
     public Condition getFirstCondition() {
         return firstCondition;
     }
 
+    @Override
     public Source<?> getSource() {
         return source;
     }
 
+    @Override
     public List<OOPathChunk<?>> getChunks() {
         return chunks;
     }

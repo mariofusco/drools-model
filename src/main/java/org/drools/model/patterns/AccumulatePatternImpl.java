@@ -43,7 +43,7 @@ public class AccumulatePatternImpl<T> extends AbstractSinglePattern implements A
     }
 
     @Override
-    public Variable[] getBoundVariables() {
+    public Variable<?>[] getBoundVariables() {
         return boundVariables;
     }
 

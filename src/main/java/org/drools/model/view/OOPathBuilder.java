@@ -22,6 +22,7 @@ import org.drools.model.Source;
 import org.drools.model.Variable;
 import org.drools.model.functions.Function1;
 import org.drools.model.functions.Predicate1;
+import org.drools.model.functions.Predicate2;
 import org.drools.model.view.OOPathViewItem.OOPathChunk;
 
 public class OOPathBuilder<T> {
@@ -58,6 +59,10 @@ public class OOPathBuilder<T> {
 
         public OOPathChunkBuilder<S, T> filter( Variable<T> var, Predicate1<T> predicate ) {
             return filter( new Expr1ViewItemImpl<T>( var, predicate ) );
+        }
+
+        public <U> OOPathChunkBuilder<S, T> filter(Variable<T> var1, Variable<U> var2, Predicate2<T, U> predicate ) {
+            return filter( new Expr2ViewItemImpl<T, U>( var1, var2, predicate ) );
         }
 
         public OOPathChunkBuilder<S, T> filter( ExprViewItem<T> expr ) {

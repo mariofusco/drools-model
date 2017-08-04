@@ -17,6 +17,11 @@ public class InputViewItem<T> implements ViewItem {
         return var;
     }
 
+    @Override
+    public Variable<?>[] getVariables() {
+        return new Variable[] { var };
+    }
+
     public DataSourceDefinition getDataSourceDefinition() {
         return dataSourceDefinition;
     }

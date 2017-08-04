@@ -1,5 +1,7 @@
 package org.drools.model.view;
 
+import java.util.stream.Stream;
+
 import org.drools.model.Condition;
 import org.drools.model.Variable;
 
@@ -16,6 +18,14 @@ public class CombinedExprViewItem<T> extends AbstractExprViewItem<T> {
 
     public ExprViewItem[] getExpressions() {
         return expressions;
+    }
+
+    @Override
+    public Variable<?>[] getVariables() {
+        return Stream.of(expressions)
+                     .flatMap( expr -> Stream.of(expr.getVariables()) )
+                     .distinct()
+                     .toArray(Variable[]::new);
     }
 
     @Override

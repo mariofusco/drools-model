@@ -23,7 +23,7 @@ public abstract class InvokerPatternImpl<T> extends AbstractSinglePattern implem
     }
 
     @Override
-    public Variable[] getBoundVariables() {
+    public Variable<?>[] getBoundVariables() {
         return new Variable[] { variable };
     }
 

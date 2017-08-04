@@ -39,6 +39,11 @@ public class Expr2ViewItemImpl<T, U> extends AbstractExprViewItem<T> implements 
     }
 
     @Override
+    public Variable<?>[] getVariables() {
+        return new Variable[] { getFirstVariable(), getSecondVariable() };
+    }
+
+    @Override
     public Condition.Type getType() {
         return Type.PATTERN;
     }

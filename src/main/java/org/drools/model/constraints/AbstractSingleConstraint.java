@@ -6,6 +6,9 @@ import java.util.List;
 import org.drools.model.Constraint;
 import org.drools.model.Index;
 import org.drools.model.SingleConstraint;
+import org.drools.model.view.Expr1ViewItemImpl;
+import org.drools.model.view.Expr2ViewItemImpl;
+import org.drools.model.view.ExprViewItem;
 
 public abstract class AbstractSingleConstraint extends AbstractConstraint implements SingleConstraint {
 
@@ -50,5 +53,15 @@ public abstract class AbstractSingleConstraint extends AbstractConstraint implem
     @Override
     public String getExprId() {
         return exprId;
+    }
+
+    public static AbstractSingleConstraint fromExpr( ExprViewItem expr ) {
+        if (expr instanceof Expr1ViewItemImpl) {
+            return new SingleConstraint1( (Expr1ViewItemImpl) expr );
+        }
+        if (expr instanceof Expr2ViewItemImpl) {
+            return new SingleConstraint2( (Expr2ViewItemImpl) expr );
+        }
+        throw new UnsupportedOperationException( "Unknown expr: " + expr );
     }
 }

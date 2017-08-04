@@ -11,6 +11,8 @@ public interface Condition {
 
     Type getType();
 
+    Variable<?>[] getBoundVariables();
+
     enum Type {
         PATTERN( false ), ACCUMULATE( false ), OOPATH( false ), OR( true ), AND( true ), NOT( true ), EXISTS( true );
 

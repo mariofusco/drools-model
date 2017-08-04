@@ -37,6 +37,11 @@ public class OOPathViewItem<S, T> implements ViewItem<T> {
         return (Variable<T>) chunks.getLast().getExpr().getFirstVariable();
     }
 
+    @Override
+    public Variable<?>[] getVariables() {
+        return chunks.getLast().getExpr().getVariables();
+    }
+
     public List<OOPathChunk<?>> getChunks() {
         return chunks;
     }

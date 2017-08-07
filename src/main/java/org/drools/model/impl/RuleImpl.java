@@ -47,7 +47,7 @@ public class RuleImpl implements Rule {
     }
 
     @Override
-    public String getPackge() {
+    public String getPackage() {
         return pkg;
     }
 

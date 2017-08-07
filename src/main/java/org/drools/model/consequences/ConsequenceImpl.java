@@ -1,11 +1,14 @@
 package org.drools.model.consequences;
 
+import java.util.stream.Stream;
+
 import org.drools.model.Consequence;
 import org.drools.model.Variable;
 import org.drools.model.functions.BlockN;
 import org.drools.model.functions.FunctionN;
 
 public class ConsequenceImpl implements Consequence {
+    private final Variable[] variables;
     private final Variable[] declarations;
     private final BlockN block;
 
@@ -15,13 +18,19 @@ public class ConsequenceImpl implements Consequence {
 
     private final boolean usingDrools;
 
-    ConsequenceImpl(BlockN block, Variable[] declarations, FunctionN[] inserts, Update[] updates, Variable[] deletes, boolean usingDrools) {
-        this.declarations = declarations;
+    ConsequenceImpl(BlockN block, Variable[] variables, FunctionN[] inserts, Update[] updates, Variable[] deletes, boolean usingDrools) {
+        this.variables = variables;
+        this.declarations = Stream.of(variables).filter( Variable::isFact ).toArray(Variable[]::new);
         this.block = block;
         this.inserts = inserts == null ? new FunctionN[0] : inserts;
         this.updates = updates == null ? new Update[0] : updates;
         this.deletes = deletes == null ? new Variable[0] : deletes;
         this.usingDrools = usingDrools;
+    }
+
+    @Override
+    public Variable[] getVariables() {
+        return variables;
     }
 
     @Override

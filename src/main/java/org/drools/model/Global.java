@@ -16,11 +16,12 @@
 
 package org.drools.model;
 
-import java.util.List;
+public interface Global<T> extends Variable<T> {
 
-public interface Model {
+    String getPackage();
 
-    List<Global> getGlobals();
-
-    List<Rule> getRules();
+    @Override
+    default boolean isFact() {
+        return false;
+    }
 }

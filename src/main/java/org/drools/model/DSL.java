@@ -13,6 +13,7 @@ import org.drools.model.functions.Function2;
 import org.drools.model.functions.Predicate1;
 import org.drools.model.functions.Predicate2;
 import org.drools.model.impl.DataSourceDefinitionImpl;
+import org.drools.model.impl.GlobalImpl;
 import org.drools.model.impl.JavaClassType;
 import org.drools.model.impl.RuleBuilder;
 import org.drools.model.impl.SourceImpl;
@@ -58,6 +59,14 @@ public class DSL {
 
     public static <T> Variable<T> variableOf( Type<T> type ) {
         return new VariableImpl<T>(type);
+    }
+
+    public static <T> Global<T> globalOf( Type<T> type, String pkg ) {
+        return new GlobalImpl<T>( type, pkg );
+    }
+
+    public static <T> Global<T> globalOf( Type<T> type, String pkg, String name ) {
+        return new GlobalImpl<T>( type, pkg, name );
     }
 
     public static <T> Source<T> sourceOf( String name, Type<T> type ) {

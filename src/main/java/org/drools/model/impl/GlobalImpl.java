@@ -14,13 +14,26 @@
  * limitations under the License.
  */
 
-package org.drools.model;
+package org.drools.model.impl;
 
-import java.util.List;
+import org.drools.model.Type;
+import org.drools.model.Global;
 
-public interface Model {
+public class GlobalImpl<T> extends VariableImpl<T> implements Global<T> {
+    private final String pkg;
 
-    List<Global> getGlobals();
+    public GlobalImpl(Type<T> type, String pkg) {
+        super(type);
+        this.pkg = pkg;
+    }
 
-    List<Rule> getRules();
+    public GlobalImpl(Type<T> type, String pkg, String name) {
+        super(type, name);
+        this.pkg = pkg;
+    }
+
+    @Override
+    public String getPackage() {
+        return pkg;
+    }
 }

@@ -60,9 +60,9 @@ public class ViewBuilder {
                 continue;
             }
 
-            Variable<?> var = viewItem.getFirstVariable();
+            Variable<?> patterVariable = viewItem.getFirstVariable();
             if ( viewItem instanceof InputViewItem ) {
-                inputs.put( var, (InputViewItem) viewItem );
+                inputs.put( patterVariable, (InputViewItem) viewItem );
                 continue;
             }
 
@@ -71,43 +71,43 @@ public class ViewBuilder {
                 Pattern pattern = setViewItem.isMultivalue() ?
                                   new InvokerMultiValuePatternImpl( DataSourceDefinitionImpl.DEFAULT,
                                                                     setViewItem.getInvokedFunction(),
-                                                                    var,
+                                                                    patterVariable,
                                                                     setViewItem.getInputVariables() ) :
                                   new InvokerSingleValuePatternImpl( DataSourceDefinitionImpl.DEFAULT,
                                                                      setViewItem.getInvokedFunction(),
-                                                                     var,
+                                                                     patterVariable,
                                                                      setViewItem.getInputVariables() );
-                conditionMap.put( var, pattern );
+                conditionMap.put( patterVariable, pattern );
                 conditions.add( pattern );
                 continue;
             }
 
-            usedVars.add(var);
+            usedVars.add(patterVariable);
             Condition condition;
             if ( type == Type.AND ) {
-                condition = conditionMap.get( var );
+                condition = conditionMap.get( patterVariable );
                 if ( condition == null ) {
-                    condition = new PatternImpl( var, Constraint.EMPTY, getDataSourceDefinition( inputs, var ) );
+                    condition = new PatternImpl( patterVariable, Constraint.EMPTY, getDataSourceDefinition( inputs, patterVariable ) );
                     conditions.add( condition );
-                    conditionMap.put( var, condition );
+                    conditionMap.put( patterVariable, condition );
                 }
             } else {
-                condition = new PatternImpl( var, Constraint.EMPTY, getDataSourceDefinition( inputs, var ) );
+                condition = new PatternImpl( patterVariable, Constraint.EMPTY, getDataSourceDefinition( inputs, patterVariable ) );
                 conditions.add( condition );
             }
 
             if (viewItem instanceof ExprViewItem ) {
-                inputs.putIfAbsent( var, (InputViewItem) input(var) );
-                if ( viewItem instanceof Expr2ViewItemImpl ) {
-                    Variable<?> var2 = ( (Expr2ViewItemImpl) viewItem ).getSecondVariable();
-                    inputs.putIfAbsent(var2, (InputViewItem) input( var2 ));
+                for (Variable var : viewItem.getVariables()) {
+                    if (var.isFact()) {
+                        inputs.putIfAbsent( var, (InputViewItem) input( var ) );
+                    }
                 }
             }
 
             Condition modifiedPattern = viewItem2Condition( viewItem, condition );
             conditions.set( conditions.indexOf( condition ), modifiedPattern );
             if (type == Type.AND) {
-                conditionMap.put( var, modifiedPattern );
+                conditionMap.put( patterVariable, modifiedPattern );
             }
         }
 

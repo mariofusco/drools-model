@@ -5,6 +5,7 @@ import org.drools.model.functions.FunctionN;
 
 public interface Consequence {
 
+    Variable[] getVariables();
     Variable[] getDeclarations();
 
     BlockN getBlock();
@@ -19,7 +20,7 @@ public interface Consequence {
 
     boolean isUsingDrools();
 
-    public interface Update<T> {
+    interface Update<T> {
         Variable<T> getUpdatedVariable();
 
         String[] getUpdatedFields();

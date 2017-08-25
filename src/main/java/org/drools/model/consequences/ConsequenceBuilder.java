@@ -1,5 +1,10 @@
 package org.drools.model.consequences;
 
+import static org.drools.model.functions.FunctionUtils.toFunctionN;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.drools.model.Consequence;
 import org.drools.model.Drools;
 import org.drools.model.Variable;
@@ -12,11 +17,6 @@ import org.drools.model.functions.Function0;
 import org.drools.model.functions.Function1;
 import org.drools.model.functions.Function2;
 import org.drools.model.functions.FunctionN;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.drools.model.functions.FunctionUtils.toFunctionN;
 
 public class ConsequenceBuilder {
 
@@ -36,7 +36,7 @@ public class ConsequenceBuilder {
         return new _2(decl1, decl2);
     }
 
-    public _N on(Variable[] declarations) {
+    public _N on(Variable... declarations) {
         return new _N(declarations);
     }
 

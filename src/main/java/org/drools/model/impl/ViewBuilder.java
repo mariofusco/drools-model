@@ -1,5 +1,9 @@
 package org.drools.model.impl;
 
+import static java.util.stream.Collectors.toList;
+import static org.drools.model.DSL.input;
+import static org.drools.model.constraints.AbstractSingleConstraint.fromExpr;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,15 +40,14 @@ import org.drools.model.view.SetViewItem;
 import org.drools.model.view.ViewItem;
 import org.drools.model.view.ViewItemBuilder;
 
-import static java.util.stream.Collectors.toList;
-import static org.drools.model.DSL.input;
-import static org.drools.model.constraints.AbstractSingleConstraint.fromExpr;
-
 public class ViewBuilder {
 
     private ViewBuilder() { }
 
     public static View viewItems2Patterns( ViewItemBuilder[] viewItemBuilders ) {
+        if (viewItemBuilders.length == 1 && viewItemBuilders[0] instanceof ExprViewItem && ((ExprViewItem) viewItemBuilders[0]).getType() == Type.AND) {
+            return (View) viewItems2Condition( Arrays.asList(((CombinedExprViewItem) viewItemBuilders[0]).getExpressions()), new HashMap<>(), new HashSet<>(), Type.AND, true );
+        }
         List<ViewItem> viewItems = Stream.of( viewItemBuilders ).map( ViewItemBuilder::get ).collect( toList() );
         return (View) viewItems2Condition( viewItems, new HashMap<>(), new HashSet<>(), Type.AND, true );
     }

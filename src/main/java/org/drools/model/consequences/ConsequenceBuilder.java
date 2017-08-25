@@ -1,7 +1,5 @@
 package org.drools.model.consequences;
 
-import static org.drools.model.functions.FunctionUtils.toFunctionN;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +15,8 @@ import org.drools.model.functions.Function0;
 import org.drools.model.functions.Function1;
 import org.drools.model.functions.Function2;
 import org.drools.model.functions.FunctionN;
+
+import static org.drools.model.functions.FunctionUtils.toFunctionN;
 
 public class ConsequenceBuilder {
 
@@ -34,10 +34,6 @@ public class ConsequenceBuilder {
 
     public <A, B> _2<A, B> on(Variable<A> decl1, Variable<B> decl2) {
         return new _2(decl1, decl2);
-    }
-
-    public _N on(Variable... declarations) {
-        return new _N(declarations);
     }
 
     public interface ValidBuilder {
@@ -169,22 +165,6 @@ public class ConsequenceBuilder {
 
         public <R> _2 insert(final Function2<A, B, R> f) {
             addInsert(toFunctionN(f));
-            return this;
-        }
-    }
-
-    public static class _N extends AbstractValidBuilder {
-        public _N(Variable[] declarations) {
-            super(declarations);
-        }
-
-        public _N execute(BlockN block) {
-            this.block = block;
-            return this;
-        }
-
-        public _N setUsingDrools(boolean usingDrools) {
-            this.usingDrools = usingDrools;
             return this;
         }
     }

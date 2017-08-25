@@ -217,6 +217,10 @@ public class DSL {
         return new ConsequenceBuilder._2(decl1, decl2);
     }
 
+    public static <A, B, C> ConsequenceBuilder._3<A, B, C> on(Variable<A> decl1, Variable<B> decl2, Variable<C> decl3) {
+        return new ConsequenceBuilder._3(decl1, decl2, decl3);
+    }
+
     public static RuleBuilder rule(String name) {
         return new RuleBuilder(name);
     }

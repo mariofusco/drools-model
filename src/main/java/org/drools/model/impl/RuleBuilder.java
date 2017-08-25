@@ -3,16 +3,11 @@ package org.drools.model.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.drools.model.Condition;
-import org.drools.model.Condition.Type;
 import org.drools.model.Consequence;
-import org.drools.model.DataSourceDefinition;
 import org.drools.model.Rule;
-import org.drools.model.View;
 import org.drools.model.consequences.ConsequenceBuilder;
 import org.drools.model.functions.Function1;
 import org.drools.model.patterns.CompositePatterns;
-import org.drools.model.patterns.PatternBuilder;
 import org.drools.model.view.ViewItemBuilder;
 
 import static org.drools.model.impl.ViewBuilder.viewItems2Patterns;
@@ -57,48 +52,25 @@ public class RuleBuilder {
         return this;
     }
 
-    public RuleBuilderWithLHS when(DataSourceDefinition dataSourceDefinition, Function1<PatternBuilder, PatternBuilder.ValidBuilder>... builders) {
-        Condition[] patterns = new Condition[builders.length];
-        for (int i = 0; i < builders.length; i++) {
-            patterns[i] = builders[i].apply(new PatternBuilder().from(dataSourceDefinition)).get();
-        }
-        return when(patterns);
-    }
-
-    public RuleBuilderWithLHS when(Function1<PatternBuilder, PatternBuilder.ValidBuilder>... builders) {
-        Condition[] patterns = new Condition[builders.length];
-        for (int i = 0; i < builders.length; i++) {
-            patterns[i] = builders[i].apply(new PatternBuilder()).get();
-        }
-        return when(patterns);
-    }
-
-    public RuleBuilderWithLHS when(View view) {
-        return new RuleBuilderWithLHS(view);
-    }
-
-    public RuleBuilderWithLHS when(Condition... patterns) {
-        return when(new CompositePatterns( Type.AND, patterns ) );
-    }
-
     public RuleBuilderWithLHS view( ViewItemBuilder... viewItemBuilders ) {
-        return when(viewItems2Patterns( viewItemBuilders ));
+        return new RuleBuilderWithLHS(viewItems2Patterns( viewItemBuilders ));
     }
 
     public class RuleBuilderWithLHS {
-        private final View view;
+        private final CompositePatterns view;
 
-        public RuleBuilderWithLHS(View view) {
+        public RuleBuilderWithLHS(CompositePatterns view) {
             this.view = view;
         }
 
         public Rule then(Function1<ConsequenceBuilder, ConsequenceBuilder.ValidBuilder> builder) {
-            Consequence consequence = builder.apply(new ConsequenceBuilder()).get();
-            return new RuleImpl(pkg, name, unit, view, consequence, attributes);
+            return then( builder.apply(new ConsequenceBuilder()) );
         }
 
         public Rule then(ConsequenceBuilder.ValidBuilder builder) {
-            return new RuleImpl(pkg, name, unit, view, builder.get(), attributes);
+            Consequence consequence = builder.get();
+            view.ensureVariablesDeclarationInView( consequence.getDeclarations() );
+            return new RuleImpl(pkg, name, unit, view, consequence, attributes);
         }
     }
 }

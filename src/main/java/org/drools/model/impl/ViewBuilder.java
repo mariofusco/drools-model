@@ -1,9 +1,5 @@
 package org.drools.model.impl;
 
-import static java.util.stream.Collectors.toList;
-import static org.drools.model.DSL.input;
-import static org.drools.model.constraints.AbstractSingleConstraint.fromExpr;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,13 +9,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.drools.model.AccumulateFunction;
 import org.drools.model.Condition;
 import org.drools.model.Condition.Type;
 import org.drools.model.Constraint;
 import org.drools.model.DataSourceDefinition;
 import org.drools.model.Pattern;
 import org.drools.model.Variable;
-import org.drools.model.View;
 import org.drools.model.constraints.SingleConstraint1;
 import org.drools.model.constraints.SingleConstraint2;
 import org.drools.model.patterns.AccumulatePatternImpl;
@@ -40,19 +36,23 @@ import org.drools.model.view.SetViewItem;
 import org.drools.model.view.ViewItem;
 import org.drools.model.view.ViewItemBuilder;
 
+import static java.util.stream.Collectors.toList;
+import static org.drools.model.DSL.input;
+import static org.drools.model.constraints.AbstractSingleConstraint.fromExpr;
+
 public class ViewBuilder {
 
     private ViewBuilder() { }
 
-    public static View viewItems2Patterns( ViewItemBuilder[] viewItemBuilders ) {
+    public static CompositePatterns viewItems2Patterns( ViewItemBuilder[] viewItemBuilders ) {
         if (viewItemBuilders.length == 1 && viewItemBuilders[0] instanceof ExprViewItem && ((ExprViewItem) viewItemBuilders[0]).getType() == Type.AND) {
-            return (View) viewItems2Condition( Arrays.asList(((CombinedExprViewItem) viewItemBuilders[0]).getExpressions()), new HashMap<>(), new HashSet<>(), Type.AND, true );
+            return viewItems2Condition( Arrays.asList(((CombinedExprViewItem) viewItemBuilders[0]).getExpressions()), new HashMap<>(), new HashSet<>(), Type.AND, true );
         }
         List<ViewItem> viewItems = Stream.of( viewItemBuilders ).map( ViewItemBuilder::get ).collect( toList() );
-        return (View) viewItems2Condition( viewItems, new HashMap<>(), new HashSet<>(), Type.AND, true );
+        return viewItems2Condition( viewItems, new HashMap<>(), new HashSet<>(), Type.AND, true );
     }
 
-    public static Condition viewItems2Condition(List<ViewItem> viewItems, Map<Variable<?>, InputViewItem<?>> inputs,
+    public static CompositePatterns viewItems2Condition(List<ViewItem> viewItems, Map<Variable<?>, InputViewItem<?>> inputs,
                                                 Set<Variable<?>> usedVars, Condition.Type type, boolean topLevel) {
         List<Condition> conditions = new ArrayList<>();
         Map<Variable<?>, Condition> conditionMap = new HashMap<>();
@@ -107,14 +107,14 @@ public class ViewBuilder {
                 }
             }
 
-            Condition modifiedPattern = viewItem2Condition( viewItem, condition );
+            Condition modifiedPattern = viewItem2Condition( viewItem, condition, usedVars );
             conditions.set( conditions.indexOf( condition ), modifiedPattern );
             if (type == Type.AND) {
                 conditionMap.put( patterVariable, modifiedPattern );
             }
         }
 
-        Condition condition = new CompositePatterns( type, conditions );
+        CompositePatterns condition = new CompositePatterns( type, conditions, usedVars );
         if ( type == Type.AND ) {
             if ( topLevel && inputs.size() > usedVars.size() ) {
                 inputs.keySet().removeAll( usedVars );
@@ -131,7 +131,7 @@ public class ViewBuilder {
         return input != null ? input.getDataSourceDefinition() : DataSourceDefinitionImpl.DEFAULT;
     }
 
-    private static Condition viewItem2Condition( ViewItem viewItem, Condition condition ) {
+    private static Condition viewItem2Condition( ViewItem viewItem, Condition condition, Set<Variable<?>> usedVars ) {
         if (viewItem instanceof Expr1ViewItemImpl ) {
             Expr1ViewItemImpl expr = (Expr1ViewItemImpl)viewItem;
             ( (PatternImpl) condition ).addConstraint( new SingleConstraint1( expr ) );
@@ -146,7 +146,10 @@ public class ViewBuilder {
 
         if (viewItem instanceof AccumulateExprViewItem) {
             AccumulateExprViewItem acc = (AccumulateExprViewItem)viewItem;
-            return new AccumulatePatternImpl( (Pattern) viewItem2Condition( acc.getExpr(), condition ), acc.getFunctions() );
+            for ( AccumulateFunction accFunc : acc.getFunctions()) {
+                usedVars.add(accFunc.getVariable());
+            }
+            return new AccumulatePatternImpl( (Pattern) viewItem2Condition( acc.getExpr(), condition, usedVars ), acc.getFunctions() );
         }
 
         if (viewItem instanceof OOPathViewItem) {
@@ -155,6 +158,9 @@ public class ViewBuilder {
                 throw new UnsupportedOperationException();
             }
             OOPathChunk chunk = oopath.getChunks().get( 0 );
+            for (Variable var : chunk.getExpr().getVariables()) {
+                usedVars.add(var);
+            }
             ( (PatternImpl) condition ).addConstraint( fromExpr( chunk.getExpr() ) );
             OOPathImpl oopathPattern = new OOPathImpl( oopath.getSource(), oopath.getChunks() );
             oopathPattern.setFirstCondition( condition );

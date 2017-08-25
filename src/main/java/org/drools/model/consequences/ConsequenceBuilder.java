@@ -10,6 +10,7 @@ import org.drools.model.functions.Block0;
 import org.drools.model.functions.Block1;
 import org.drools.model.functions.Block2;
 import org.drools.model.functions.Block3;
+import org.drools.model.functions.Block4;
 import org.drools.model.functions.BlockN;
 import org.drools.model.functions.Function0;
 import org.drools.model.functions.Function1;
@@ -164,6 +165,38 @@ public class ConsequenceBuilder {
         }
 
         public <R> _2 insert(final Function2<A, B, R> f) {
+            addInsert(toFunctionN(f));
+            return this;
+        }
+    }
+
+    public static class _3<A, B, C> extends AbstractValidBuilder {
+        public _3(Variable<A> decl1, Variable<B> decl2, Variable<C> decl3) {
+            super(decl1, decl2, decl3);
+        }
+
+        public _3<A, B, C> execute(final Block3<A, B, C> block) {
+            this.block = new BlockN() {
+                @Override
+                public void execute(Object... objs) {
+                    block.execute((A)objs[0], (B)objs[1], (C)objs[2]);
+                }
+            };
+            return this;
+        }
+
+        public _3<A, B, C> execute(final Block4<Drools, A, B, C> block ) {
+            this.usingDrools = true;
+            this.block = new BlockN() {
+                @Override
+                public void execute(Object... objs) {
+                    block.execute((Drools)objs[0], (A)objs[1], (B)objs[2], (C)objs[2]);
+                }
+            };
+            return this;
+        }
+
+        public <R> _3 insert(final Function2<A, B, R> f) {
             addInsert(toFunctionN(f));
             return this;
         }

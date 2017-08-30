@@ -12,6 +12,10 @@ import org.drools.model.functions.Function1;
 import org.drools.model.functions.Function2;
 import org.drools.model.functions.Predicate1;
 import org.drools.model.functions.Predicate2;
+import org.drools.model.functions.temporal.AfterPredicate;
+import org.drools.model.functions.temporal.BeforePredicate;
+import org.drools.model.functions.temporal.Interval;
+import org.drools.model.functions.temporal.TemporalPredicate;
 import org.drools.model.impl.DataSourceDefinitionImpl;
 import org.drools.model.impl.GlobalImpl;
 import org.drools.model.impl.JavaClassType;
@@ -29,6 +33,7 @@ import org.drools.model.view.InputViewItem;
 import org.drools.model.view.OOPathBuilder;
 import org.drools.model.view.OOPathBuilder.OOPathChunkBuilder;
 import org.drools.model.view.SetViewItem;
+import org.drools.model.view.TemporalExprViewItem;
 import org.drools.model.view.ViewItem;
 import org.drools.model.view.ViewItemBuilder;
 
@@ -197,6 +202,28 @@ public class DSL {
         public <A, B> SetViewItem<T> in(Variable<A> var1, Variable<B> var2, Function2<A, B, Iterable<? extends T>> f) {
             return new SetViewItem<T>(toFunctionN(f), true, var, var1, var2);
         }
+    }
+
+    // -- Temporal Constraints --
+
+    public static <T> TemporalExprViewItem<T> expr( String exprId, Variable<T> var1, Variable<?> var2, TemporalPredicate temporalPredicate ) {
+        return new TemporalExprViewItem<T>( exprId, var1, var2, temporalPredicate);
+    }
+
+    public static TemporalPredicate after() {
+        return new AfterPredicate();
+    }
+
+    public static TemporalPredicate after(long lowerBound, long upperBound) {
+        return new AfterPredicate( new Interval( lowerBound, upperBound ) );
+    }
+
+    public static TemporalPredicate before() {
+        return new BeforePredicate();
+    }
+
+    public static TemporalPredicate before(long lowerBound, long upperBound) {
+        return new BeforePredicate( new Interval( lowerBound, upperBound ) );
     }
 
     // -- RHS --

@@ -18,6 +18,7 @@ import org.drools.model.Pattern;
 import org.drools.model.Variable;
 import org.drools.model.constraints.SingleConstraint1;
 import org.drools.model.constraints.SingleConstraint2;
+import org.drools.model.constraints.TemporalConstraint;
 import org.drools.model.patterns.AccumulatePatternImpl;
 import org.drools.model.patterns.CompositePatterns;
 import org.drools.model.patterns.InvokerMultiValuePatternImpl;
@@ -33,6 +34,7 @@ import org.drools.model.view.InputViewItem;
 import org.drools.model.view.OOPathViewItem;
 import org.drools.model.view.OOPathViewItem.OOPathChunk;
 import org.drools.model.view.SetViewItem;
+import org.drools.model.view.TemporalExprViewItem;
 import org.drools.model.view.ViewItem;
 import org.drools.model.view.ViewItemBuilder;
 
@@ -132,19 +134,25 @@ public class ViewBuilder {
     }
 
     private static Condition viewItem2Condition( ViewItem viewItem, Condition condition, Set<Variable<?>> usedVars ) {
-        if (viewItem instanceof Expr1ViewItemImpl ) {
+        if ( viewItem instanceof Expr1ViewItemImpl ) {
             Expr1ViewItemImpl expr = (Expr1ViewItemImpl)viewItem;
             ( (PatternImpl) condition ).addConstraint( new SingleConstraint1( expr ) );
             return condition;
         }
 
-        if (viewItem instanceof Expr2ViewItemImpl ) {
+        if ( viewItem instanceof Expr2ViewItemImpl ) {
             Expr2ViewItemImpl expr = (Expr2ViewItemImpl)viewItem;
             ( (PatternImpl) condition ).addConstraint( new SingleConstraint2( expr ) );
             return condition;
         }
 
-        if (viewItem instanceof AccumulateExprViewItem) {
+        if (viewItem instanceof TemporalExprViewItem) {
+            TemporalExprViewItem expr = (TemporalExprViewItem)viewItem;
+            ( (PatternImpl) condition ).addConstraint( new TemporalConstraint( expr ) );
+            return condition;
+        }
+
+        if ( viewItem instanceof AccumulateExprViewItem) {
             AccumulateExprViewItem acc = (AccumulateExprViewItem)viewItem;
             for ( AccumulateFunction accFunc : acc.getFunctions()) {
                 usedVars.add(accFunc.getVariable());
@@ -152,7 +160,7 @@ public class ViewBuilder {
             return new AccumulatePatternImpl( (Pattern) viewItem2Condition( acc.getExpr(), condition, usedVars ), acc.getFunctions() );
         }
 
-        if (viewItem instanceof OOPathViewItem) {
+        if ( viewItem instanceof OOPathViewItem) {
             OOPathViewItem<?,?> oopath = ( (OOPathViewItem) viewItem );
             if (oopath.getChunks().size() > 1) {
                 throw new UnsupportedOperationException();

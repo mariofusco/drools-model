@@ -18,7 +18,7 @@ public class AccumulateExprViewItem<T> extends AbstractExprViewItem<T> {
 
     @Override
     public Condition.Type getType() {
-        return Type.PATTERN;
+        return Type.ACCUMULATE;
     }
 
     @Override

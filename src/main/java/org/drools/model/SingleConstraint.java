@@ -12,4 +12,8 @@ public interface SingleConstraint extends Constraint {
     String getExprId();
 
     String[] getReactiveProps();
+
+    default boolean isTemporal() {
+        return false;
+    }
 }

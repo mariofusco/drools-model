@@ -21,12 +21,14 @@ import org.drools.model.constraints.SingleConstraint2;
 import org.drools.model.constraints.TemporalConstraint;
 import org.drools.model.patterns.AccumulatePatternImpl;
 import org.drools.model.patterns.CompositePatterns;
+import org.drools.model.patterns.ExistentialPatternImpl;
 import org.drools.model.patterns.InvokerMultiValuePatternImpl;
 import org.drools.model.patterns.InvokerSingleValuePatternImpl;
 import org.drools.model.patterns.OOPathImpl;
 import org.drools.model.patterns.PatternImpl;
 import org.drools.model.view.AccumulateExprViewItem;
 import org.drools.model.view.CombinedExprViewItem;
+import org.drools.model.view.ExistentialExprViewItem;
 import org.drools.model.view.Expr1ViewItemImpl;
 import org.drools.model.view.Expr2ViewItemImpl;
 import org.drools.model.view.ExprViewItem;
@@ -87,7 +89,7 @@ public class ViewBuilder {
                 continue;
             }
 
-            usedVars.add(patterVariable);
+            usedVars.add( patterVariable );
             Condition condition;
             if ( type == Type.AND ) {
                 condition = conditionMap.get( patterVariable );
@@ -109,7 +111,7 @@ public class ViewBuilder {
                 }
             }
 
-            Condition modifiedPattern = viewItem2Condition( viewItem, condition, usedVars );
+            Condition modifiedPattern = viewItem2Condition( viewItem, condition, usedVars, inputs );
             conditions.set( conditions.indexOf( condition ), modifiedPattern );
             if (type == Type.AND) {
                 conditionMap.put( patterVariable, modifiedPattern );
@@ -122,6 +124,7 @@ public class ViewBuilder {
                 inputs.keySet().removeAll( usedVars );
                 for ( Map.Entry<Variable<?>, InputViewItem<?>> entry : inputs.entrySet() ) {
                     conditions.add( 0, new PatternImpl( entry.getKey(), Constraint.EMPTY, entry.getValue().getDataSourceDefinition() ) );
+                    usedVars.add( entry.getKey() );
                 }
             }
         }
@@ -133,7 +136,7 @@ public class ViewBuilder {
         return input != null ? input.getDataSourceDefinition() : DataSourceDefinitionImpl.DEFAULT;
     }
 
-    private static Condition viewItem2Condition( ViewItem viewItem, Condition condition, Set<Variable<?>> usedVars ) {
+    private static Condition viewItem2Condition( ViewItem viewItem, Condition condition, Set<Variable<?>> usedVars, Map<Variable<?>, InputViewItem<?>> inputs ) {
         if ( viewItem instanceof Expr1ViewItemImpl ) {
             Expr1ViewItemImpl expr = (Expr1ViewItemImpl)viewItem;
             ( (PatternImpl) condition ).addConstraint( new SingleConstraint1( expr ) );
@@ -157,7 +160,7 @@ public class ViewBuilder {
             for ( AccumulateFunction accFunc : acc.getFunctions()) {
                 usedVars.add(accFunc.getVariable());
             }
-            return new AccumulatePatternImpl( (Pattern) viewItem2Condition( acc.getExpr(), condition, usedVars ), acc.getFunctions() );
+            return new AccumulatePatternImpl( (Pattern) viewItem2Condition( acc.getExpr(), condition, usedVars, inputs ), acc.getFunctions() );
         }
 
         if ( viewItem instanceof OOPathViewItem) {
@@ -173,6 +176,17 @@ public class ViewBuilder {
             OOPathImpl oopathPattern = new OOPathImpl( oopath.getSource(), oopath.getChunks() );
             oopathPattern.setFirstCondition( condition );
             return oopathPattern;
+        }
+
+        if ( viewItem instanceof ExistentialExprViewItem) {
+            ExistentialExprViewItem existential = ( (ExistentialExprViewItem) viewItem );
+            return new ExistentialPatternImpl( viewItem2Condition( existential.getExpression(), condition, usedVars, inputs ), existential.getType() );
+        }
+
+        if ( viewItem instanceof CombinedExprViewItem ) {
+            CombinedExprViewItem combined = (CombinedExprViewItem) viewItem;
+            CompositePatterns patterns = viewItems2Condition( Arrays.asList( combined.getExpressions() ), inputs, usedVars, combined.getType(), false );
+            return patterns.getSubConditions().size() == 1 ? patterns.getSubConditions().get(0) : patterns;
         }
 
         throw new UnsupportedOperationException( "Unknown ViewItem: " + viewItem );

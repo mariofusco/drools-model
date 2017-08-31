@@ -10,7 +10,7 @@ public class CombinedExprViewItem<T> extends AbstractExprViewItem<T> {
     private final Condition.Type type;
     private final ExprViewItem[] expressions;
 
-    public CombinedExprViewItem(Condition.Type type, ExprViewItem... expressions) {
+    public CombinedExprViewItem(Condition.Type type, ExprViewItem[] expressions) {
         super(getCombinedVariable(expressions));
         this.type = type;
         this.expressions = expressions;

@@ -24,6 +24,7 @@ import org.drools.model.impl.SourceImpl;
 import org.drools.model.impl.VariableImpl;
 import org.drools.model.view.AccumulateExprViewItem;
 import org.drools.model.view.CombinedExprViewItem;
+import org.drools.model.view.ExistentialExprViewItem;
 import org.drools.model.view.Expr1ViewItem;
 import org.drools.model.view.Expr1ViewItemImpl;
 import org.drools.model.view.Expr2ViewItem;
@@ -124,8 +125,8 @@ public class DSL {
         return new OOPathBuilder<T>(source).firstChunk();
     }
 
-    public static ExprViewItem not(ExprViewItem... expressions) {
-        return new CombinedExprViewItem(Condition.Type.NOT, expressions);
+    public static ExprViewItem not(ExprViewItem expression, ExprViewItem... expressions) {
+        return new ExistentialExprViewItem( Condition.Type.NOT, and( expression, expressions) );
     }
 
     public static <T> ExprViewItem<T> not(Variable<T> var) {
@@ -140,8 +141,8 @@ public class DSL {
         return not(new Expr2ViewItemImpl<T, U>( var1, var2, predicate) );
     }
 
-    public static ExprViewItem exists(ExprViewItem... expressions) {
-        return new CombinedExprViewItem(Condition.Type.EXISTS, expressions);
+    public static ExprViewItem exists(ExprViewItem expression, ExprViewItem... expressions) {
+        return new ExistentialExprViewItem( Condition.Type.EXISTS, and( expression, expressions) );
     }
 
     public static <T> ExprViewItem<T> exists(Variable<T> var) {
@@ -160,12 +161,25 @@ public class DSL {
         return new AccumulateExprViewItem(expr, functions);
     }
 
-    public static ExprViewItem or(ExprViewItem... expressions) {
-        return new CombinedExprViewItem(Condition.Type.OR, expressions);
+    public static ExprViewItem or(ExprViewItem expression, ExprViewItem... expressions) {
+        if (expressions == null || expressions.length == 0) {
+            return expression;
+        }
+        return new CombinedExprViewItem(Condition.Type.OR, combineExprs( expression, expressions ) );
     }
 
-    public static ExprViewItem and(ExprViewItem... expressions) {
-        return new CombinedExprViewItem(Condition.Type.AND, expressions);
+    public static ExprViewItem and(ExprViewItem expression, ExprViewItem... expressions) {
+        if (expressions == null || expressions.length == 0) {
+            return expression;
+        }
+        return new CombinedExprViewItem(Condition.Type.AND, combineExprs( expression, expressions ) );
+    }
+
+    private static ExprViewItem[] combineExprs( ExprViewItem expression, ExprViewItem[] expressions ) {
+        ExprViewItem[] andExprs = new ExprViewItem[expressions.length+1];
+        andExprs[0] = expression;
+        System.arraycopy( expressions, 0, andExprs, 1, expressions.length );
+        return andExprs;
     }
 
     public static <T> SetViewItemBuilder<T> set(Variable<T> var) {

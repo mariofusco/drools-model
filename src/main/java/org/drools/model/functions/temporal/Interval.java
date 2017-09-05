@@ -16,6 +16,8 @@
 
 package org.drools.model.functions.temporal;
 
+import java.util.concurrent.TimeUnit;
+
 public class Interval {
     public static final long MIN = Long.MIN_VALUE;
     public static final long MAX = Long.MAX_VALUE;
@@ -24,13 +26,16 @@ public class Interval {
     private final long upperBound;
 
     public Interval() {
-        this.lowerBound = MIN;
-        this.upperBound = MAX;
+        this( MIN, MAX );
     }
 
     public Interval( long lowerBound, long upperBound ) {
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
+    }
+
+    public Interval( long lowerBound, TimeUnit lowerUnit, long upperBound, TimeUnit upperUnit ) {
+        this( unitToLong( lowerBound, lowerUnit), unitToLong( upperBound, upperUnit) );
     }
 
     public long getLowerBound() {
@@ -44,5 +49,16 @@ public class Interval {
     @Override
     public String toString() {
         return "[" + lowerBound + "," + upperBound + "]";
+    }
+
+    private static long unitToLong( long value, TimeUnit unit) {
+        switch (unit) {
+            case DAYS: value *= 24;
+            case HOURS: value *= 60;
+            case MINUTES: value *= 60;
+            case SECONDS: value *= 1000;
+            case MILLISECONDS: return value;
+        }
+        throw new IllegalArgumentException( "Time Unit " + unit + " is not supported" );
     }
 }

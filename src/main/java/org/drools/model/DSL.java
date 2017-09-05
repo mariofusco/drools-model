@@ -1,5 +1,7 @@
 package org.drools.model;
 
+import java.util.concurrent.TimeUnit;
+
 import org.drools.model.consequences.ConsequenceBuilder;
 import org.drools.model.datasources.DataStore;
 import org.drools.model.datasources.DataStream;
@@ -228,8 +230,12 @@ public class DSL {
         return new AfterPredicate();
     }
 
-    public static TemporalPredicate after(long lowerBound, long upperBound) {
+    public static TemporalPredicate after( long lowerBound, long upperBound ) {
         return new AfterPredicate( new Interval( lowerBound, upperBound ) );
+    }
+
+    public static TemporalPredicate after( long lowerBound, TimeUnit lowerUnit, long upperBound, TimeUnit upperUnit ) {
+        return new AfterPredicate( new Interval( lowerBound, lowerUnit, upperBound, upperUnit ) );
     }
 
     public static TemporalPredicate before() {
@@ -238,6 +244,10 @@ public class DSL {
 
     public static TemporalPredicate before(long lowerBound, long upperBound) {
         return new BeforePredicate( new Interval( lowerBound, upperBound ) );
+    }
+
+    public static TemporalPredicate before( long lowerBound, TimeUnit lowerUnit, long upperBound, TimeUnit upperUnit ) {
+        return new BeforePredicate( new Interval( lowerBound, lowerUnit, upperBound, upperUnit ) );
     }
 
     // -- RHS --

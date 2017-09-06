@@ -18,22 +18,18 @@ package org.drools.model.impl;
 
 import org.drools.model.Declaration;
 import org.drools.model.Type;
+import org.drools.model.Window;
 
 public class DeclarationImpl<T> extends VariableImpl<T> implements Declaration<T> {
     private String entryPoint;
+    private Window window;
 
     public DeclarationImpl(Type<T> type) {
         super(type);
     }
 
-    public DeclarationImpl(Type<T> type, String entryPoint) {
-        super(type);
-        this.entryPoint = entryPoint;
-    }
-
-    public DeclarationImpl(Type<T> type, String name, String entryPoint) {
+    public DeclarationImpl(Type<T> type, String name) {
         super(type, name);
-        this.entryPoint = entryPoint;
     }
 
     @Override
@@ -41,7 +37,18 @@ public class DeclarationImpl<T> extends VariableImpl<T> implements Declaration<T
         return entryPoint;
     }
 
-    public void setEntryPoint( String entryPoint ) {
+    public DeclarationImpl<T> setEntryPoint( String entryPoint ) {
         this.entryPoint = entryPoint;
+        return this;
+    }
+
+    @Override
+    public Window getWindow() {
+        return window;
+    }
+
+    public DeclarationImpl<T> setWindow( Window window ) {
+        this.window = window;
+        return this;
     }
 }

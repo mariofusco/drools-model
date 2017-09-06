@@ -16,9 +16,11 @@
 
 package org.drools.model;
 
-public interface Declaration<T> extends Variable<T> {
+public interface Window {
 
-    String getEntryPoint();
+    enum Type { LENGTH, TIME }
 
-    Window getWindow();
+    Type getType();
+
+    long getValue();
 }

@@ -24,6 +24,7 @@ import org.drools.model.impl.GlobalImpl;
 import org.drools.model.impl.JavaClassType;
 import org.drools.model.impl.RuleBuilder;
 import org.drools.model.impl.SourceImpl;
+import org.drools.model.impl.WindowImpl;
 import org.drools.model.view.AccumulateExprViewItem;
 import org.drools.model.view.CombinedExprViewItem;
 import org.drools.model.view.ExistentialExprViewItem;
@@ -70,7 +71,15 @@ public class DSL {
     }
 
     public static <T> Declaration<T> declarationOf( Type<T> type, String entryPoint ) {
-        return new DeclarationImpl<T>( type, entryPoint );
+        return new DeclarationImpl<T>( type ).setEntryPoint( entryPoint );
+    }
+
+    public static <T> Declaration<T> declarationOf( Type<T> type, Window window ) {
+        return new DeclarationImpl<T>( type ).setWindow( window );
+    }
+
+    public static <T> Declaration<T> declarationOf( Type<T> type, String entryPoint, Window window ) {
+        return new DeclarationImpl<T>( type ).setEntryPoint( entryPoint ).setWindow( window );
     }
 
     public static <T> Global<T> globalOf( Type<T> type, String pkg ) {
@@ -87,6 +96,14 @@ public class DSL {
 
     public static <T> Type<T> type( Class<T> type ) {
         return new JavaClassType<T>(type);
+    }
+
+    public static Window window( Window.Type type, long value ) {
+        return new WindowImpl(type, value);
+    }
+
+    public static Window window( Window.Type type, long value, TimeUnit timeUnit ) {
+        return new WindowImpl(type, value, timeUnit);
     }
 
     // -- LHS --

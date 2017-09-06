@@ -14,11 +14,25 @@
  * limitations under the License.
  */
 
-package org.drools.model;
+package org.drools.model.functions.temporal;
 
-public interface Declaration<T> extends Variable<T> {
+import java.util.concurrent.TimeUnit;
 
-    String getEntryPoint();
+public final class TimeUtil {
 
-    Window getWindow();
+    private TimeUtil() { }
+
+    public static long unitToLong( long value, TimeUnit unit ) {
+        if (unit == null) {
+            return value;
+        }
+        switch (unit) {
+            case DAYS: value *= 24;
+            case HOURS: value *= 60;
+            case MINUTES: value *= 60;
+            case SECONDS: value *= 1000;
+            case MILLISECONDS: return value;
+        }
+        throw new IllegalArgumentException( "Time Unit " + unit + " is not supported" );
+    }
 }

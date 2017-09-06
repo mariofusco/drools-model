@@ -27,9 +27,6 @@ public class LambdaIntrospector {
 
     public static String getLambdaFingerprint(Object lambda, Variable... vars) {
         StringBuilder sb = new StringBuilder();
-        for ( Variable var : vars ) {
-            sb.append( "Var " ).append( System.identityHashCode( var ) ).append( "\n" );
-        }
         sb.append( LambdaIntrospector.getInstance().introspectLambda( lambda ) );
         return sb.toString();
     }

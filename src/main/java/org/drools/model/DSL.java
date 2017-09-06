@@ -19,11 +19,11 @@ import org.drools.model.functions.temporal.BeforePredicate;
 import org.drools.model.functions.temporal.Interval;
 import org.drools.model.functions.temporal.TemporalPredicate;
 import org.drools.model.impl.DataSourceDefinitionImpl;
+import org.drools.model.impl.DeclarationImpl;
 import org.drools.model.impl.GlobalImpl;
 import org.drools.model.impl.JavaClassType;
 import org.drools.model.impl.RuleBuilder;
 import org.drools.model.impl.SourceImpl;
-import org.drools.model.impl.VariableImpl;
 import org.drools.model.view.AccumulateExprViewItem;
 import org.drools.model.view.CombinedExprViewItem;
 import org.drools.model.view.ExistentialExprViewItem;
@@ -62,11 +62,15 @@ public class DSL {
     // -- Variable --
 
     public static <T> Variable<T> any(Class<T> type) {
-        return variableOf( type( type ) );
+        return declarationOf( type( type ) );
     }
 
-    public static <T> Variable<T> variableOf( Type<T> type ) {
-        return new VariableImpl<T>(type);
+    public static <T> Declaration<T> declarationOf( Type<T> type ) {
+        return new DeclarationImpl<T>( type );
+    }
+
+    public static <T> Declaration<T> declarationOf( Type<T> type, String entryPoint ) {
+        return new DeclarationImpl<T>( type, entryPoint );
     }
 
     public static <T> Global<T> globalOf( Type<T> type, String pkg ) {

@@ -3,7 +3,7 @@ package org.drools.model.impl;
 import org.drools.model.Type;
 import org.drools.model.Variable;
 
-public class VariableImpl<T> implements Variable<T> {
+public abstract class VariableImpl<T> implements Variable<T> {
 
     private static int variableIndex = 0;
 

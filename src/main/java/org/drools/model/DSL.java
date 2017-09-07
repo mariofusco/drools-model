@@ -102,7 +102,15 @@ public class DSL {
         return new WindowImpl(type, value);
     }
 
+    public static <T> Window window( Window.Type type, long value, Class<T> var, Predicate1<T>... predicates ) {
+        return new WindowImpl(type, value);
+    }
+
     public static Window window( Window.Type type, long value, TimeUnit timeUnit ) {
+        return new WindowImpl(type, value, timeUnit);
+    }
+
+    public static <T> Window window( Window.Type type, long value, TimeUnit timeUnit, Class<T> var, Predicate1<T>... predicates ) {
         return new WindowImpl(type, value, timeUnit);
     }
 
@@ -156,6 +164,10 @@ public class DSL {
         return not(new Expr1ViewItemImpl<T>( "true", var, Predicate1.TRUE) );
     }
 
+    public static <T> ExprViewItem<T> not(ViewItem<T> view) {
+        return new ExistentialExprViewItem( Condition.Type.NOT, new Expr1ViewItemImpl<T>( "true", view.getFirstVariable(), Predicate1.TRUE ) );
+    }
+
     public static <T> ExprViewItem<T> not(Variable<T> var, Predicate1<T> predicate) {
         return not(new Expr1ViewItemImpl<T>( var, predicate) );
     }
@@ -170,6 +182,10 @@ public class DSL {
 
     public static <T> ExprViewItem<T> exists(Variable<T> var) {
         return exists(new Expr1ViewItemImpl<T>( "true", var, Predicate1.TRUE) );
+    }
+
+    public static <T> ExprViewItem<T> exists(ViewItem<T> view) {
+        return new ExistentialExprViewItem( Condition.Type.EXISTS, new Expr1ViewItemImpl<T>( "true", view.getFirstVariable(), Predicate1.TRUE ) );
     }
 
     public static <T> ExprViewItem<T> exists(Variable<T> var, Predicate1<T> predicate) {

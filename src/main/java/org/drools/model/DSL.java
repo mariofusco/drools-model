@@ -34,6 +34,7 @@ import org.drools.model.view.Expr2ViewItem;
 import org.drools.model.view.Expr2ViewItemImpl;
 import org.drools.model.view.ExprViewItem;
 import org.drools.model.view.InputViewItem;
+import org.drools.model.view.InputViewItemImpl;
 import org.drools.model.view.OOPathBuilder;
 import org.drools.model.view.OOPathBuilder.OOPathChunkBuilder;
 import org.drools.model.view.SetViewItem;
@@ -124,16 +125,16 @@ public class DSL {
         return viewItems2Patterns( viewItemBuilders );
     }
 
-    public static <T> ViewItem<T> input(Variable<T> var) {
-        return new InputViewItem<T>(var, DataSourceDefinitionImpl.DEFAULT);
+    public static <T> InputViewItem<T> input( Variable<T> var ) {
+        return new InputViewItemImpl<T>( var, DataSourceDefinitionImpl.DEFAULT);
     }
 
-    public static <T> ViewItem<T> input(Variable<T> var, String dataSourceName) {
-        return new InputViewItem<T>(var, new DataSourceDefinitionImpl(dataSourceName, false));
+    public static <T> InputViewItem<T> input(Variable<T> var, String dataSourceName) {
+        return new InputViewItemImpl<T>( var, new DataSourceDefinitionImpl( dataSourceName, false));
     }
 
     public static <T> ViewItem<T> subscribe(Variable<T> var, String dataSourceName) {
-        return new InputViewItem<T>(var, new DataSourceDefinitionImpl(dataSourceName, true));
+        return new InputViewItemImpl<T>( var, new DataSourceDefinitionImpl( dataSourceName, true));
     }
 
     public static <T> Expr1ViewItem<T> expr( Variable<T> var, Predicate1<T> predicate ) {
@@ -164,8 +165,8 @@ public class DSL {
         return not(new Expr1ViewItemImpl<T>( "true", var, Predicate1.TRUE) );
     }
 
-    public static <T> ExprViewItem<T> not(ViewItem<T> view) {
-        return new ExistentialExprViewItem( Condition.Type.NOT, new Expr1ViewItemImpl<T>( "true", view.getFirstVariable(), Predicate1.TRUE ) );
+    public static <T> ExprViewItem<T> not(InputViewItem<T> view) {
+        return not( view.getFirstVariable() );
     }
 
     public static <T> ExprViewItem<T> not(Variable<T> var, Predicate1<T> predicate) {
@@ -184,8 +185,8 @@ public class DSL {
         return exists(new Expr1ViewItemImpl<T>( "true", var, Predicate1.TRUE) );
     }
 
-    public static <T> ExprViewItem<T> exists(ViewItem<T> view) {
-        return new ExistentialExprViewItem( Condition.Type.EXISTS, new Expr1ViewItemImpl<T>( "true", view.getFirstVariable(), Predicate1.TRUE ) );
+    public static <T> ExprViewItem<T> exists(InputViewItem<T> view) {
+        return exists( view.getFirstVariable() );
     }
 
     public static <T> ExprViewItem<T> exists(Variable<T> var, Predicate1<T> predicate) {

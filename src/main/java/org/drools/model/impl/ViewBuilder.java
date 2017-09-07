@@ -32,7 +32,7 @@ import org.drools.model.view.ExistentialExprViewItem;
 import org.drools.model.view.Expr1ViewItemImpl;
 import org.drools.model.view.Expr2ViewItemImpl;
 import org.drools.model.view.ExprViewItem;
-import org.drools.model.view.InputViewItem;
+import org.drools.model.view.InputViewItemImpl;
 import org.drools.model.view.OOPathViewItem;
 import org.drools.model.view.OOPathViewItem.OOPathChunk;
 import org.drools.model.view.SetViewItem;
@@ -56,7 +56,7 @@ public class ViewBuilder {
         return viewItems2Condition( viewItems, new HashMap<>(), new HashSet<>(), Type.AND, true );
     }
 
-    public static CompositePatterns viewItems2Condition(List<ViewItem> viewItems, Map<Variable<?>, InputViewItem<?>> inputs,
+    public static CompositePatterns viewItems2Condition(List<ViewItem> viewItems, Map<Variable<?>, InputViewItemImpl<?>> inputs,
                                                 Set<Variable<?>> usedVars, Condition.Type type, boolean topLevel) {
         List<Condition> conditions = new ArrayList<>();
         Map<Variable<?>, Condition> conditionMap = new HashMap<>();
@@ -68,8 +68,8 @@ public class ViewBuilder {
             }
 
             Variable<?> patterVariable = viewItem.getFirstVariable();
-            if ( viewItem instanceof InputViewItem ) {
-                inputs.put( patterVariable, (InputViewItem) viewItem );
+            if ( viewItem instanceof InputViewItemImpl ) {
+                inputs.put( patterVariable, (InputViewItemImpl) viewItem );
                 continue;
             }
 
@@ -106,7 +106,7 @@ public class ViewBuilder {
             if (viewItem instanceof ExprViewItem ) {
                 for (Variable var : viewItem.getVariables()) {
                     if (var.isFact()) {
-                        inputs.putIfAbsent( var, (InputViewItem) input( var ) );
+                        inputs.putIfAbsent( var, (InputViewItemImpl) input( var ) );
                     }
                 }
             }
@@ -122,7 +122,7 @@ public class ViewBuilder {
         if ( type == Type.AND ) {
             if ( topLevel && inputs.size() > usedVars.size() ) {
                 inputs.keySet().removeAll( usedVars );
-                for ( Map.Entry<Variable<?>, InputViewItem<?>> entry : inputs.entrySet() ) {
+                for ( Map.Entry<Variable<?>, InputViewItemImpl<?>> entry : inputs.entrySet() ) {
                     conditions.add( 0, new PatternImpl( entry.getKey(), Constraint.EMPTY, entry.getValue().getDataSourceDefinition() ) );
                     usedVars.add( entry.getKey() );
                 }
@@ -131,12 +131,12 @@ public class ViewBuilder {
         return condition;
     }
 
-    private static DataSourceDefinition getDataSourceDefinition( Map<Variable<?>, InputViewItem<?>> inputs, Variable var ) {
-        InputViewItem input = inputs.get(var);
+    private static DataSourceDefinition getDataSourceDefinition( Map<Variable<?>, InputViewItemImpl<?>> inputs, Variable var ) {
+        InputViewItemImpl input = inputs.get( var );
         return input != null ? input.getDataSourceDefinition() : DataSourceDefinitionImpl.DEFAULT;
     }
 
-    private static Condition viewItem2Condition( ViewItem viewItem, Condition condition, Set<Variable<?>> usedVars, Map<Variable<?>, InputViewItem<?>> inputs ) {
+    private static Condition viewItem2Condition( ViewItem viewItem, Condition condition, Set<Variable<?>> usedVars, Map<Variable<?>, InputViewItemImpl<?>> inputs ) {
         if ( viewItem instanceof Expr1ViewItemImpl ) {
             Expr1ViewItemImpl expr = (Expr1ViewItemImpl)viewItem;
             ( (PatternImpl) condition ).addConstraint( new SingleConstraint1( expr ) );

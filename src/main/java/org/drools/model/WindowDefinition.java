@@ -16,6 +16,11 @@
 
 package org.drools.model;
 
-public interface Window extends WindowDefinition {
+public interface WindowDefinition {
 
+    enum Type { LENGTH, TIME }
+
+    Type getType();
+
+    long getValue();
 }

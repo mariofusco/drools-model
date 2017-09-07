@@ -3,15 +3,15 @@ package org.drools.model.impl;
 import org.drools.model.Type;
 import org.drools.model.Variable;
 
-public abstract class VariableImpl<T> implements Variable<T> {
+import static org.drools.model.impl.NamesGenerator.generateName;
 
-    private static int variableIndex = 0;
+public abstract class VariableImpl<T> implements Variable<T> {
 
     private final Type<T> type;
     private final String name;
 
     public VariableImpl(Type<T> type) {
-        this(type, generateName());
+        this(type, generateName("var"));
     }
 
     public VariableImpl(Type<T> type, String name) {
@@ -34,7 +34,4 @@ public abstract class VariableImpl<T> implements Variable<T> {
         return "Variable " + name + " of type " + type;
     }
 
-    private static String generateName() {
-        return "$" + variableIndex++ + "$";
-    }
 }

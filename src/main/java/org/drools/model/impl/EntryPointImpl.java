@@ -14,8 +14,20 @@
  * limitations under the License.
  */
 
-package org.drools.model;
+package org.drools.model.impl;
 
-public interface Window extends WindowDefinition {
+import org.drools.model.EntryPoint;
 
+public class EntryPointImpl implements EntryPoint {
+
+    private final String name;
+
+    public EntryPointImpl( String name ) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
 }

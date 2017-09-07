@@ -18,15 +18,31 @@ package org.drools.model.impl;
 
 import java.util.concurrent.TimeUnit;
 
-import org.drools.model.Window;
+import org.drools.model.WindowDefinition;
 
-public class WindowImpl extends AbstractWindow implements Window {
+import static org.drools.model.functions.temporal.TimeUtil.unitToLong;
 
-    public WindowImpl( Type type, long value ) {
-        super(type, value);
+public abstract class AbstractWindow implements WindowDefinition {
+
+    private final Type type;
+    private final long value;
+
+    public AbstractWindow( Type type, long value ) {
+        this(type, value, null);
     }
 
-    public WindowImpl( Type type, long value, TimeUnit timeUnit ) {
-        super(type, value, timeUnit);
+    public AbstractWindow( Type type, long value, TimeUnit timeUnit ) {
+        this.type = type;
+        this.value = unitToLong( value, timeUnit );
+    }
+
+    @Override
+    public long getValue() {
+        return value;
+    }
+
+    @Override
+    public Type getType() {
+        return type;
     }
 }

@@ -16,6 +16,7 @@
 
 package org.drools.model;
 
-public interface Window extends WindowDefinition {
+public interface EntryPoint extends DeclarationSource {
 
+    String getName();
 }

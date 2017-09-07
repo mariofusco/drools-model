@@ -16,6 +16,13 @@
 
 package org.drools.model;
 
-public interface Window extends WindowDefinition {
+import org.drools.model.functions.Predicate1;
 
+public interface WindowReference<T> extends WindowDefinition, DeclarationSource {
+
+    Class<T> getPatternType();
+
+    Predicate1<T>[] getPredicates();
+
+    String getName();
 }

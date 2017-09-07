@@ -17,11 +17,12 @@
 package org.drools.model.impl;
 
 import org.drools.model.Declaration;
+import org.drools.model.DeclarationSource;
 import org.drools.model.Type;
 import org.drools.model.Window;
 
 public class DeclarationImpl<T> extends VariableImpl<T> implements Declaration<T> {
-    private String entryPoint;
+    private DeclarationSource source;
     private Window window;
 
     public DeclarationImpl(Type<T> type) {
@@ -33,12 +34,12 @@ public class DeclarationImpl<T> extends VariableImpl<T> implements Declaration<T
     }
 
     @Override
-    public String getEntryPoint() {
-        return entryPoint;
+    public DeclarationSource getSource() {
+        return source;
     }
 
-    public DeclarationImpl<T> setEntryPoint( String entryPoint ) {
-        this.entryPoint = entryPoint;
+    public DeclarationImpl<T> setSource( DeclarationSource source ) {
+        this.source = source;
         return this;
     }
 

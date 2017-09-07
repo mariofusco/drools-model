@@ -14,8 +14,21 @@
  * limitations under the License.
  */
 
-package org.drools.model;
+package org.drools.model.impl;
 
-public interface Window extends WindowDefinition {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
+public class NamesGenerator {
+
+    private static int index = 0;
+
+    private static Map<String, AtomicInteger> indexes = new HashMap<>();
+
+    private NamesGenerator() { }
+
+    public static String generateName(String topic) {
+        return "$" + topic + "$" + indexes.computeIfAbsent( topic, t -> new AtomicInteger() ).incrementAndGet() + "$";
+    }
 }

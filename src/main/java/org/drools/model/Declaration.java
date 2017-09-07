@@ -18,7 +18,7 @@ package org.drools.model;
 
 public interface Declaration<T> extends Variable<T> {
 
-    String getEntryPoint();
+    DeclarationSource getSource();
 
     Window getWindow();
 }

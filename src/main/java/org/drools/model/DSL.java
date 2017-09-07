@@ -20,11 +20,13 @@ import org.drools.model.functions.temporal.Interval;
 import org.drools.model.functions.temporal.TemporalPredicate;
 import org.drools.model.impl.DataSourceDefinitionImpl;
 import org.drools.model.impl.DeclarationImpl;
+import org.drools.model.impl.EntryPointImpl;
 import org.drools.model.impl.GlobalImpl;
 import org.drools.model.impl.JavaClassType;
 import org.drools.model.impl.RuleBuilder;
 import org.drools.model.impl.SourceImpl;
 import org.drools.model.impl.WindowImpl;
+import org.drools.model.impl.WindowReferenceImpl;
 import org.drools.model.view.AccumulateExprViewItem;
 import org.drools.model.view.CombinedExprViewItem;
 import org.drools.model.view.ExistentialExprViewItem;
@@ -71,16 +73,16 @@ public class DSL {
         return new DeclarationImpl<T>( type );
     }
 
-    public static <T> Declaration<T> declarationOf( Type<T> type, String entryPoint ) {
-        return new DeclarationImpl<T>( type ).setEntryPoint( entryPoint );
+    public static <T> Declaration<T> declarationOf( Type<T> type, DeclarationSource source ) {
+        return new DeclarationImpl<T>( type ).setSource( source );
     }
 
     public static <T> Declaration<T> declarationOf( Type<T> type, Window window ) {
         return new DeclarationImpl<T>( type ).setWindow( window );
     }
 
-    public static <T> Declaration<T> declarationOf( Type<T> type, String entryPoint, Window window ) {
-        return new DeclarationImpl<T>( type ).setEntryPoint( entryPoint ).setWindow( window );
+    public static <T> Declaration<T> declarationOf( Type<T> type, DeclarationSource source, Window window ) {
+        return new DeclarationImpl<T>( type ).setSource( source ).setWindow( window );
     }
 
     public static <T> Global<T> globalOf( Type<T> type, String pkg ) {
@@ -99,11 +101,11 @@ public class DSL {
         return new JavaClassType<T>(type);
     }
 
-    public static Window window( Window.Type type, long value ) {
-        return new WindowImpl(type, value);
+    public static EntryPoint entryPoint( String name ) {
+        return new EntryPointImpl( name );
     }
 
-    public static <T> Window window( Window.Type type, long value, Class<T> var, Predicate1<T>... predicates ) {
+    public static Window window( Window.Type type, long value ) {
         return new WindowImpl(type, value);
     }
 
@@ -111,8 +113,12 @@ public class DSL {
         return new WindowImpl(type, value, timeUnit);
     }
 
-    public static <T> Window window( Window.Type type, long value, TimeUnit timeUnit, Class<T> var, Predicate1<T>... predicates ) {
-        return new WindowImpl(type, value, timeUnit);
+    public static <T> WindowReference<T> window( Window.Type type, long value, Class<T> patternType, Predicate1<T>... predicates ) {
+        return new WindowReferenceImpl( type, value, patternType, predicates );
+    }
+
+    public static <T> WindowReference<T> window( Window.Type type, long value, TimeUnit timeUnit, Class<T> patternType, Predicate1<T>... predicates ) {
+        return new WindowReferenceImpl( type, value, timeUnit, patternType, predicates );
     }
 
     // -- LHS --

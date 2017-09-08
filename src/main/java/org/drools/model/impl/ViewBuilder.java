@@ -139,7 +139,9 @@ public class ViewBuilder {
     private static Condition viewItem2Condition( ViewItem viewItem, Condition condition, Set<Variable<?>> usedVars, Map<Variable<?>, InputViewItemImpl<?>> inputs ) {
         if ( viewItem instanceof Expr1ViewItemImpl ) {
             Expr1ViewItemImpl expr = (Expr1ViewItemImpl)viewItem;
-            ( (PatternImpl) condition ).addConstraint( new SingleConstraint1( expr ) );
+            if (expr.getPredicate() != null) {
+                ( (PatternImpl) condition ).addConstraint( new SingleConstraint1( expr ) );
+            }
             return condition;
         }
 

@@ -168,7 +168,7 @@ public class DSL {
     }
 
     public static <T> ExprViewItem<T> not(Variable<T> var) {
-        return not(new Expr1ViewItemImpl<T>( "true", var, Predicate1.TRUE) );
+        return not( new Expr1ViewItemImpl<T>( "true", var, null ) );
     }
 
     public static <T> ExprViewItem<T> not(InputViewItem<T> view) {
@@ -188,7 +188,7 @@ public class DSL {
     }
 
     public static <T> ExprViewItem<T> exists(Variable<T> var) {
-        return exists(new Expr1ViewItemImpl<T>( "true", var, Predicate1.TRUE) );
+        return exists(new Expr1ViewItemImpl<T>( "true", var, null ) );
     }
 
     public static <T> ExprViewItem<T> exists(InputViewItem<T> view) {

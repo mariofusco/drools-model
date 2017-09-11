@@ -16,13 +16,12 @@
 
 package org.drools.model;
 
-import java.util.List;
+public interface Query {
 
-public interface Model {
+    String getPackage();
+    String getName();
 
-    List<Global> getGlobals();
+    View getView();
 
-    List<Rule> getRules();
-
-    List<Query> getQueries();
+    Variable<?>[] getArguments();
 }

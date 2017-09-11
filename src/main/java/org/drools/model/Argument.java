@@ -16,13 +16,8 @@
 
 package org.drools.model;
 
-import java.util.List;
+public interface Argument<T> {
 
-public interface Model {
+    Type<T> getType();
 
-    List<Global> getGlobals();
-
-    List<Rule> getRules();
-
-    List<Query> getQueries();
 }

@@ -19,12 +19,14 @@ package org.drools.model.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.drools.model.Model;
-import org.drools.model.Rule;
 import org.drools.model.Global;
+import org.drools.model.Model;
+import org.drools.model.Query;
+import org.drools.model.Rule;
 
 public class ModelImpl implements Model {
     private List<Rule> rules = new ArrayList<>();
+    private List<Query> queries = new ArrayList<>();
     private List<Global> globals = new ArrayList<>();
 
     @Override
@@ -37,6 +39,11 @@ public class ModelImpl implements Model {
         return globals;
     }
 
+    @Override
+    public List<Query> getQueries() {
+        return queries;
+    }
+
     public ModelImpl withRules( List<Rule> rules ) {
         this.rules = rules;
         return this;
@@ -44,6 +51,16 @@ public class ModelImpl implements Model {
 
     public ModelImpl addRule( Rule rule ) {
         this.rules.add(rule);
+        return this;
+    }
+
+    public ModelImpl addQuery( Query query ) {
+        this.queries.add(query);
+        return this;
+    }
+
+    public ModelImpl withQueries( List<Query> queries ) {
+        this.queries = queries;
         return this;
     }
 

@@ -23,8 +23,10 @@ import org.drools.model.impl.DeclarationImpl;
 import org.drools.model.impl.EntryPointImpl;
 import org.drools.model.impl.GlobalImpl;
 import org.drools.model.impl.JavaClassType;
+import org.drools.model.impl.QueryBuider;
 import org.drools.model.impl.RuleBuilder;
 import org.drools.model.impl.SourceImpl;
+import org.drools.model.impl.ValueImpl;
 import org.drools.model.impl.WindowImpl;
 import org.drools.model.impl.WindowReferenceImpl;
 import org.drools.model.view.AccumulateExprViewItem;
@@ -73,16 +75,32 @@ public class DSL {
         return new DeclarationImpl<T>( type );
     }
 
+    public static <T> Declaration<T> declarationOf( Type<T> type, String name ) {
+        return new DeclarationImpl<T>( type, name );
+    }
+
     public static <T> Declaration<T> declarationOf( Type<T> type, DeclarationSource source ) {
         return new DeclarationImpl<T>( type ).setSource( source );
+    }
+
+    public static <T> Declaration<T> declarationOf( Type<T> type, String name, DeclarationSource source ) {
+        return new DeclarationImpl<T>( type, name ).setSource( source );
     }
 
     public static <T> Declaration<T> declarationOf( Type<T> type, Window window ) {
         return new DeclarationImpl<T>( type ).setWindow( window );
     }
 
+    public static <T> Declaration<T> declarationOf( Type<T> type, String name, Window window ) {
+        return new DeclarationImpl<T>( type, name ).setWindow( window );
+    }
+
     public static <T> Declaration<T> declarationOf( Type<T> type, DeclarationSource source, Window window ) {
         return new DeclarationImpl<T>( type ).setSource( source ).setWindow( window );
+    }
+
+    public static <T> Declaration<T> declarationOf( Type<T> type, String name, DeclarationSource source, Window window ) {
+        return new DeclarationImpl<T>( type, name ).setSource( source ).setWindow( window );
     }
 
     public static <T> Global<T> globalOf( Type<T> type, String pkg ) {
@@ -316,11 +334,35 @@ public class DSL {
         return new ConsequenceBuilder._3(decl1, decl2, decl3);
     }
 
+    // -- rule --
+
     public static RuleBuilder rule(String name) {
         return new RuleBuilder(name);
     }
 
     public static RuleBuilder rule(String pkg, String name) {
         return new RuleBuilder(pkg, name);
+    }
+
+    // -- query --
+
+    public static <A> QueryBuider._1<A> query( String name, Variable<A> var1 ) {
+        return new QueryBuider._1<A>( name, var1 );
+    }
+
+    public static <A> QueryBuider._1<A> query( String pkg, String name, Variable<A> var1 ) {
+        return new QueryBuider._1<A>( pkg, name, var1 );
+    }
+
+    public static <A, B> QueryBuider._2<A, B> query( String name, Variable<A> var1, Variable<B> var2 ) {
+        return new QueryBuider._2<A, B>( name, var1, var2 );
+    }
+
+    public static <A, B> QueryBuider._2<A, B> query( String pkg, String name, Variable<A> var1, Variable<B> var2 ) {
+        return new QueryBuider._2<A, B>( pkg, name, var1, var2 );
+    }
+
+    public static <T> Value<T> valueOf(T value) {
+        return new ValueImpl<>( value );
     }
 }

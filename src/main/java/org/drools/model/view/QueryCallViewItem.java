@@ -14,15 +14,7 @@
  * limitations under the License.
  */
 
-package org.drools.model;
+package org.drools.model.view;
 
-import java.util.List;
-
-public interface Model {
-
-    List<Global> getGlobals();
-
-    List<Rule> getRules();
-
-    List<Query> getQueries();
+public interface QueryCallViewItem<T> extends ViewItem<T> {
 }

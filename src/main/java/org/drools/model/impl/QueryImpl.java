@@ -14,15 +14,35 @@
  * limitations under the License.
  */
 
-package org.drools.model;
+package org.drools.model.impl;
 
-import java.util.List;
+import org.drools.model.Query;
+import org.drools.model.View;
 
-public interface Model {
+public abstract class QueryImpl implements Query {
 
-    List<Global> getGlobals();
+    private final String pkg;
+    private final String name;
+    private final View view;
 
-    List<Rule> getRules();
+    public QueryImpl( String pkg, String name, View view ) {
+        this.pkg = pkg;
+        this.name = name;
+        this.view = view;
+    }
 
-    List<Query> getQueries();
+    @Override
+    public View getView() {
+        return view;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getPackage() {
+        return pkg;
+    }
 }

@@ -14,15 +14,30 @@
  * limitations under the License.
  */
 
-package org.drools.model;
+package org.drools.model.impl;
 
-import java.util.List;
+import org.drools.model.Type;
+import org.drools.model.Value;
 
-public interface Model {
+import static org.drools.model.DSL.type;
 
-    List<Global> getGlobals();
+public class ValueImpl<T> implements Value<T> {
 
-    List<Rule> getRules();
+    private final T value;
+    private final Type<T> type;
 
-    List<Query> getQueries();
+    public ValueImpl( T value ) {
+        this.value = value;
+        this.type = type( (Class<T>) value.getClass()) ;
+    }
+
+    @Override
+    public T getValue() {
+        return value;
+    }
+
+    @Override
+    public Type<T> getType() {
+        return type;
+    }
 }

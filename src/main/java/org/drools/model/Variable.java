@@ -1,8 +1,6 @@
 package org.drools.model;
 
-public interface Variable<T> {
-
-    Type<T> getType();
+public interface Variable<T> extends Argument<T> {
 
     String getName();
 

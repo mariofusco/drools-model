@@ -16,13 +16,8 @@
 
 package org.drools.model;
 
-import java.util.List;
+import org.drools.model.view.QueryCallViewItem;
 
-public interface Model {
-
-    List<Global> getGlobals();
-
-    List<Rule> getRules();
-
-    List<Query> getQueries();
+public interface Query1<A> extends Query {
+    QueryCallViewItem call(Argument<A> aVar);
 }

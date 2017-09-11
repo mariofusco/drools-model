@@ -11,6 +11,8 @@ public abstract class AbstractExprViewItem<T> implements ExprViewItem<T>  {
 
     private String[] reactiveProps;
 
+    private boolean queryExpression;
+
     public AbstractExprViewItem(Variable<T> var) {
         this(randomUUID().toString(), var);
     }
@@ -37,5 +39,13 @@ public abstract class AbstractExprViewItem<T> implements ExprViewItem<T>  {
 
     public String[] getReactiveProps() {
         return reactiveProps;
+    }
+
+    public boolean isQueryExpression() {
+        return queryExpression;
+    }
+
+    public void setQueryExpression( boolean queryExpression ) {
+        this.queryExpression = queryExpression;
     }
 }

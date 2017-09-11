@@ -14,6 +14,8 @@ import static org.drools.model.impl.ViewBuilder.viewItems2Patterns;
 
 public class RuleBuilder {
 
+    public static final String DEFAULT_PACKAGE = "defaultpkg";
+
     private final String pkg;
     private final String name;
 
@@ -22,7 +24,7 @@ public class RuleBuilder {
     private final Map<Rule.Attribute, Object> attributes = new HashMap<Rule.Attribute, Object>();
 
     public RuleBuilder(String name) {
-        this("defaultpkg", name);
+        this(DEFAULT_PACKAGE, name);
     }
 
     public RuleBuilder(String pkg, String name) {

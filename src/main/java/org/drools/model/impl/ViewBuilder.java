@@ -26,6 +26,7 @@ import org.drools.model.patterns.InvokerMultiValuePatternImpl;
 import org.drools.model.patterns.InvokerSingleValuePatternImpl;
 import org.drools.model.patterns.OOPathImpl;
 import org.drools.model.patterns.PatternImpl;
+import org.drools.model.view.AbstractExprViewItem;
 import org.drools.model.view.AccumulateExprViewItem;
 import org.drools.model.view.CombinedExprViewItem;
 import org.drools.model.view.ExistentialExprViewItem;
@@ -57,7 +58,7 @@ public class ViewBuilder {
     }
 
     public static CompositePatterns viewItems2Condition(List<ViewItem> viewItems, Map<Variable<?>, InputViewItemImpl<?>> inputs,
-                                                Set<Variable<?>> usedVars, Condition.Type type, boolean topLevel) {
+                                                        Set<Variable<?>> usedVars, Condition.Type type, boolean topLevel) {
         List<Condition> conditions = new ArrayList<>();
         Map<Variable<?>, Condition> conditionMap = new HashMap<>();
         for (ViewItem viewItem : viewItems) {
@@ -103,7 +104,7 @@ public class ViewBuilder {
                 conditions.add( condition );
             }
 
-            if (viewItem instanceof ExprViewItem ) {
+            if ( viewItem instanceof AbstractExprViewItem && !( (AbstractExprViewItem) viewItem ).isQueryExpression() ) {
                 for (Variable var : viewItem.getVariables()) {
                     if (var.isFact()) {
                         inputs.putIfAbsent( var, (InputViewItemImpl) input( var ) );

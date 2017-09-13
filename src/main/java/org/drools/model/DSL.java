@@ -1,5 +1,6 @@
 package org.drools.model;
 
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 import org.drools.model.consequences.ConsequenceBuilder;
@@ -14,6 +15,9 @@ import org.drools.model.functions.Function1;
 import org.drools.model.functions.Function2;
 import org.drools.model.functions.Predicate1;
 import org.drools.model.functions.Predicate2;
+import org.drools.model.functions.accumulate.Average;
+import org.drools.model.functions.accumulate.Reduce;
+import org.drools.model.functions.accumulate.Sum;
 import org.drools.model.functions.temporal.AfterPredicate;
 import org.drools.model.functions.temporal.BeforePredicate;
 import org.drools.model.functions.temporal.Interval;
@@ -310,6 +314,20 @@ public class DSL {
 
     public static TemporalPredicate before( long lowerBound, TimeUnit lowerUnit, long upperBound, TimeUnit upperUnit ) {
         return new BeforePredicate( new Interval( lowerBound, lowerUnit, upperBound, upperUnit ) );
+    }
+
+    // -- Accumulate Functions --
+
+    public static <T, N extends Number> Sum<T, N> sum(Function1<T, N> mapper) {
+        return new Sum(mapper);
+    }
+
+    public static <T> Average<T> avg(Function1<T, ? extends Number> mapper) {
+        return new Average<T>(mapper);
+    }
+
+    public static <T, R extends Serializable> Reduce<T, R> reduce(R zero, Function2<R, T, R> reducingFunction) {
+        return new Reduce(zero, reducingFunction);
     }
 
     // -- RHS --

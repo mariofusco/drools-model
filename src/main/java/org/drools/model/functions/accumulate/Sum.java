@@ -8,7 +8,7 @@ public class Sum<T, N extends Number> extends AbstractAccumulateFunction<T, Sum.
 
     private final Function1<T, N> mapper;
 
-    private Sum(Function1<T, N> mapper) {
+    public Sum(Function1<T, N> mapper) {
         this.mapper = mapper;
     }
 
@@ -30,10 +30,6 @@ public class Sum<T, N extends Number> extends AbstractAccumulateFunction<T, Sum.
     @Override
     public N result(Context<N> acc) {
         return acc.result();
-    }
-
-    public static <T, N extends Number> Sum<T, N> sum(Function1<T, N> mapper) {
-        return new Sum<T, N>(mapper);
     }
 
     public static class Context<N extends Number> implements Serializable {

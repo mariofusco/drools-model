@@ -14,30 +14,34 @@
  * limitations under the License.
  */
 
-package org.drools.model.impl;
+package org.drools.model.view;
 
 import org.drools.model.Argument;
-import org.drools.model.Query1;
+import org.drools.model.Query;
 import org.drools.model.Variable;
-import org.drools.model.View;
-import org.drools.model.view.QueryCallViewItem;
-import org.drools.model.view.QueryCallViewItemImpl;
 
-public class Query1Impl<A> extends QueryImpl implements Query1<A> {
-    private final Variable<A> var1;
+public class QueryCallViewItemImpl implements QueryCallViewItem {
 
-    public Query1Impl( String pkg, String name, View view, Variable<A> var1 ) {
-        super( pkg, name, view );
-        this.var1 = var1;
+    private final Query query;
+    private final Argument<?>[] arguments;
+
+    public QueryCallViewItemImpl( Query query, Argument<?>... arguments ) {
+        this.query = query;
+        this.arguments = arguments;
     }
 
     @Override
-    public QueryCallViewItem call( Argument<A> aVar ) {
-        return new QueryCallViewItemImpl( this, aVar );
+    public Query getQuery() {
+        return query;
     }
 
     @Override
-    public Variable<?>[] getArguments() {
-        return new Variable<?>[] { var1 };
+    public Argument<?>[] getArguments() {
+        return arguments;
+    }
+
+    @Override
+    public Variable<?>[] getVariables() {
+        throw new UnsupportedOperationException();
     }
 }

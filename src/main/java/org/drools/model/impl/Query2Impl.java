@@ -21,6 +21,7 @@ import org.drools.model.Query2;
 import org.drools.model.Variable;
 import org.drools.model.View;
 import org.drools.model.view.QueryCallViewItem;
+import org.drools.model.view.QueryCallViewItemImpl;
 
 public class Query2Impl<A, B> extends QueryImpl implements Query2<A, B> {
     private final Variable<A> var1;
@@ -34,8 +35,7 @@ public class Query2Impl<A, B> extends QueryImpl implements Query2<A, B> {
 
     @Override
     public QueryCallViewItem call( Argument<A> aVar, Argument<B> bVar ) {
-        throw new UnsupportedOperationException( "org.drools.model.impl.Query2Impl.call -> TODO" );
-
+        return new QueryCallViewItemImpl( this, aVar, bVar );
     }
 
     @Override

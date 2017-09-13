@@ -16,5 +16,12 @@
 
 package org.drools.model.view;
 
-public interface QueryCallViewItem<T> extends ViewItem<T> {
+import org.drools.model.Argument;
+import org.drools.model.Query;
+
+public interface QueryCallViewItem extends ViewItem {
+
+    Query getQuery();
+
+    Argument<?>[] getArguments();
 }

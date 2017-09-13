@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.drools.model.AccumulateFunction;
+import org.drools.model.Argument;
 import org.drools.model.Condition;
 import org.drools.model.Condition.Type;
 import org.drools.model.Constraint;
@@ -26,6 +27,7 @@ import org.drools.model.patterns.InvokerMultiValuePatternImpl;
 import org.drools.model.patterns.InvokerSingleValuePatternImpl;
 import org.drools.model.patterns.OOPathImpl;
 import org.drools.model.patterns.PatternImpl;
+import org.drools.model.patterns.QueryCallPattern;
 import org.drools.model.view.AbstractExprViewItem;
 import org.drools.model.view.AccumulateExprViewItem;
 import org.drools.model.view.CombinedExprViewItem;
@@ -36,6 +38,7 @@ import org.drools.model.view.ExprViewItem;
 import org.drools.model.view.InputViewItemImpl;
 import org.drools.model.view.OOPathViewItem;
 import org.drools.model.view.OOPathViewItem.OOPathChunk;
+import org.drools.model.view.QueryCallViewItem;
 import org.drools.model.view.SetViewItem;
 import org.drools.model.view.TemporalExprViewItem;
 import org.drools.model.view.ViewItem;
@@ -65,6 +68,17 @@ public class ViewBuilder {
             if ( viewItem instanceof CombinedExprViewItem ) {
                 CombinedExprViewItem combined = (CombinedExprViewItem) viewItem;
                 conditions.add( viewItems2Condition( Arrays.asList( combined.getExpressions() ), inputs, usedVars, combined.getType(), false ) );
+                continue;
+            }
+
+            if ( viewItem instanceof QueryCallViewItem ) {
+                QueryCallViewItem query = ( (QueryCallViewItem) viewItem );
+                for ( Argument arg : query.getArguments()) {
+                    if (arg instanceof Variable) {
+                        usedVars.add( ( (Variable) arg ));
+                    }
+                }
+                conditions.add( new QueryCallPattern( query ) );
                 continue;
             }
 

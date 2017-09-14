@@ -9,7 +9,7 @@ public class Reduce<T, R extends Serializable> extends AbstractAccumulateFunctio
     private final R zero;
     private final Function2<R, T, R> reducingFunction;
 
-    private Reduce(R zero, Function2<R, T, R> reducingFunction) {
+    public Reduce(R zero, Function2<R, T, R> reducingFunction) {
         this.zero = zero;
         this.reducingFunction = reducingFunction;
     }
@@ -32,10 +32,6 @@ public class Reduce<T, R extends Serializable> extends AbstractAccumulateFunctio
     @Override
     public R result(Context<R> acc) {
         return acc.value;
-    }
-
-    public static <T, R extends Serializable> Reduce<T, R> reduce(R zero, Function2<R, T, R> reducingFunction) {
-        return new Reduce(zero, reducingFunction);
     }
 
     public static class Context<A extends Serializable> implements Serializable {

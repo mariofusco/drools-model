@@ -8,7 +8,7 @@ public class Average<T> extends AbstractAccumulateFunction<T, Average.Context, D
 
     private final Function1<T, ? extends Number> mapper;
 
-    private Average(Function1<T, ? extends Number> mapper) {
+    public Average(Function1<T, ? extends Number> mapper) {
         this.mapper = mapper;
     }
 
@@ -30,10 +30,6 @@ public class Average<T> extends AbstractAccumulateFunction<T, Average.Context, D
     @Override
     public void action(Context acc, T obj) {
         acc.add(mapper.apply(obj));
-    }
-
-    public static <T> Average<T> avg(Function1<T, ? extends Number> mapper) {
-        return new Average<T>(mapper);
     }
 
     public static class Context implements Serializable {
